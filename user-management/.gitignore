@@ -1,0 +1,38 @@
+# Ignore target directory
+/target/
+
+# Ignore .env files (contains sensitive information, like database credentials)
+.env
+
+# Ignore compiled Rust files
+*.rs.bk
+
+# Ignore generated documentation
+/target/doc/
+
+# Ignore Mac OS system files
+.DS_Store
+
+# Ignore IntelliJ IDEA project files
+.idea/
+
+# Ignore Visual Studio Code project files
+.vscode/
+
+# Ignore build artifacts and cache for Diesel
+/target/debug/
+/target/release/
+/target/.rustc_info.json
+/target/.rustc_metadata.json
+
+# Ignore SQLite database file (if used for development)
+*.sqlite
+
+# Ignore PostgreSQL data directory
+/data/
+
+# Ignore environment-specific configuration files
+*.toml.orig
+*.toml.local
+*.toml.dev
+*.toml.prod

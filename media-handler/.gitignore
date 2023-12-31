@@ -1,0 +1,27 @@
+# Ignore Go binary
+*.exe
+*.test
+*.prof
+*.out
+*.app
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Go related files
+/.idea
+/.vscode
+
+# Ignore compiled files
+/bin/
+/pkg/
+
+# Ignore MongoDB data directory
+/data/
+
+# Ignore environment-specific configuration files
+.env
+
+# Ignore logs
+/logs/
+*.log
