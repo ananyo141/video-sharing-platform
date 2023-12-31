@@ -1,0 +1,5 @@
+[global]
+address = "0.0.0.0"
+
+[debug]
+address = "0.0.0.0"
