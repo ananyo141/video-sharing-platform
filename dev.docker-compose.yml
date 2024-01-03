@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  media-handler-dev:
+    volumes:
+      - ./media-handler:/app
+    build:
+      context: ./media-handler
+      dockerfile: dev.dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - media-db
+    networks:
+      - media-handler-network
+      - mongodb-network
+    env_file:
+      - ./media-handler/.env.docker
+
+  user-management-dev:
+    volumes:
+      - ./user-management:/app
+    build:
+      context: ./user-management
+      dockerfile: dev.dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user-db
+    networks:
+      - user-network
+      - postgres-network
+    env_file:
+      - ./user-management/.env.docker
+
+  user-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: devdocker
+      POSTGRES_PASSWORD: dbpassword
+      POSTGRES_DB: user-docker-db
+    ports:
+      - "5432:5432"
+    networks:
+      - user-network
+      - postgres-network
+
+  media-db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - mongodb-network
+
+networks:
+  user-network:
+  postgres-network:
+  media-handler-network:
+  mongodb-network:
