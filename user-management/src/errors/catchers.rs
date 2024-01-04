@@ -1,5 +1,8 @@
 use super::custom_error::CustomError;
 
+use rocket::http::Status;
+use rocket::Request;
+
 #[catch(404)]
 pub fn not_found() -> CustomError {
     CustomError::NotFound
@@ -23,4 +26,26 @@ pub fn bad_request() -> CustomError {
 #[catch(401)]
 pub fn unauthorized() -> CustomError {
     CustomError::Unauthorized
+}
+
+#[catch(422)]
+pub fn unprocessable_entity() -> CustomError {
+    CustomError::UnprocessableEntity
+}
+
+#[catch(default)]
+pub fn default_catcher(status: Status, _: &Request) -> CustomError {
+    CustomError::new(status.code)
+}
+
+pub fn get_catchers() -> Vec<rocket::Catcher> {
+    catchers![
+        not_found,
+        forbidden,
+        unauthorized,
+        bad_request,
+        unprocessable_entity,
+        default_catcher,
+        internal_server_error,
+    ]
 }
