@@ -1,11 +1,13 @@
 # Use the official Rust image as a base image
-FROM rust:1.74-alpine
+FROM rust:1.74-slim-buster
 
 # Set the working directory inside the container
 WORKDIR /app
 
 # Install system dependencies (PostgreSQL client library)
-RUN apk add --no-cache pcc-libs-dev musl-dev
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the Rocket app files into the container at /app
 COPY . .

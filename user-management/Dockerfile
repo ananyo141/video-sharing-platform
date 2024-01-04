@@ -5,7 +5,7 @@ FROM rust:1.74-alpine
 WORKDIR /app
 
 # Install system dependencies (PostgreSQL client library)
-RUN apk add --no-cache pcc-libs-dev musl-dev
+RUN apk add --no-cache pcc-libs-dev musl-dev libpq-dev
 
 # Copy the Rocket app files into the container at /app
 COPY . .
