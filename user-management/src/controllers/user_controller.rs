@@ -1,68 +1,63 @@
-use diesel::RunQueryDsl;
 use rocket::{
     http::Status,
-    serde::json::{Json, Value},
+    serde::json::{json, Json, Value},
 };
 
-use crate::models::user_model::User;
-use crate::utils::res_fmt::ResFmt;
-use crate::Db;
-
-use crate::schema::users;
-
-// #[get("/")]
-// pub async fn get_all_users(connection: Db) -> Result<Json<Value>, Status> {
+use crate::{errors::custom_error::CustomError, models::user_model::User};
+use crate::{models::user_model::NewUser, utils::res_fmt::ResFmt};
+use crate::{models::user_model::UpdateUser, Db};
 
 #[get("/")]
-pub async fn get_all_users(connection: Db) -> Json<Vec<User>> {
-    connection
-        .run(|c| users::table.load(c))
-        .await
-        .map(Json)
-        .expect("Failed to fetch blog posts")
-}
-
-#[get("/<id>")]
-pub fn get_user_by_id(id: i32) -> Result<Json<Value>, Status> {
-    match id {
-        1 => Ok(ResFmt::new(true, format!("User with id: {}", id)).to_json()),
-        _ => Err(Status::NotFound),
+pub async fn get_all_users(connection: Db) -> Result<Json<Value>, CustomError> {
+    match User::find_all(connection).await.map(Json) {
+        Ok(users) => Ok(ResFmt::new(true, "users")
+            .with_data(json!(users.into_inner()))
+            .to_json()),
+        Err(_) => Err(CustomError::NotFound),
     }
 }
 
-// #[post("/", data = "<user>")]
-// pub fn create_user(user: Json<User>) -> Result<Json<Value>, Status> {
-//     Ok(ResFmt::new(true, format!("User with name: {}", user.id)).to_json())
-// }
-
-#[post("/", data = "<user>")]
-pub async fn create_user(connection: Db, user: Json<User>) -> Json<User> {
-    connection
-        .run(move |c| {
-            diesel::insert_into(users::table)
-                .values(&user.into_inner())
-                .get_result(c)
-        })
-        .await
-        .map(Json)
-        .expect("boo")
+#[get("/<id>")]
+pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Status> {
+    match User::find_by_id(connection, id).await.map(Json) {
+        Ok(user) => Ok(ResFmt::new(true, "user")
+            .with_data(json!(user.into_inner()))
+            .to_json()),
+        Err(_) => Err(Status::NotFound),
+    }
 }
 
-#[put("/<id>", data = "<user>")]
-pub fn update_user(id: i32, user: Json<Value>) -> Result<Json<Value>, Status> {
-    match user["name"].as_str() {
-        Some(name) => {
-            Ok(ResFmt::new(true, format!("User with id: {} and name: {}", id, name)).to_json())
-        }
-        None => Err(Status::BadRequest),
+#[post("/", data = "<user>")]
+pub async fn create_user(connection: Db, user: Json<NewUser>) -> Result<Json<Value>, CustomError> {
+    match User::create(connection, user.into_inner()).await {
+        Ok(user) => Ok(ResFmt::new(true, "User created")
+            .with_data(json!(user))
+            .to_json()),
+        Err(_) => Err(CustomError::InternalServerError),
+    }
+}
+
+#[patch("/<id>", data = "<user>")]
+pub async fn update_user(
+    connection: Db,
+    id: i32,
+    user: Json<UpdateUser>,
+) -> Result<Json<Value>, CustomError> {
+    match User::update(connection, id, user.into_inner()).await {
+        Ok(user) => Ok(ResFmt::new(true, "User updated")
+            .with_data(json!(user))
+            .to_json()),
+        Err(_) => Err(CustomError::BadRequest),
     }
 }
 
 #[delete("/<id>")]
-pub fn delete_user(id: i32) -> Result<Json<Value>, Status> {
-    match id {
-        1 => Ok(ResFmt::new(true, format!("User with id: {} deleted", id)).to_json()),
-        _ => Err(Status::NotFound),
+pub async fn delete_user(connection: Db, id: i32) -> Result<Json<Value>, CustomError> {
+    match User::delete(connection, id).await {
+        Ok(user) => Ok(ResFmt::new(true, "User deleted")
+            .with_data(json!(user))
+            .to_json()),
+        Err(_) => Err(CustomError::InternalServerError),
     }
 }
 

@@ -2,15 +2,15 @@ use rocket::serde::json::{json, Json, Value};
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
-pub struct ResFmt {
+pub struct ResFmt<'a> {
     pub success: bool,
-    pub message: String,
+    pub message: &'a str,
     pub data: Value,
     pub page: i64,
 }
 
-impl ResFmt {
-    pub fn new(success: bool, message: String) -> Self {
+impl<'a> ResFmt<'a> {
+    pub fn new(success: bool, message: &'a str) -> Self {
         Self {
             success,
             message,

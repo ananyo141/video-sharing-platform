@@ -6,11 +6,9 @@ use rocket::serde::json::{Json, Value};
 use rocket_sync_db_pools::database;
 
 mod controllers;
-mod db;
 mod errors;
 mod models;
 mod schema;
-mod serializers;
 mod utils;
 
 use controllers::user_controller::user_routes;
@@ -22,7 +20,7 @@ pub struct Db(diesel::PgConnection);
 
 #[get("/")]
 fn index() -> Result<Json<Value>, Status> {
-    Ok(ResFmt::new(true, "Backend is running!".to_string())
+    Ok(ResFmt::new(true, "Backend is running!")
         .with_page(1)
         .to_json())
 }
