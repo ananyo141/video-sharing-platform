@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::http::Status;
 use rocket::serde::json::{Json, Value};
 use rocket_sync_db_pools::database;
 
@@ -19,10 +18,8 @@ use utils::res_fmt::ResFmt;
 pub struct Db(diesel::PgConnection);
 
 #[get("/")]
-fn index() -> Result<Json<Value>, Status> {
-    Ok(ResFmt::new(true, "Backend is running!")
-        .with_page(1)
-        .to_json())
+fn index() -> Json<Value> {
+    ResFmt::new(true, "Welcome to Rust Rocket API").to_json()
 }
 
 #[launch]

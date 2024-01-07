@@ -3,7 +3,10 @@ use rocket::{
     serde::json::{json, Json, Value},
 };
 
-use crate::{errors::custom_error::CustomError, models::user_model::User};
+use crate::{
+    errors::custom_error::{CustomError, ErrorDetails},
+    models::user_model::User,
+};
 use crate::{models::user_model::NewUser, utils::res_fmt::ResFmt};
 use crate::{models::user_model::UpdateUser, Db};
 
@@ -13,7 +16,7 @@ pub async fn get_all_users(connection: Db) -> Result<Json<Value>, CustomError> {
         Ok(users) => Ok(ResFmt::new(true, "users")
             .with_data(json!(users.into_inner()))
             .to_json()),
-        Err(_) => Err(CustomError::NotFound),
+        Err(_) => Err(CustomError::not_found("No users found".to_string())),
     }
 }
 
@@ -33,7 +36,13 @@ pub async fn create_user(connection: Db, user: Json<NewUser>) -> Result<Json<Val
         Ok(user) => Ok(ResFmt::new(true, "User created")
             .with_data(json!(user))
             .to_json()),
-        Err(_) => Err(CustomError::InternalServerError),
+        Err(err) => Err(CustomError::bad_request(
+            String::from("Invalid schema"),
+            Some(vec![ErrorDetails {
+                field: None,
+                message: err.to_string(),
+            }]),
+        )),
     }
 }
 
@@ -47,7 +56,7 @@ pub async fn update_user(
         Ok(user) => Ok(ResFmt::new(true, "User updated")
             .with_data(json!(user))
             .to_json()),
-        Err(_) => Err(CustomError::BadRequest),
+        Err(err) => Err(CustomError::bad_request(err.to_string(), None)),
     }
 }
 
@@ -57,7 +66,9 @@ pub async fn delete_user(connection: Db, id: i32) -> Result<Json<Value>, CustomE
         Ok(user) => Ok(ResFmt::new(true, "User deleted")
             .with_data(json!(user))
             .to_json()),
-        Err(_) => Err(CustomError::InternalServerError),
+        Err(_) => Err(CustomError::internal_server_error(String::from(
+            "Unable to delete User",
+        ))),
     }
 }
 

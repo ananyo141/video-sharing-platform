@@ -1,52 +1,77 @@
-use rocket::http::Status;
-use rocket::response::Responder;
-use rocket::serde::json::{json, Json};
+use rocket::http::{ContentType, Status};
+use rocket::response::{Responder, Response};
+use rocket::serde::json::{json, Json, Value};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub enum CustomError {
-    NotFound,
-    Forbidden,
-    Unauthorized,
-    BadRequest,
-    UnprocessableEntity,
-    InternalServerError,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ErrorDetails {
+    pub field: Option<String>,
+    pub message: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CustomError {
+    pub code: Status,
+    pub message: String,
+    pub error: Vec<ErrorDetails>,
+}
+
+#[allow(dead_code)]
 impl CustomError {
-    pub fn new(code: u16) -> CustomError {
-        match code {
-            401 => CustomError::Unauthorized,
-            403 => CustomError::Forbidden,
-            404 => CustomError::NotFound,
-            500 => CustomError::InternalServerError,
-            400 => CustomError::BadRequest,
-            _ => CustomError::InternalServerError,
+    pub fn new(code: Status, message: String, error: Option<Vec<ErrorDetails>>) -> CustomError {
+        CustomError {
+            code,
+            message,
+            error: match error {
+                Some(e) => e,
+                None => vec![],
+            },
         }
+    }
+
+    pub fn internal_server_error(message: String) -> CustomError {
+        CustomError::new(Status::InternalServerError, message, None)
+    }
+
+    pub fn unauthorized(message: String, errors: Option<Vec<ErrorDetails>>) -> CustomError {
+        CustomError::new(Status::Unauthorized, message, errors)
+    }
+
+    pub fn forbidden(message: String) -> CustomError {
+        CustomError::new(Status::Forbidden, message, None)
+    }
+    pub fn not_found(message: String) -> CustomError {
+        CustomError::new(Status::NotFound, message, None)
+    }
+
+    pub fn bad_request(message: String, errors: Option<Vec<ErrorDetails>>) -> CustomError {
+        CustomError::new(Status::BadRequest, message, errors)
+    }
+
+    pub fn unprocessable_entity(message: String, errors: Option<Vec<ErrorDetails>>) -> CustomError {
+        CustomError::new(Status::UnprocessableEntity, message, errors)
+    }
+
+    pub fn to_json(&self) -> Json<Value> {
+        Json(json!({
+            "success": false,
+            "message": self.message,
+            "error": self.error,
+        }))
     }
 }
 
-impl<'r> Responder<'r, 'static> for CustomError {
-    fn respond_to(self, r: &'r rocket::Request<'_>) -> rocket::response::Result<'static> {
-        let (status_code, message) = match self {
-            CustomError::Unauthorized => (Status::Unauthorized, "Unauthorized"),
-            CustomError::Forbidden => (Status::Forbidden, "Forbidden"),
-            CustomError::NotFound => (Status::NotFound, "Not Found"),
-            CustomError::BadRequest => (Status::BadRequest, "Bad Request"),
-            CustomError::UnprocessableEntity => {
-                (Status::UnprocessableEntity, "Invalid data or param type")
-            }
-            CustomError::InternalServerError => {
-                (Status::InternalServerError, "Internal Server Error")
-            }
-        };
-        // build response
-        Json(json!({
+impl<'b> Responder<'b, 'static> for CustomError {
+    fn respond_to(self, r: &'b rocket::Request<'_>) -> rocket::response::Result<'static> {
+        let json = Json(json!({
             "success": false,
-            "message": message,
-            "error": {
-                "code": status_code.code,
-            },
-        }))
-        .respond_to(&r)
+            "message": self.message,
+            "error": self.error,
+        }));
+        let response = Response::build_from(json.respond_to(&r).unwrap())
+            .status(self.code)
+            .header(ContentType::JSON)
+            .finalize();
+        Ok(response)
     }
 }
