@@ -31,8 +31,24 @@ pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Stat
 }
 
 #[post("/", data = "<user>")]
-pub async fn create_user(connection: Db, user: Json<NewUser>) -> Result<Json<Value>, CustomError> {
-    match User::create(connection, user.into_inner()).await {
+pub async fn create_user<'a>(
+    connection: Db,
+    user: Result<Json<NewUser>, rocket::serde::json::Error<'a>>,
+) -> Result<Json<Value>, CustomError> {
+    let validated_user = match user {
+        Ok(user) => user,
+        Err(err) => {
+            eprintln!("err is {:?}", err);
+            return Err(CustomError::bad_request(
+                String::from("Invalid schema"),
+                Some(vec![ErrorDetails {
+                    field: Some(err.to_string()),
+                    message: String::from("Invalid schema"),
+                }]),
+            ));
+        }
+    };
+    match User::create(connection, validated_user.into_inner()).await {
         Ok(user) => Ok(ResFmt::new(true, "User created")
             .with_data(json!(user))
             .to_json()),
@@ -47,12 +63,24 @@ pub async fn create_user(connection: Db, user: Json<NewUser>) -> Result<Json<Val
 }
 
 #[patch("/<id>", data = "<user>")]
-pub async fn update_user(
+pub async fn update_user<'a>(
     connection: Db,
     id: i32,
-    user: Json<UpdateUser>,
+    user: Result<Json<UpdateUser>, rocket::serde::json::Error<'a>>,
 ) -> Result<Json<Value>, CustomError> {
-    match User::update(connection, id, user.into_inner()).await {
+    let validated_user = match user {
+        Ok(user) => user,
+        Err(err) => {
+            return Err(CustomError::bad_request(
+                String::from("Invalid schema"),
+                Some(vec![ErrorDetails {
+                    field: Some(err.to_string()),
+                    message: String::from("Invalid schema"),
+                }]),
+            ));
+        }
+    };
+    match User::update(connection, id, validated_user.into_inner()).await {
         Ok(user) => Ok(ResFmt::new(true, "User updated")
             .with_data(json!(user))
             .to_json()),
@@ -66,9 +94,13 @@ pub async fn delete_user(connection: Db, id: i32) -> Result<Json<Value>, CustomE
         Ok(user) => Ok(ResFmt::new(true, "User deleted")
             .with_data(json!(user))
             .to_json()),
-        Err(_) => Err(CustomError::internal_server_error(String::from(
-            "Unable to delete User",
-        ))),
+        Err(err) => Err(CustomError::bad_request(
+            String::from("Unable to delete user"),
+            Some(vec![ErrorDetails {
+                field: Some(err.to_string()),
+                message: String::from("Unable to delete user"),
+            }]),
+        )),
     }
 }
 
