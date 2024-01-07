@@ -53,7 +53,7 @@ pub async fn create_user<'a>(
     })?;
 
     // Create a new user in the database
-    let user = User::create(connection, validated_user.into_inner())
+    let user = User::create(connection, &validated_user.into_inner())
         .await
         .map_err(|err| {
             let error_details = vec![ErrorDetails {

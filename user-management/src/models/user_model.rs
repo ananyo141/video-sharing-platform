@@ -1,5 +1,5 @@
-use crate::schema::users;
 use crate::Db;
+use crate::{schema::users, utils::hash_passwd::hash_password};
 
 use chrono::prelude::*;
 use diesel::prelude::*;
@@ -45,10 +45,14 @@ impl User {
             .await
     }
 
-    pub async fn create(conn: Db, new_user: NewUser) -> QueryResult<User> {
+    pub async fn create(conn: Db, new_user: &NewUser) -> QueryResult<User> {
+        let hashed_user = NewUser {
+            password: hash_password(&new_user.password).unwrap(),
+            email: new_user.email.clone(),
+        };
         conn.run(move |c| {
             diesel::insert_into(users::table)
-                .values(&new_user)
+                .values(&hashed_user)
                 .get_result(c)
         })
         .await
