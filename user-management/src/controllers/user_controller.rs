@@ -76,6 +76,7 @@ pub async fn create_user<'a>(
     )
 }
 
+// FIXME: Update is not recording the timestamp
 #[patch("/<id>", data = "<user>")]
 pub async fn update_user<'a>(
     connection: Db,
