@@ -1,14 +1,17 @@
+use std::error::Error;
+
 use rocket::{
     http::Status,
+    response::status::Created,
     serde::json::{json, Json, Value},
 };
 
 use crate::{
     errors::custom_error::{CustomError, ErrorDetails},
-    models::user_model::User,
+    models::user_model::{NewUser, UpdateUser, User},
+    utils::res_fmt::ResFmt,
+    Db,
 };
-use crate::{models::user_model::NewUser, utils::res_fmt::ResFmt};
-use crate::{models::user_model::UpdateUser, Db};
 
 #[get("/")]
 pub async fn get_all_users(connection: Db) -> Result<Json<Value>, CustomError> {
@@ -34,32 +37,43 @@ pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Stat
 pub async fn create_user<'a>(
     connection: Db,
     user: Result<Json<NewUser>, rocket::serde::json::Error<'a>>,
-) -> Result<Json<Value>, CustomError> {
-    let validated_user = match user {
-        Ok(user) => user,
-        Err(err) => {
-            eprintln!("err is {:?}", err);
-            return Err(CustomError::bad_request(
-                String::from("Invalid schema"),
-                Some(vec![ErrorDetails {
-                    field: Some(err.to_string()),
-                    message: String::from("Invalid schema"),
-                }]),
-            ));
-        }
-    };
-    match User::create(connection, validated_user.into_inner()).await {
-        Ok(user) => Ok(ResFmt::new(true, "User created")
-            .with_data(json!(user))
-            .to_json()),
-        Err(err) => Err(CustomError::bad_request(
+) -> Result<Created<Json<Value>>, CustomError> {
+    // Validate user
+    let validated_user = user.map_err(|err| {
+        CustomError::bad_request(
             String::from("Invalid schema"),
             Some(vec![ErrorDetails {
-                field: None,
-                message: err.to_string(),
+                field: Some(err.to_string()),
+                message: err.source().map_or_else(
+                    || String::from("Unable to create user"),
+                    |source| source.to_string(),
+                ),
             }]),
-        )),
-    }
+        )
+    })?;
+
+    // Create a new user in the database
+    let user = User::create(connection, validated_user.into_inner())
+        .await
+        .map_err(|err| {
+            let error_details = vec![ErrorDetails {
+                field: Some(err.to_string()),
+                message: err.source().map_or_else(
+                    || String::from("Unable to create user"),
+                    |source| source.to_string(),
+                ),
+            }];
+
+            CustomError::bad_request(String::from("Invalid schema"), Some(error_details))
+        })?;
+
+    Ok(
+        Created::new(format!("/users/{}", user.id).to_string()).body(
+            ResFmt::new(true, "User created")
+                .with_data(json!(user))
+                .to_json(),
+        ),
+    )
 }
 
 #[patch("/<id>", data = "<user>")]
@@ -68,6 +82,7 @@ pub async fn update_user<'a>(
     id: i32,
     user: Result<Json<UpdateUser>, rocket::serde::json::Error<'a>>,
 ) -> Result<Json<Value>, CustomError> {
+    // validate user
     let validated_user = match user {
         Ok(user) => user,
         Err(err) => {
@@ -75,11 +90,13 @@ pub async fn update_user<'a>(
                 String::from("Invalid schema"),
                 Some(vec![ErrorDetails {
                     field: Some(err.to_string()),
-                    message: String::from("Invalid schema"),
+                    message: err.source().unwrap().to_string(),
                 }]),
             ));
         }
     };
+
+    // update user in the database
     match User::update(connection, id, validated_user.into_inner()).await {
         Ok(user) => Ok(ResFmt::new(true, "User updated")
             .with_data(json!(user))
