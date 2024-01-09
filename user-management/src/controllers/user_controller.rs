@@ -15,7 +15,7 @@ use crate::{
 
 #[get("/")]
 pub async fn get_all_users(connection: Db) -> Result<Json<Value>, CustomError> {
-    match User::find_all(connection).await.map(Json) {
+    match User::find_all_with_roles(connection).await.map(Json) {
         Ok(users) => Ok(ResFmt::new(true, "users")
             .with_data(json!(users.into_inner()))
             .to_json()),

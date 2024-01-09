@@ -1,3 +1,5 @@
+use crate::models::roles_model::Role;
+use crate::schema::roles::dsl as role_dsl;
 use crate::{schema::users, utils::hash_passwd::hash_password, Db};
 
 use chrono::prelude::*;
@@ -13,6 +15,16 @@ pub struct User {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub role_id: i32,
+}
+
+#[derive(Queryable, Serialize, Deserialize)]
+#[diesel(table_name=users)]
+pub struct UserWithRole {
+    pub id: i32,
+    pub email: String,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+    pub role: Role,
 }
 
 #[derive(Insertable, Serialize, Deserialize)]
@@ -36,8 +48,42 @@ impl User {
             .await
     }
 
-    pub async fn find_by_id(conn: Db, user_id: i32) -> QueryResult<User> {
-        conn.run(move |c| users::table.find(user_id).first(c)).await
+    pub async fn find_all_with_roles(conn: Db) -> QueryResult<Vec<UserWithRole>> {
+        conn.run(move |c| {
+            users::table
+                .inner_join(role_dsl::roles)
+                .load::<(User, Role)>(c)
+        })
+        .await
+        .map(move |result| {
+            result
+                .into_iter()
+                .map(move |(user, role)| UserWithRole {
+                    role,
+                    id: user.id,
+                    email: user.email,
+                    created_at: user.created_at,
+                    updated_at: user.updated_at,
+                })
+                .collect()
+        })
+    }
+
+    pub async fn find_by_id(conn: Db, user_id: i32) -> QueryResult<UserWithRole> {
+        conn.run(move |c| {
+            users::table
+                .inner_join(role_dsl::roles)
+                .filter(users::id.eq(user_id))
+                .first::<(User, Role)>(c)
+        })
+        .await
+        .map(|(user, role)| UserWithRole {
+            role,
+            id: user.id,
+            email: user.email,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+        })
     }
 
     pub async fn find_by_email(conn: Db, user_email: String) -> QueryResult<User> {
