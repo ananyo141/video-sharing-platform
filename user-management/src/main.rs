@@ -21,7 +21,7 @@ pub struct Db(diesel::PgConnection);
 
 #[get("/")]
 fn index() -> Json<Value> {
-    ResFmt::new(true, "Welcome to Rust Rocket API").to_json()
+    ResFmt::new(true, "User Service Running").to_json()
 }
 
 #[launch]
