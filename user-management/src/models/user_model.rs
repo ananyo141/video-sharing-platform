@@ -1,8 +1,7 @@
-use crate::Db;
-use crate::{schema::users, utils::hash_passwd::hash_password};
+use crate::{schema::users, utils::hash_passwd::hash_password, Db};
 
 use chrono::prelude::*;
-use diesel::prelude::*;
+use diesel::{self, prelude::*};
 use serde::{Deserialize, Serialize};
 
 #[derive(Queryable, Insertable, Serialize, Deserialize)]
@@ -13,6 +12,7 @@ pub struct User {
     pub password: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub role_id: i32,
 }
 
 #[derive(Insertable, Serialize, Deserialize)]
@@ -50,6 +50,7 @@ impl User {
             password: hash_password(&new_user.password).unwrap(),
             email: new_user.email.clone(),
         };
+
         conn.run(move |c| {
             diesel::insert_into(users::table)
                 .values(&hashed_user)
