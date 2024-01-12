@@ -23,4 +23,4 @@ RUN go install github.com/githubnemo/CompileDaemon@latest
 EXPOSE 3000
 
 # Command to run the GoFiber app when the container starts
-CMD ["/go/bin/CompileDaemon", "-directory=/app/src", "-command=/app/src/src"]
+CMD ["/go/bin/CompileDaemon", "-directory=/app", "-command=/app/media-handler"]
