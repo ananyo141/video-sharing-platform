@@ -1,0 +1,138 @@
+package db
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	// "go.mongodb.org/mongo-driver/mongo/readpref"
+	"media-handler/graph/model"
+)
+
+type DB struct {
+	client *mongo.Client
+}
+
+func Connect() *DB {
+	// Set client options
+	clientOptions := options.Client().ApplyURI("mongodb://media-db:27017")
+
+	// Connect to MongoDB
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check the connection
+	err = client.Ping(context.TODO(), nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Connected to MongoDB!")
+
+	return &DB{
+		client: client,
+	}
+}
+
+func (db *DB) GetVideo(id string) *model.Video {
+	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	_id, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": _id}
+	var video model.Video
+	err := videoCollec.FindOne(ctx, filter).Decode(&video)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &video
+}
+
+func (db *DB) GetVideos() []*model.Video {
+	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	var videos []*model.Video
+	cursor, err := videoCollec.Find(ctx, bson.D{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = cursor.All(context.TODO(), &videos); err != nil {
+		panic(err)
+	}
+
+	return videos
+}
+
+func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) *model.Video {
+	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	inserg, err := videoCollec.InsertOne(ctx,
+		bson.M{"title": jobInfo.Title, "description": jobInfo.Description, "userId": jobInfo.UserID})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
+	returnVideo := model.Video{ID: insertedID, Title: jobInfo.Title, Description: jobInfo.Description, UserID: jobInfo.UserID}
+	return &returnVideo
+}
+
+func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) *model.Video {
+	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	updateVideo := bson.M{}
+
+	if videoInfo.Title != nil {
+		updateVideo["title"] = videoInfo.Title
+	}
+	if videoInfo.Description != nil {
+		updateVideo["description"] = videoInfo.Description
+	}
+	if videoInfo.UserID != nil {
+		updateVideo["userId"] = videoInfo.UserID
+	}
+
+	_id, _ := primitive.ObjectIDFromHex(videoId)
+	filter := bson.M{"_id": _id}
+	update := bson.M{"$set": updateVideo}
+
+	results := videoCollec.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
+
+	var video model.Video
+
+	if err := results.Decode(&video); err != nil {
+		log.Fatal(err)
+	}
+
+	return &video
+}
+
+func (db *DB) DeleteVideo(videoId string) *model.Video {
+	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	_id, _ := primitive.ObjectIDFromHex(videoId)
+	filter := bson.M{"_id": _id}
+	_, err := videoCollec.DeleteOne(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &model.Video{ID: videoId}
+}

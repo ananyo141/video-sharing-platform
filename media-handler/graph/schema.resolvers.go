@@ -6,18 +6,35 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"media-handler/db"
 	"media-handler/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+var dbInstance *db.DB = db.Connect()
+
+// CreateVideo is the resolver for the createVideo field.
+func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
+	return dbInstance.CreateVideo(input), nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// UpdateVideo is the resolver for the updateVideo field.
+func (r *mutationResolver) UpdateVideo(ctx context.Context, id string, input model.UpdateVideoInput) (*model.Video, error) {
+	return dbInstance.UpdateVideo(id, input), nil
+}
+
+// DeleteVideo is the resolver for the deleteVideo field.
+func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.Video, error) {
+	return dbInstance.DeleteVideo(id), nil
+}
+
+// Videos is the resolver for the videos field.
+func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
+	return dbInstance.GetVideos(), nil
+}
+
+// Video is the resolver for the video field.
+func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, error) {
+	return dbInstance.GetVideo(id), nil
 }
 
 // Mutation returns MutationResolver implementation.

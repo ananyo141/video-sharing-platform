@@ -2,25 +2,33 @@
 
 package model
 
-type Mutation struct {
+type CreateVideoInput struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	UserID      int    `json:"userId"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type DeleteVideoInput struct {
+	ID string `json:"id"`
+}
+
+type Mutation struct {
 }
 
 type Query struct {
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type UpdateVideoInput struct {
+	Title       *string `json:"title,omitempty"`
+	Description *string `json:"description,omitempty"`
+	UserID      *int    `json:"userId,omitempty"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type Video struct {
+	ID          string `json:"_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	UserID      int    `json:"userId"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
