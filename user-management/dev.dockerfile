@@ -14,9 +14,11 @@ COPY . .
 
 # Build the Rust app
 RUN cargo install cargo-watch
+# Install diesel_cli
+RUN cargo install diesel_cli --no-default-features --features postgres
 
 # Expose the port that your Rocket app will run on
 EXPOSE 8000
 
 # Command to run the Rocket app when the container starts
-CMD ["cargo", "watch", "-x", "run"]
+CMD ["sh", "-c", "diesel migration run --database-url 'postgres://devdocker:dbpassword@user-db:5432/user-docker-db' && cargo watch -x run"]
