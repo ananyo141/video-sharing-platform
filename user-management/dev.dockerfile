@@ -6,8 +6,8 @@ WORKDIR /app
 
 # Install system dependencies (PostgreSQL client library)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
+  apt-get install -y --no-install-recommends libpq-dev && \
+  rm -rf /var/lib/apt/lists/*
 
 # Copy the Rocket app files into the container at /app
 COPY . .
