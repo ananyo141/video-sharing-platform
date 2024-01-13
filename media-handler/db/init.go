@@ -2,8 +2,8 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"media-handler/utils"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,7 +15,7 @@ type DB struct {
 
 func Connect() *DB {
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://media-db:27017")
+	clientOptions := options.Client().ApplyURI(utils.Env["MONGO_URI"])
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -31,10 +31,9 @@ func Connect() *DB {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Connected to MongoDB!")
+	log.Println("Connected to MongoDB!")
 
 	return &DB{
 		client: client,
 	}
 }
-

@@ -1,19 +1,19 @@
 package main
 
 import (
-	"log"
-	"media-handler/graph"
-	"net/http"
-	"os"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+
+	"log"
+	"media-handler/graph"
+	"media-handler/utils"
+	"net/http"
 )
 
 const defaultPort = "3000"
 
 func main() {
-	port := os.Getenv("PORT")
+	port := utils.Env["PORT"]
 	if port == "" {
 		port = defaultPort
 	}

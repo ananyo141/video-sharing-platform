@@ -4,6 +4,7 @@ go 1.21.5
 
 require (
 	github.com/99designs/gqlgen v0.17.42
+	github.com/joho/godotenv v1.5.1
 	github.com/vektah/gqlparser/v2 v2.5.10
 	go.mongodb.org/mongo-driver v1.13.1
 )

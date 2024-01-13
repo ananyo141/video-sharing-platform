@@ -1,8 +1,9 @@
-package db;
+package db
 
 import (
 	"context"
 	"log"
+	"media-handler/utils"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -11,8 +12,10 @@ import (
 	"media-handler/graph/model"
 )
 
+var collectionName = "videos"
+
 func (db *DB) GetVideo(id string) *model.Video {
-	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -27,7 +30,7 @@ func (db *DB) GetVideo(id string) *model.Video {
 }
 
 func (db *DB) GetVideos() []*model.Video {
-	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var videos []*model.Video
@@ -44,7 +47,7 @@ func (db *DB) GetVideos() []*model.Video {
 }
 
 func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) *model.Video {
-	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	inserg, err := videoCollec.InsertOne(ctx,
@@ -60,7 +63,7 @@ func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) *model.Video {
 }
 
 func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) *model.Video {
-	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -92,7 +95,7 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) *mod
 }
 
 func (db *DB) DeleteVideo(videoId string) *model.Video {
-	videoCollec := db.client.Database("graphql-job-board").Collection("jobs")
+	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
