@@ -1,3 +1,4 @@
+// https://github.com/99designs/gqlgen/discussions/1943#discussioncomment-2110715
 package main
 
 import (
