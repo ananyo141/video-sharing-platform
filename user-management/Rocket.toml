@@ -3,6 +3,3 @@ address = "0.0.0.0"
 
 [debug]
 address = "0.0.0.0"
-
-[default.databases.user_db]
-url = "postgres://devdocker:dbpassword@user-db:5432/user-docker-db"
