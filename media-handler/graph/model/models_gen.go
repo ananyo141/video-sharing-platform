@@ -3,13 +3,13 @@
 package model
 
 type CreateVideoInput struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	UserID      int    `json:"userId"`
+	Title       string `json:"title" bson:"title"`
+	Description string `json:"description" bson:"description"`
+	UserID      int    `json:"userId" bson:"userId"`
 }
 
 type DeleteVideoInput struct {
-	ID string `json:"id"`
+	ID string `json:"id" bson:"_id"`
 }
 
 type Mutation struct {
@@ -19,16 +19,16 @@ type Query struct {
 }
 
 type UpdateVideoInput struct {
-	Title       *string `json:"title,omitempty"`
-	Description *string `json:"description,omitempty"`
-	UserID      *int    `json:"userId,omitempty"`
+	Title       *string `json:"title,omitempty" bson:"title"`
+	Description *string `json:"description,omitempty" bson:"description"`
+	UserID      *int    `json:"userId,omitempty" bson:"userId"`
 }
 
 type Video struct {
-	ID          string `json:"_id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	UserID      int    `json:"userId"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	ID          string `json:"_id" bson:"_id"`
+	Title       string `json:"title" bson:"title"`
+	Description string `json:"description" bson:"description"`
+	UserID      int    `json:"userId" bson:"userId"`
+	CreatedAt   string `json:"createdAt" bson:"createdAt"`
+	UpdatedAt   string `json:"updatedAt" bson:"updatedAt"`
 }

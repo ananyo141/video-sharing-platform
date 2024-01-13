@@ -1,3 +1,4 @@
+//go:generate go run ../hooks/bson.go
 package graph
 
 import "media-handler/db"
