@@ -12,10 +12,10 @@ RUN apt-get update && \
 # Copy the Rocket app files into the container at /app
 COPY . .
 
-# Build the Rust app
-RUN cargo install cargo-watch
-# Install diesel_cli
-RUN cargo install diesel_cli --no-default-features --features postgres
+# Install rust dependencies
+RUN cargo install cargo-watch & \
+  cargo install diesel_cli --no-default-features --features postgres & \
+  wait
 
 # Expose the port that your Rocket app will run on
 EXPOSE 8000
