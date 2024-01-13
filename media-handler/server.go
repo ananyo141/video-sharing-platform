@@ -6,6 +6,7 @@ import (
 
 	"encoding/json"
 	"log"
+	"media-handler/db"
 	"media-handler/graph"
 	"media-handler/utils"
 	"net/http"
@@ -19,7 +20,11 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	dbInstance := db.Connect()
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		DB: dbInstance,
+	}}))
 
 	http.Handle("/playground", playground.Handler("GraphQL playground", "/graphql"))
 	http.Handle("/graphql", srv)

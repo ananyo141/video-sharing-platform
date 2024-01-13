@@ -7,5 +7,9 @@
 
 ## Media Handler
 
+- [ ] Data loaders
+- [ ] (No Eager fetching)[https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user]
+
 ## User Management
+
 - [ ] Logging

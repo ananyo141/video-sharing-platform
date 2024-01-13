@@ -6,35 +6,32 @@ package graph
 
 import (
 	"context"
-	"media-handler/db"
 	"media-handler/graph/model"
 )
 
-var dbInstance *db.DB = db.Connect()
-
 // CreateVideo is the resolver for the createVideo field.
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
-	return dbInstance.CreateVideo(input), nil
+	return r.DB.CreateVideo(input), nil
 }
 
 // UpdateVideo is the resolver for the updateVideo field.
 func (r *mutationResolver) UpdateVideo(ctx context.Context, id string, input model.UpdateVideoInput) (*model.Video, error) {
-	return dbInstance.UpdateVideo(id, input), nil
+	return r.DB.UpdateVideo(id, input), nil
 }
 
 // DeleteVideo is the resolver for the deleteVideo field.
 func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.Video, error) {
-	return dbInstance.DeleteVideo(id), nil
+	return r.DB.DeleteVideo(id), nil
 }
 
 // Videos is the resolver for the videos field.
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
-	return dbInstance.GetVideos(), nil
+	return r.DB.GetVideos(), nil
 }
 
 // Video is the resolver for the video field.
 func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, error) {
-	return dbInstance.GetVideo(id), nil
+	return r.DB.GetVideo(id), nil
 }
 
 // Mutation returns MutationResolver implementation.
