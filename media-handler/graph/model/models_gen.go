@@ -2,10 +2,15 @@
 
 package model
 
+import (
+	"time"
+)
+
 type CreateVideoInput struct {
 	Title       string `json:"title" bson:"title"`
 	Description string `json:"description" bson:"description"`
 	UserID      int    `json:"userId" bson:"userId"`
+	Source      string `json:"source" bson:"source"`
 }
 
 type DeleteVideoInput struct {
@@ -22,14 +27,15 @@ type UpdateVideoInput struct {
 	Title       *string `json:"title,omitempty" bson:"title"`
 	Description *string `json:"description,omitempty" bson:"description"`
 	UserID      *int    `json:"userId,omitempty" bson:"userId"`
+	Source      *string `json:"source,omitempty" bson:"source"`
 }
 
 type Video struct {
-	ID          string `json:"_id" bson:"_id"`
-	Title       string `json:"title" bson:"title"`
-	Description string `json:"description" bson:"description"`
-	URL         string `json:"url" bson:"url"`
-	UserID      int    `json:"userId" bson:"userId"`
-	CreatedAt   string `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   string `json:"updatedAt" bson:"updatedAt"`
+	ID          string    `json:"_id" bson:"_id"`
+	Title       string    `json:"title" bson:"title"`
+	Description string    `json:"description" bson:"description"`
+	Source      string    `json:"source" bson:"source"`
+	UserID      int       `json:"userId" bson:"userId"`
+	CreatedAt   time.Time `json:"createdAt" bson:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt" bson:"updatedAt"`
 }

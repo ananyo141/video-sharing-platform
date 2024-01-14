@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -62,8 +63,8 @@ type ComplexityRoot struct {
 		CreatedAt   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Source      func(childComplexity int) int
 		Title       func(childComplexity int) int
-		URL         func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UserID      func(childComplexity int) int
 	}
@@ -174,19 +175,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.ID(childComplexity), true
 
+	case "Video.source":
+		if e.complexity.Video.Source == nil {
+			break
+		}
+
+		return e.complexity.Video.Source(childComplexity), true
+
 	case "Video.title":
 		if e.complexity.Video.Title == nil {
 			break
 		}
 
 		return e.complexity.Video.Title(childComplexity), true
-
-	case "Video.url":
-		if e.complexity.Video.URL == nil {
-			break
-		}
-
-		return e.complexity.Video.URL(childComplexity), true
 
 	case "Video.updatedAt":
 		if e.complexity.Video.UpdatedAt == nil {
@@ -496,8 +497,8 @@ func (ec *executionContext) fieldContext_Mutation_createVideo(ctx context.Contex
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
-			case "url":
-				return ec.fieldContext_Video_url(ctx, field)
+			case "source":
+				return ec.fieldContext_Video_source(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -567,8 +568,8 @@ func (ec *executionContext) fieldContext_Mutation_updateVideo(ctx context.Contex
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
-			case "url":
-				return ec.fieldContext_Video_url(ctx, field)
+			case "source":
+				return ec.fieldContext_Video_source(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -638,8 +639,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteVideo(ctx context.Contex
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
-			case "url":
-				return ec.fieldContext_Video_url(ctx, field)
+			case "source":
+				return ec.fieldContext_Video_source(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -709,8 +710,8 @@ func (ec *executionContext) fieldContext_Query_videos(ctx context.Context, field
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
-			case "url":
-				return ec.fieldContext_Video_url(ctx, field)
+			case "source":
+				return ec.fieldContext_Video_source(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -769,8 +770,8 @@ func (ec *executionContext) fieldContext_Query_video(ctx context.Context, field 
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
-			case "url":
-				return ec.fieldContext_Video_url(ctx, field)
+			case "source":
+				return ec.fieldContext_Video_source(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -1056,8 +1057,8 @@ func (ec *executionContext) fieldContext_Video_description(ctx context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _Video_url(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Video_url(ctx, field)
+func (ec *executionContext) _Video_source(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_source(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1070,7 +1071,7 @@ func (ec *executionContext) _Video_url(ctx context.Context, field graphql.Collec
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
+		return obj.Source, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1087,7 +1088,7 @@ func (ec *executionContext) _Video_url(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Video_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Video_source(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Video",
 		Field:      field,
@@ -1170,9 +1171,9 @@ func (ec *executionContext) _Video_createdAt(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Video_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1182,7 +1183,7 @@ func (ec *executionContext) fieldContext_Video_createdAt(ctx context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1214,9 +1215,9 @@ func (ec *executionContext) _Video_updatedAt(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(time.Time)
 	fc.Result = res
-	return ec.marshalNDateTime2string(ctx, field.Selections, res)
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Video_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1226,7 +1227,7 @@ func (ec *executionContext) fieldContext_Video_updatedAt(ctx context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type DateTime does not have child fields")
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3012,7 +3013,7 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "userId"}
+	fieldsInOrder := [...]string{"title", "description", "userId", "source"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3040,6 +3041,13 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.UserID = data
+		case "source":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Source = data
 		}
 	}
 
@@ -3080,7 +3088,7 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "userId"}
+	fieldsInOrder := [...]string{"title", "description", "userId", "source"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3108,6 +3116,13 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.UserID = data
+		case "source":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Source = data
 		}
 	}
 
@@ -3305,8 +3320,8 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "url":
-			out.Values[i] = ec._Video_url(ctx, field, obj)
+		case "source":
+			out.Values[i] = ec._Video_source(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -3694,21 +3709,6 @@ func (ec *executionContext) unmarshalNCreateVideoInput2mediaᚑhandlerᚋgraph�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNDateTime2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalString(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNDateTime2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3746,6 +3746,21 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+	res, err := graphql.UnmarshalTime(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	res := graphql.MarshalTime(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")

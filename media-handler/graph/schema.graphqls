@@ -2,16 +2,14 @@
 #
 # https://gqlgen.com/getting-started/
 
-scalar UploadFile
-
 type Video {
   _id: ID!
   title: String!
   description: String!
-  url: String!
+  source: String!
   userId: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: Time!
+  updatedAt: Time!
 }
 
 type Query {
@@ -29,12 +27,14 @@ input CreateVideoInput {
   title: String!
   description: String!
   userId: Int!
+  source: String!
 }
 
 input UpdateVideoInput {
   title: String
   description: String
   userId: Int
+  source: String
 }
 
 input DeleteVideoInput {
@@ -42,4 +42,4 @@ input DeleteVideoInput {
 }
 
 # type DateTime @scalar(timestamp)
-scalar DateTime
+scalar Time

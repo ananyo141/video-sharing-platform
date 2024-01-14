@@ -14,6 +14,7 @@ import (
 
 var collectionName = "videos"
 
+// FIXME: remove log.Fatals and replace with proper error handling
 func (db *DB) GetVideo(id string) *model.Video {
 	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -51,14 +52,18 @@ func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) *model.Video {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	inserg, err := videoCollec.InsertOne(ctx,
-		bson.M{"title": jobInfo.Title, "description": jobInfo.Description, "userId": jobInfo.UserID})
+		bson.M{"title": jobInfo.Title, "description": jobInfo.Description, "userId": jobInfo.UserID,
+			"createdAt": time.Now(), "updatedAt": time.Now(), "source": jobInfo.Source})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
-	returnVideo := model.Video{ID: insertedID, Title: jobInfo.Title, Description: jobInfo.Description, UserID: jobInfo.UserID}
+	// FIXME: use a struct to avoid repeating the same code
+	returnVideo := model.Video{ID: insertedID, Title: jobInfo.Title,
+		Description: jobInfo.Description, UserID: jobInfo.UserID, Source: jobInfo.Source,
+		CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	return &returnVideo
 }
 
@@ -78,6 +83,7 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) *mod
 	if videoInfo.UserID != nil {
 		updateVideo["userId"] = videoInfo.UserID
 	}
+	updateVideo["updatedAt"] = time.Now()
 
 	_id, _ := primitive.ObjectIDFromHex(videoId)
 	filter := bson.M{"_id": _id}
