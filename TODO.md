@@ -9,7 +9,10 @@
 
 - [ ] Data loaders
 - [ ] (No Eager fetching)[https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user]
+- [ ] Add Pagination
+- [ ] Add Redis for user caching
 
 ## User Management
 
 - [ ] Logging
+- [ ] Add Pagination
