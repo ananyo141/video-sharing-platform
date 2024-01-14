@@ -2,10 +2,13 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar UploadFile
+
 type Video {
   _id: ID!
   title: String!
   description: String!
+  url: String!
   userId: Int!
   createdAt: DateTime!
   updatedAt: DateTime!

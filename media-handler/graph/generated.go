@@ -63,6 +63,7 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Title       func(childComplexity int) int
+		URL         func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 		UserID      func(childComplexity int) int
 	}
@@ -179,6 +180,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.Title(childComplexity), true
+
+	case "Video.url":
+		if e.complexity.Video.URL == nil {
+			break
+		}
+
+		return e.complexity.Video.URL(childComplexity), true
 
 	case "Video.updatedAt":
 		if e.complexity.Video.UpdatedAt == nil {
@@ -488,6 +496,8 @@ func (ec *executionContext) fieldContext_Mutation_createVideo(ctx context.Contex
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
+			case "url":
+				return ec.fieldContext_Video_url(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -557,6 +567,8 @@ func (ec *executionContext) fieldContext_Mutation_updateVideo(ctx context.Contex
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
+			case "url":
+				return ec.fieldContext_Video_url(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -626,6 +638,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteVideo(ctx context.Contex
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
+			case "url":
+				return ec.fieldContext_Video_url(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -695,6 +709,8 @@ func (ec *executionContext) fieldContext_Query_videos(ctx context.Context, field
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
+			case "url":
+				return ec.fieldContext_Video_url(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -753,6 +769,8 @@ func (ec *executionContext) fieldContext_Query_video(ctx context.Context, field 
 				return ec.fieldContext_Video_title(ctx, field)
 			case "description":
 				return ec.fieldContext_Video_description(ctx, field)
+			case "url":
+				return ec.fieldContext_Video_url(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "createdAt":
@@ -1026,6 +1044,50 @@ func (ec *executionContext) _Video_description(ctx context.Context, field graphq
 }
 
 func (ec *executionContext) fieldContext_Video_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Video",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Video_url(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Video_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Video",
 		Field:      field,
@@ -3240,6 +3302,11 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "description":
 			out.Values[i] = ec._Video_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "url":
+			out.Values[i] = ec._Video_url(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

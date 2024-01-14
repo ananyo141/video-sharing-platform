@@ -28,6 +28,7 @@ type Video struct {
 	ID          string `json:"_id" bson:"_id"`
 	Title       string `json:"title" bson:"title"`
 	Description string `json:"description" bson:"description"`
+	URL         string `json:"url" bson:"url"`
 	UserID      int    `json:"userId" bson:"userId"`
 	CreatedAt   string `json:"createdAt" bson:"createdAt"`
 	UpdatedAt   string `json:"updatedAt" bson:"updatedAt"`
