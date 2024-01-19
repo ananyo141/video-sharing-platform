@@ -10,9 +10,14 @@
 - [ ] Data loaders
 - [ ] (No Eager fetching)[https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user]
 - [ ] Add Pagination
+- [ ] Graphql subscriptions to tell user video processing state
 - [ ] Add Redis for user caching
 
 ## User Management
 
 - [ ] Logging
 - [ ] Add Pagination
+
+## Video Processing
+
+- [ ] Processing capability
