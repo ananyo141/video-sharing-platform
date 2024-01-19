@@ -1,6 +1,7 @@
 version: "3"
 
 services:
+  # Media Service #
   media-handler-dev:
     volumes:
       - ./media-handler:/app
@@ -17,6 +18,17 @@ services:
     env_file:
       - ./media-handler/.env.docker
 
+  media-db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - mongodb-network
+    # volumes:
+    #   - media-data:/data/db
+  # --- END --- #
+
+  # User Service #
   user-management-dev:
     volumes:
       - ./user-management:/app
@@ -44,16 +56,48 @@ services:
     networks:
       - user-network
       - postgres-network
+    # volumes:
+    #   - user-data:/var/lib/postgresql/data
+  # --- END --- #
 
-  media-db:
-    image: mongo:latest
+  # Video Processing Service #
+  video-service-dev:
+    volumes:
+      - ./video-processing:/app
+    build:
+      context: ./video-processing
+      dockerfile: dev.dockerfile
     ports:
-      - "27017:27017"
+      - "8001:8001"
+    depends_on:
+      - video-bucket
     networks:
-      - mongodb-network
+      - video-bucket-network
+    env_file:
+      - ./video-processing/.env.docker
+
+  video-bucket:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+    networks:
+      - video-bucket-network
+    volumes:
+      - video-bucket-volume:/data
+  # --- END --- #
 
 networks:
   user-network:
   postgres-network:
   media-handler-network:
   mongodb-network:
+  video-bucket-network:
+
+volumes:
+  # user-data:
+  # media-data:
+  video-bucket-volume:
