@@ -5,8 +5,8 @@ import morgan from "morgan";
 
 import logger from "@utils/logger";
 import env from "./environment";
-import { errorHandler } from "@utils/errorHandler";
-import { routeNotFound } from "@utils/routeNotFound";
+import { errorHandler } from "@/middleware/errorhandler.middleware";
+import { routeNotFound } from "@/middleware/notfound.middleware";
 
 const app: Express = express();
 const port = env.PORT;
