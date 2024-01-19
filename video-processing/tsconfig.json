@@ -1,0 +1,83 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": "./src",
+    // add custom type extensions
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ],
+    "noEmitOnError": false,
+    "removeComments": true,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./build",
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "outDir": "build",
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "baseUrl": "src",
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@/*": [
+        "*"
+      ],
+      "@constants/*": [
+        "constants/*"
+      ],
+      "@controllers/*": [
+        "controllers/*"
+      ],
+      "@database/*": [
+        "database/*"
+      ],
+      "@errors/*": [
+        "errors/*"
+      ],
+      "@interfaces/*": [
+        "interfaces/*"
+      ],
+      "@middlewares/*": [
+        "middlewares/*"
+      ],
+      "@models/*": [
+        "models/*"
+      ],
+      "@routes/*": [
+        "routes/*"
+      ],
+      "@services/*": [
+        "services/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@schema/*": [
+        "schema/*"
+      ],
+      "@entity/*": [
+        "entities/*"
+      ],
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json",
+    ".env",
+  ],
+  "exclude": [
+    "node_modules",
+    "src/http",
+    "src/logs",
+    "src/tests"
+  ]
+}
