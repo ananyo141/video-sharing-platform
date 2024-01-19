@@ -4,6 +4,7 @@
 - [ ] Docker environment separation for production and development  
        - [x] Dev Environment  
        - [ ] Prod Environment
+- [ ] Enable data persistence with volumes on production
 
 ## Media Handler
 
