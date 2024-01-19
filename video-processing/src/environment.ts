@@ -8,8 +8,8 @@ const envPath = process.env.NODE_ENV
   : ".env";
 
 if (!fs.existsSync(envPath)) {
-  logger.warn(process.env.NODE_ENV)
-  logger.warn(`No .env file found at ${envPath}`)
+  logger.warn(process.env.NODE_ENV);
+  logger.warn(`No .env file found at ${envPath}`);
 }
 
 dotenv.config({
@@ -17,19 +17,29 @@ dotenv.config({
 });
 
 interface EnvType {
-  JWT_ACCESS_SECRET: string;
-  JWT_REFRESH_SECRET: string;
+  MINIO_ENDPOINT: string;
+  MINIO_PORT: string;
+  MINIO_SSL: string;
+  MINIO_ACCESS_KEY: string;
+  MINIO_SECRET_KEY: string;
+  MINIO_BUCKET: string;
   PORT: string;
 }
 
 const env: EnvType = {
-  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
-  PORT: process.env.PORT ?? "8001",
+  MINIO_ENDPOINT: process.env.MINIO_ENDPOINT as string,
+  MINIO_PORT: process.env.MINIO_PORT as string,
+  MINIO_SSL: process.env.MINIO_SSL as string,
+  MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY as string,
+  MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY as string,
+  MINIO_BUCKET: process.env.MINIO_BUCKET as string,
+  PORT: process.env.PORT as string,
 };
 
 if (Object.values(env).includes(undefined)) {
-  logger.error("Some environment variables are missing");
+  logger.error(
+    `Some environment variables are missing, given env: ${JSON.stringify(env, null, 2)}`,
+  );
   process.exit(1);
 }
 
