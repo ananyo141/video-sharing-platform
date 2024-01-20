@@ -1,5 +1,5 @@
 # Use the official Rust image as a base image
-FROM rust:1.74-slim-buster
+FROM rust:1.75
 
 # Set the working directory inside the container
 WORKDIR /app
