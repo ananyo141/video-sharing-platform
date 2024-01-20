@@ -6,7 +6,7 @@ RUN mkdir /app
 WORKDIR /app
 
 # Copy package.json and package-lock.json into the root directory in the container
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
 # Install the application dependencies inside the container
 RUN yarn install
@@ -15,7 +15,7 @@ RUN yarn install
 COPY . .
 
 # The application listens on port 8080, so you can use that value for EXPOSE
-EXPOSE 8001
+EXPOSE 8003
 
 # Define the command to run the application
 CMD [ "yarn", "start:dev" ]

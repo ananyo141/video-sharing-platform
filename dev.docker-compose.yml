@@ -68,7 +68,7 @@ services:
       context: ./video-processing
       dockerfile: dev.dockerfile
     ports:
-      - "8001:8001"
+      - "8003:8003"
     depends_on:
       - video-bucket
     networks:
