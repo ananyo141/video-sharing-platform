@@ -1,4 +1,6 @@
 import compression from "compression";
+import { Server } from "@tus/server";
+import { FileStore } from "@tus/file-store";
 import cors from "cors";
 import express, { Express } from "express";
 import morgan from "morgan";
@@ -8,8 +10,14 @@ import env from "./environment";
 import { errorHandler } from "@/middleware/errorhandler.middleware";
 import { routeNotFound } from "@/middleware/notfound.middleware";
 
-const app: Express = express();
 const port = env.PORT;
+const app: Express = express();
+const tusServer = new Server({
+  datastore: new FileStore({
+    directory: "./uploads",
+  }),
+  path: "/uploads",
+});
 
 function initMiddleware(): void {
   app.use(compression());
@@ -20,6 +28,7 @@ function initMiddleware(): void {
 }
 
 function initRouter(): void {
+  app.use("/uploads", tusServer.handle.bind(tusServer));
   app.use(routeNotFound); // fallback route
   app.use(errorHandler); // error handler
 }
