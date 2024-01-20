@@ -9,16 +9,22 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends libpq-dev && \
   rm -rf /var/lib/apt/lists/*
 
-# Copy the Rocket app files into the container at /app
-COPY . .
-
 # Install rust dependencies
 RUN cargo install cargo-watch & \
   cargo install diesel_cli --no-default-features --features postgres & \
   wait
 
+# Copy the Rocket app files into the container at /app
+COPY . .
+
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod 777 /usr/local/bin/docker-entrypoint.sh && \
+    # backwards compat
+    ln -s usr/local/bin/docker-entrypoint.sh /
+
+ENTRYPOINT ["docker-entrypoint.sh"]
 # Expose the port that your Rocket app will run on
 EXPOSE 8000
 
 # Command to run the Rocket app when the container starts
-CMD ["sh", "-c", "diesel migration run && cargo watch -x run"]
+CMD ["cargo", "watch", "-x", "run"]
