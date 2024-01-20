@@ -9,6 +9,7 @@ import logger from "@utils/logger";
 import env from "./environment";
 import { errorHandler } from "@/middleware/errorhandler.middleware";
 import { routeNotFound } from "@/middleware/notfound.middleware";
+import { onUploadFinish } from "@/middleware/upload.middleware";
 
 const port = env.PORT;
 const app: Express = express();
@@ -17,6 +18,7 @@ const tusServer = new Server({
     directory: "./uploads",
   }),
   path: "/uploads",
+  onUploadFinish,
 });
 
 function initMiddleware(): void {
