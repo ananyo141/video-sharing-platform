@@ -3,6 +3,7 @@ import { Server } from "@tus/server";
 import { FileStore } from "@tus/file-store";
 import cors from "cors";
 import express, { Express } from "express";
+import fs from "fs";
 import morgan from "morgan";
 
 import logger from "@utils/logger";
@@ -12,11 +13,16 @@ import { routeNotFound } from "@/middleware/notfound.middleware";
 import { onUploadFinish } from "@/middleware/uploadvideo.middleware";
 import { onIncomingRequest } from "@/middleware/uploadauth.middleware";
 
+// Create upload folder if doesn't exist
+if (!fs.existsSync(env.UPLOAD_FOLDER)) {
+  fs.mkdirSync(env.UPLOAD_FOLDER);
+}
+
 const port = env.PORT;
 const app: Express = express();
 const tusServer = new Server({
   datastore: new FileStore({
-    directory: "./uploads",
+    directory: "./" + env.UPLOAD_FOLDER,
   }),
   path: "/uploads",
   onIncomingRequest,

@@ -24,6 +24,7 @@ interface EnvType {
   MINIO_ROOT_PASSWORD: string;
   MINIO_BUCKET: string;
   PORT: string;
+  UPLOAD_FOLDER: string;
 }
 
 const env: EnvType = {
@@ -34,6 +35,7 @@ const env: EnvType = {
   MINIO_ROOT_PASSWORD: process.env.MINIO_ROOT_PASSWORD as string,
   MINIO_BUCKET: process.env.MINIO_BUCKET as string,
   PORT: process.env.PORT as string,
+  UPLOAD_FOLDER: process.env.UPLOAD_FOLDER as string,
 };
 
 if (Object.values(env).includes(undefined)) {
