@@ -1,32 +1,6 @@
 version: "3"
 
 services:
-  # Media Service #
-  media-handler-dev:
-    volumes:
-      - ./media-handler:/app
-    build:
-      context: ./media-handler
-      dockerfile: dev.dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - media-db
-    networks:
-      - video-sharing-platform
-    env_file:
-      - ./media-handler/.env.docker
-
-  media-db:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    networks:
-      - video-sharing-platform
-    # volumes:
-    #   - media-data:/data/db
-  # --- END --- #
-
   # User Service #
   user-management-dev:
     volumes:
@@ -35,7 +9,7 @@ services:
       context: ./user-management
       dockerfile: dev.dockerfile
     ports:
-      - "8000:8000"
+      - "8001:8000"
     depends_on:
       - user-db
     networks:
@@ -49,12 +23,34 @@ services:
       POSTGRES_USER: devdocker
       POSTGRES_PASSWORD: dbpassword
       POSTGRES_DB: user-docker-db
-    ports:
-      - "5432:5432"
     networks:
       - video-sharing-platform
     # volumes:
     #   - user-data:/var/lib/postgresql/data
+  # --- END --- #
+
+  # Media Service #
+  media-handler-dev:
+    volumes:
+      - ./media-handler:/app
+    build:
+      context: ./media-handler
+      dockerfile: dev.dockerfile
+    ports:
+      - "8002:3000"
+    depends_on:
+      - media-db
+    networks:
+      - video-sharing-platform
+    env_file:
+      - ./media-handler/.env.docker
+
+  media-db:
+    image: mongo:latest
+    networks:
+      - video-sharing-platform
+    # volumes:
+    #   - media-data:/data/db
   # --- END --- #
 
   # Video Processing Service #
@@ -80,7 +76,6 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"
       - "9001:9001" # Web Interface
     networks:
       - video-sharing-platform
