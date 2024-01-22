@@ -79,14 +79,14 @@ services:
       - "9001:9001" # Web Interface
     networks:
       - video-sharing-platform
-    volumes:
-      - video-bucket-volume:/data
+    # volumes:
+    #   - video-bucket-volume:/data
   # --- END --- #
 
 networks:
   video-sharing-platform:
 
-volumes:
+# volumes:
   # user-data:
   # media-data:
-  video-bucket-volume:
+  # video-bucket-volume:
