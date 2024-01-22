@@ -47,18 +47,24 @@ export async function uploadToMinio(
       bucketName,
       objectName,
       filePath,
-      (err: any, etag: any) => {
+      (
+        err: any,
+        details: {
+          etag: string;
+          versionId: string;
+        }
+      ) => {
         if (err) {
           logger.error(`Error uploading file: ${err}`);
           reject(err);
         } else {
-          logger.info(`File uploaded successfully. Etag: ${JSON.stringify(etag, null, 2)}`);
+          logger.info(`File uploaded successfully. Etag: ${details.etag}`);
           resolve(
             Object.freeze({
               bucketName,
               objectName,
               filePath,
-              etag,
+              etag: details.etag,
             })
           );
         }

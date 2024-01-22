@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Upload } from "@tus/server";
 
+import fs from "fs";
 import logger from "@/utils/logger";
 import { uploadToMinio } from "@/lib/uploadBucket";
 import env from "@/environment";
@@ -12,6 +13,12 @@ export const onUploadFinish = async (
   upload: Upload
 ) => {
   logger.info("Upload complete", upload.id);
-  uploadToMinio(upload.id, `./${env.UPLOAD_FOLDER}/${upload.id}`);
+  await uploadToMinio(upload.id, `./${env.UPLOAD_FOLDER}/${upload.id}`);
+  fs.unlink(`./${env.UPLOAD_FOLDER}/${upload.id}`, (err) => {
+    if (err) logger.error(err);
+  });
+  fs.unlink(`./${env.UPLOAD_FOLDER}/${upload.id}.json`, (err) => {
+    if (err) logger.error(err);
+  });
   return res;
 };
