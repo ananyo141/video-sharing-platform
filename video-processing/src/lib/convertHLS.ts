@@ -1,7 +1,10 @@
 import ffmpeg from "fluent-ffmpeg";
 
 // Function to convert video to HLS format
-export default function convertToHLS(inputPath: string, outputPath: string): Promise<void> {
+export default function convertToHLS(
+  inputPath: string,
+  outputPath: string
+): Promise<void> {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .outputOptions([
@@ -12,7 +15,7 @@ export default function convertToHLS(inputPath: string, outputPath: string): Pro
         "-hls_list_size 0", // 0 means keep all segments in the playlist
         "-f hls",
       ])
-      .output(`${outputPath}/output.m3u8`)
+      .output(outputPath)
       .on("end", () => resolve())
       .on("error", (err) => reject(err))
       .run();

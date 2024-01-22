@@ -1,12 +1,15 @@
 import ffmpeg from "fluent-ffmpeg";
 
 // Function to compress a video using FFmpeg
-export default function compressVideo(inputPath: string, outputPath: string): Promise<void> {
+export default function compressVideo(
+  inputPath: string,
+  outputPath: string
+): Promise<void> {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .videoCodec("libx264") // Video codec
+      .videoCodec("libx265") // Video codec
       .audioCodec("aac") // Audio codec
-      .size("640x480") // Output resolution
+      .size("1280x720") // Output resolution
       .outputOptions(["-crf 23", "-preset medium"]) // Additional options
       .on("end", () => resolve())
       .on("error", (err) => reject(err))

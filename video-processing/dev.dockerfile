@@ -1,9 +1,13 @@
 # Use an official Node.js runtime as the base image
-FROM node:18
+FROM node:18-alpine
 
 RUN mkdir /app
 # Set the working directory in the container to /app
 WORKDIR /app
+
+# Install FFmpeg and libx265
+RUN apk update && \
+    apk add ffmpeg
 
 # Copy package.json and package-lock.json into the root directory in the container
 COPY package.json yarn.lock ./
