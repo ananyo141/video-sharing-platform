@@ -5,27 +5,27 @@ import logger from "@/utils/logger";
 
 const MinioConfig: Minio.ClientOptions = {
   endPoint: env.MINIO_ENDPOINT,
-  port: parseInt(env.PORT),
+  port: parseInt(env.MINIO_PORT),
   useSSL: env.MINIO_SSL === "true",
-  accessKey: env.MINIO_ACCESS_KEY,
-  secretKey: env.MINIO_SECRET_KEY,
+  accessKey: env.MINIO_ROOT_USER,
+  secretKey: env.MINIO_ROOT_PASSWORD,
 };
 
 const MinioClient = new Minio.Client(MinioConfig);
 
 MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
   if (err) {
-    logger.crit(err);
+    logger.error(err);
     process.exit(1);
   }
 
   if (!exists) {
     MinioClient.makeBucket(env.MINIO_BUCKET, "", (err) => {
       if (err) {
-        logger.crit(err);
+        logger.error(err);
         process.exit(1);
       }
-      logger.alert(`Bucket "${env.MINIO_BUCKET}" created successfully.`);
+      logger.info(`Bucket "${env.MINIO_BUCKET}" created successfully.`);
     });
   }
 });
@@ -33,7 +33,7 @@ MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
 // Function to upload a file to Minio
 export async function uploadToMinio(
   objectName: string,
-  filePath: string,
+  filePath: string
 ): Promise<{
   objectName: string;
   filePath: string;
@@ -59,10 +59,10 @@ export async function uploadToMinio(
               objectName,
               filePath,
               etag,
-            }),
+            })
           );
         }
-      },
+      }
     );
   });
 }

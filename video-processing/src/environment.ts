@@ -20,8 +20,8 @@ interface EnvType {
   MINIO_ENDPOINT: string;
   MINIO_PORT: string;
   MINIO_SSL: string;
-  MINIO_ACCESS_KEY: string;
-  MINIO_SECRET_KEY: string;
+  MINIO_ROOT_USER: string;
+  MINIO_ROOT_PASSWORD: string;
   MINIO_BUCKET: string;
   PORT: string;
 }
@@ -30,8 +30,8 @@ const env: EnvType = {
   MINIO_ENDPOINT: process.env.MINIO_ENDPOINT as string,
   MINIO_PORT: process.env.MINIO_PORT as string,
   MINIO_SSL: process.env.MINIO_SSL as string,
-  MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY as string,
-  MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY as string,
+  MINIO_ROOT_USER: process.env.MINIO_ROOT_USER as string,
+  MINIO_ROOT_PASSWORD: process.env.MINIO_ROOT_PASSWORD as string,
   MINIO_BUCKET: process.env.MINIO_BUCKET as string,
   PORT: process.env.PORT as string,
 };

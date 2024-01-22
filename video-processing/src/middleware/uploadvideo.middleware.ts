@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "http";
 import type { Upload } from "@tus/server";
 
 import logger from "@/utils/logger";
+import { uploadToMinio } from "@/lib/uploadBucket";
 
 // TODO: Implement minio upload logic
 export const onUploadFinish = async (
@@ -10,5 +11,6 @@ export const onUploadFinish = async (
   upload: Upload
 ) => {
   logger.info("Upload complete", upload.id);
+  uploadToMinio(upload.id, `./uploads/${upload.id}`);
   return res;
 };

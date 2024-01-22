@@ -9,7 +9,7 @@ import logger from "@utils/logger";
 import env from "./environment";
 import { errorHandler } from "@/middleware/errorhandler.middleware";
 import { routeNotFound } from "@/middleware/notfound.middleware";
-import { onUploadFinish } from "@/middleware/upload.middleware";
+import { onUploadFinish } from "@/middleware/uploadvideo.middleware";
 import { onIncomingRequest } from "@/middleware/uploadauth.middleware";
 
 const port = env.PORT;
