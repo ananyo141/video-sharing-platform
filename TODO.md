@@ -21,4 +21,5 @@
 
 ## Video Processing
 
-- [ ] Processing capability
+- [x] Processing capability
+- [ ] Handle different types (formats) of media upload
