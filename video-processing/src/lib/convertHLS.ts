@@ -1,23 +1,44 @@
 import ffmpeg from "fluent-ffmpeg";
+import fs from "fs";
+import path from "path";
+
+import logger from "@/utils/logger";
 
 // Function to convert video to HLS format
-export default function convertToHLS(
-  inputPath: string,
-  outputPath: string
-): Promise<void> {
+export default function convertToHLS(inputPath: string): Promise<void> {
+  // Create the hls folder if it doesn't exist
+  const inputPathDir = inputPath + "_hls";
+  if (!fs.existsSync(inputPathDir)) {
+    fs.mkdirSync(inputPathDir);
+  }
+  logger.debug(inputPathDir);
+  const playlistPath = path.join(inputPathDir, "playlist.m3u8");
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .outputOptions([
-        "-profile:v baseline",
+        // "-profile:v baseline",
+        // "-c:v h264",
+        "-c:v libx265",
+        "-tag:v hvc1",
         "-level 3.0",
         "-start_number 0",
         "-hls_time 10", // Set the segment duration (in seconds)
         "-hls_list_size 0", // 0 means keep all segments in the playlist
         "-f hls",
+        `-hls_segment_filename ${path.join(inputPathDir, "segment%03d.ts")}`,
       ])
-      .output(outputPath)
+      .output(playlistPath)
+      .on("progress", (progress) =>
+        logger.info(`Progress: ${progress.percent}%`)
+      )
       .on("end", () => resolve())
-      .on("error", (err) => reject(err))
+      .on("error", (err, stdout, stderr) => {
+        // Log detailed error information
+        logger.error("Error:" + err);
+        logger.error("ffmpeg stdout:\n" + stdout);
+        logger.error("ffmpeg stderr:\n" + stderr);
+        reject(err);
+      })
       .run();
   });
 }

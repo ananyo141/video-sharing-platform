@@ -1,4 +1,7 @@
 import * as Minio from "minio";
+import * as fs from "fs";
+import * as path from "path";
+import { promisify } from "util";
 
 import env from "@/environment";
 import logger from "@/utils/logger";
@@ -10,6 +13,9 @@ const MinioConfig: Minio.ClientOptions = {
   accessKey: env.MINIO_ROOT_USER,
   secretKey: env.MINIO_ROOT_PASSWORD,
 };
+
+// Promisify fs.readdir to use it with async/await
+const readdirAsync = promisify(fs.readdir);
 
 const MinioClient = new Minio.Client(MinioConfig);
 
@@ -30,8 +36,34 @@ MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
   }
 });
 
+// Function to recursively upload a folder and its contents to Minio
+export async function uploadFolderBucket(
+  localFolderPath: string,
+  remoteFolderPath: string
+): Promise<void> {
+  // Get a list of files in the local folder
+  const files = await readdirAsync(localFolderPath);
+
+  // Upload each file to MinIO
+  for (const file of files) {
+    const filePath = path.join(localFolderPath, file);
+    const objectName = path.join(remoteFolderPath, file);
+
+    // Check if it's a file or a directory
+    const stats = fs.statSync(filePath);
+    if (stats.isFile()) {
+      // Upload file
+      await uploadToBucket(objectName, filePath);
+      logger.info(`Uploaded file: ${objectName}`);
+    } else if (stats.isDirectory()) {
+      // Recursively upload contents of subdirectory
+      await uploadFolderBucket(filePath, objectName);
+    }
+  }
+}
+
 // Function to upload a file to Minio
-export async function uploadToMinio(
+export async function uploadToBucket(
   objectName: string,
   filePath: string
 ): Promise<{
