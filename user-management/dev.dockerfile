@@ -1,5 +1,5 @@
 # Use the official Rust image as a base image
-FROM rust:1.75
+FROM rust:1.75-slim-bullseye
 
 # Set the working directory inside the container
 WORKDIR /app
