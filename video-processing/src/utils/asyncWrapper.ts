@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import CustomError from "@/errors";
+import logger from "@utils/logger";
 
 type Callback = (
   _req: Request,
@@ -16,7 +17,7 @@ const asyncWrapper =
     try {
       await callback(_req, _res, _next);
     } catch (error: any) {
-      console.error(error.message);
+      logger.error(error.message);
       _next(
         new CustomError.InternalServerError(
           `Something went wrong ${error.message}`
