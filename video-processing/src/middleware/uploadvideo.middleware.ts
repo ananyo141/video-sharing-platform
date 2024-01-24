@@ -1,11 +1,16 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import type { Upload } from "@tus/server";
+import { Queue } from "bullmq";
 
-import fs from "fs";
 import logger from "@/utils/logger";
-import { uploadFolderBucket } from "@/lib/uploadBucket";
 import env from "@/environment";
-import convertToHLS from "@/lib/convertHLS";
+
+const queue = new Queue(env.JOB_QUEUE_NAME, {
+  connection: {
+    host: env.REDIS_HOST,
+    port: parseInt(env.REDIS_PORT),
+  },
+});
 
 export const onUploadFinish = async (
   _: IncomingMessage,
@@ -14,25 +19,8 @@ export const onUploadFinish = async (
 ) => {
   logger.info("Uploaded file to server", upload.id);
   const filename = `./${env.UPLOAD_FOLDER}/${upload.id}`;
+  const job = await queue.add("video", { filename });
+  logger.info(`Job ${job.id} added to queue`);
 
-  try {
-    // transcode video
-    await convertToHLS(filename);
-    // delete original file
-    fs.unlink(filename, (err) => {
-      if (err) logger.error(err);
-    });
-    fs.unlink(filename + ".json", (err) => {
-      if (err) logger.error(err);
-    });
-    // upload to minio
-    await uploadFolderBucket(filename + "_hls", filename);
-    // delete muxed file
-    fs.rm(filename + "_hls", { recursive: true }, (err) => {
-      if (err) logger.error(err);
-    });
-  } catch (err) {
-    logger.error(err);
-  }
   return res;
 };

@@ -64,10 +64,16 @@ services:
       - "8003:8003"
     depends_on:
       - video-bucket
+      - video-redis
     networks:
       - video-sharing-platform
     env_file:
       - ./video-processing/.env.docker
+
+  video-redis:
+    image: redis:7-alpine
+    networks:
+      - video-sharing-platform
 
   video-bucket:
     image: minio/minio

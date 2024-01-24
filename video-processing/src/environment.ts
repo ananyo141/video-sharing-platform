@@ -25,6 +25,9 @@ interface EnvType {
   MINIO_BUCKET: string;
   PORT: string;
   UPLOAD_FOLDER: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  JOB_QUEUE_NAME: string;
 }
 
 const env: EnvType = {
@@ -36,6 +39,9 @@ const env: EnvType = {
   MINIO_BUCKET: process.env.MINIO_BUCKET as string,
   PORT: process.env.PORT as string,
   UPLOAD_FOLDER: process.env.UPLOAD_FOLDER as string,
+  REDIS_HOST: process.env.REDIS_HOST as string,
+  REDIS_PORT: process.env.REDIS_PORT as string,
+  JOB_QUEUE_NAME: process.env.JOB_QUEUE_NAME as string,
 };
 
 if (Object.values(env).includes(undefined)) {
