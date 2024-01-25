@@ -89,10 +89,22 @@ services:
     #   - video-bucket-volume:/data
   # --- END --- #
 
+  # Web Client #
+  web-client-dev:
+    volumes:
+      - ./web-client:/app
+    build:
+      context: ./web-client
+      dockerfile: dev.dockerfile
+    ports:
+      - "8004:3000"
+    networks:
+      - video-sharing-platform
+  # --- END --- #
+
 networks:
   video-sharing-platform:
-
 # volumes:
-  # user-data:
-  # media-data:
-  # video-bucket-volume:
+# user-data:
+# media-data:
+# video-bucket-volume:
