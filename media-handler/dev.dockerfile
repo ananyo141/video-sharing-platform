@@ -10,14 +10,15 @@ ENV GO111MODULE=on
 # Install necessary dependencies
 RUN apk --no-cache add git
 
+# Build the GoFiber app
+RUN go install github.com/githubnemo/CompileDaemon@latest
+
 # Copy the GoFiber app files into the container at /app
 COPY . .
 
 # Download GoFiber dependencies
 RUN go mod download
 
-# Build the GoFiber app
-RUN go install github.com/githubnemo/CompileDaemon@latest
 
 # Expose the port that your GoFiber app will run on
 EXPOSE 3000
