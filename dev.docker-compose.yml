@@ -1,6 +1,19 @@
 version: "3"
 
 services:
+  # API Gateway #
+  traefik:
+    image: traefik:v2.10
+    restart: always
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8001:80"
+      - "8002:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - video-sharing-platform
+
   # User Service #
   user-management-dev:
     volumes:
@@ -8,10 +21,11 @@ services:
     build:
       context: ./user-management
       dockerfile: dev.dockerfile
-    ports:
-      - "8001:8000"
     depends_on:
       - user-db
+      - traefik
+    labels:
+      - "traefik.http.routers.user-management-dev.rule=Host(`user.localhost`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -36,10 +50,11 @@ services:
     build:
       context: ./media-handler
       dockerfile: dev.dockerfile
-    ports:
-      - "8002:3000"
     depends_on:
       - media-db
+      - traefik
+    labels:
+      - "traefik.http.routers.media-handler-dev.rule=Host(`media.localhost`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -60,11 +75,12 @@ services:
     build:
       context: ./video-processing
       dockerfile: dev.dockerfile
-    ports:
-      - "8003:8003"
     depends_on:
       - video-bucket
       - video-redis
+      - traefik
+    labels:
+      - "traefik.http.routers.video-service-dev.rule=Host(`video.localhost`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -82,7 +98,7 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9001:9001" # Web Interface
+      - "8003:9001" # Web Interface
     networks:
       - video-sharing-platform
     # volumes:
@@ -96,8 +112,10 @@ services:
     build:
       context: ./web-client
       dockerfile: dev.dockerfile
-    ports:
-      - "8004:3000"
+    depends_on:
+      - traefik
+    labels:
+      - "traefik.http.routers.web-client-dev.rule=Host(`web.localhost`)"
     networks:
       - video-sharing-platform
   # --- END --- #
