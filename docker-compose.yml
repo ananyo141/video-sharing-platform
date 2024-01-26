@@ -1,13 +1,1 @@
-# FIXME: Update for production
-version: "3"
-
-services:
-  media-handler:
-    build: ./media-handler
-    ports:
-      - "3000:3000"
-
-  user-management:
-    build: ./user-management
-    ports:
-      - "8000:8000"
+dev.docker-compose.yml
