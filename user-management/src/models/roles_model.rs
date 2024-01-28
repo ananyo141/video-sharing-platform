@@ -1,5 +1,3 @@
-use crate::schema::roles;
-
 use diesel::{self, prelude::*};
 use serde::{Deserialize, Serialize};
 
