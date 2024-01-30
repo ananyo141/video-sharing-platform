@@ -24,6 +24,6 @@ mod tests {
         let hashed_password = hash_password(password).unwrap();
         assert_ne!(password, hashed_password);
         assert!(compare_password(password, &hashed_password));
+        assert_eq!(compare_password("invalid", &hashed_password), false);
     }
 }
-

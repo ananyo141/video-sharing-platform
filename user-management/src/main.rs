@@ -10,7 +10,7 @@ mod models;
 mod schema;
 mod utils;
 
-use controllers::user_controller::user_routes;
+use controllers::{auth_controllers::auth_routes, user_controller::user_routes};
 use errors::catchers::get_catchers;
 use utils::res_fmt::ResFmt;
 
@@ -29,4 +29,5 @@ fn rocket() -> _ {
         .register("/", get_catchers())
         .mount("/", routes![index])
         .mount("/users", user_routes())
+        .mount("/auth", auth_routes())
 }

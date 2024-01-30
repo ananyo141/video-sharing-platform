@@ -87,7 +87,7 @@ impl User {
     }
 
     pub async fn find_by_email(conn: Db, user_email: String) -> QueryResult<User> {
-        conn.run(move |c| users::table.filter(users::email.eq(user_email)).first(c))
+        conn.run(|c| users::table.filter(users::email.eq(user_email)).first(c))
             .await
     }
 

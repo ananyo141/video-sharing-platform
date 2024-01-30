@@ -33,49 +33,6 @@ pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Stat
     }
 }
 
-#[post("/", data = "<user>")]
-pub async fn create_user<'a>(
-    connection: Db,
-    user: Result<Json<NewUser>, rocket::serde::json::Error<'a>>,
-) -> Result<Created<Json<Value>>, CustomError> {
-    // Validate user
-    let validated_user = user.map_err(|err| {
-        CustomError::bad_request(
-            String::from("Invalid schema"),
-            Some(vec![ErrorDetails {
-                field: Some(err.to_string()),
-                message: err.source().map_or_else(
-                    || String::from("Unable to create user"),
-                    |source| source.to_string(),
-                ),
-            }]),
-        )
-    })?;
-
-    // Create a new user in the database
-    let user = User::create(connection, &validated_user.into_inner())
-        .await
-        .map_err(|err| {
-            let error_details = vec![ErrorDetails {
-                field: Some(err.to_string()),
-                message: err.source().map_or_else(
-                    || String::from("Unable to create user"),
-                    |source| source.to_string(),
-                ),
-            }];
-
-            CustomError::bad_request(String::from("Invalid schema"), Some(error_details))
-        })?;
-
-    Ok(
-        Created::new(format!("/users/{}", user.id).to_string()).body(
-            ResFmt::new(true, "User created")
-                .with_data(json!(user))
-                .to_json(),
-        ),
-    )
-}
-
 // FIXME: Update is not recording the timestamp
 #[patch("/<id>", data = "<user>")]
 pub async fn update_user<'a>(
@@ -127,7 +84,6 @@ pub fn user_routes() -> Vec<rocket::Route> {
     routes![
         get_all_users,
         get_user_by_id,
-        create_user,
         update_user,
         delete_user
     ]
