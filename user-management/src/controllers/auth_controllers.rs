@@ -10,7 +10,7 @@ use crate::{
     errors::custom_error::{CustomError, ErrorDetails},
     models::{
         auth_model::{LoginRequest, Token},
-        user_model::{NewUser, User},
+        user_model::{NewUser, User, UserView},
     },
     utils::{
         hash_passwd::compare_password,
@@ -127,7 +127,7 @@ pub async fn register<'a>(
     Ok(
         Created::new(format!("/users/{}", user.id).to_string()).body(
             ResFmt::new(true, "User created")
-                .with_data(json!(user))
+                .with_data(json!(UserView::from_user(user)))
                 .to_json(),
         ),
     )

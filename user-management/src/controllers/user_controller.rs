@@ -2,21 +2,32 @@ use std::error::Error;
 
 use rocket::{
     http::Status,
-    response::status::Created,
     serde::json::{json, Json, Value},
 };
 
 use crate::{
     errors::custom_error::{CustomError, ErrorDetails},
-    models::user_model::{NewUser, UpdateUser, User},
+    models::user_model::{UpdateUser, User},
     utils::res_fmt::ResFmt,
     Db,
 };
 
+// FIXME: Return UserVeiw instead of User, to hide hashed password
+#[get("/?<id>")]
+pub async fn get_users_by_ids(db: Db, id: Vec<i32>) -> Result<Json<Value>, CustomError> {
+    let user_ids = id;
+    match User::find_by_ids(db, user_ids).await.map(Json) {
+        Ok(users) => Ok(ResFmt::new(true, "Fetched user")
+            .with_data(json!(users.into_inner()))
+            .to_json()),
+        Err(_) => Err(CustomError::not_found("No users found".to_string())),
+    }
+}
+
 #[get("/")]
 pub async fn get_all_users(connection: Db) -> Result<Json<Value>, CustomError> {
     match User::find_all_with_roles(connection).await.map(Json) {
-        Ok(users) => Ok(ResFmt::new(true, "users")
+        Ok(users) => Ok(ResFmt::new(true, "Fetched users")
             .with_data(json!(users.into_inner()))
             .to_json()),
         Err(_) => Err(CustomError::not_found("No users found".to_string())),
@@ -84,6 +95,7 @@ pub fn user_routes() -> Vec<rocket::Route> {
     routes![
         get_all_users,
         get_user_by_id,
+        get_users_by_ids,
         update_user,
         delete_user
     ]
