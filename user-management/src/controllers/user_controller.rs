@@ -14,20 +14,18 @@ use crate::{
 
 // FIXME: Return UserVeiw instead of User, to hide hashed password
 #[get("/?<id>")]
-pub async fn get_users_by_ids(db: Db, id: Vec<i32>) -> Result<Json<Value>, CustomError> {
+pub async fn get_users_by_ids(connection: Db, id: Vec<i32>) -> Result<Json<Value>, CustomError> {
     let user_ids = id;
-    match User::find_by_ids(db, user_ids).await.map(Json) {
-        Ok(users) => Ok(ResFmt::new(true, "Fetched user")
-            .with_data(json!(users.into_inner()))
-            .to_json()),
-        Err(_) => Err(CustomError::not_found("No users found".to_string())),
+    if user_ids.is_empty() {
+        return match User::find_all_with_roles(connection).await.map(Json) {
+            Ok(users) => Ok(ResFmt::new(true, "Fetched users")
+                .with_data(json!(users.into_inner()))
+                .to_json()),
+            Err(_) => Err(CustomError::not_found("No users found".to_string())),
+        };
     }
-}
-
-#[get("/")]
-pub async fn get_all_users(connection: Db) -> Result<Json<Value>, CustomError> {
-    match User::find_all_with_roles(connection).await.map(Json) {
-        Ok(users) => Ok(ResFmt::new(true, "Fetched users")
+    match User::find_by_ids(connection, user_ids).await.map(Json) {
+        Ok(users) => Ok(ResFmt::new(true, "Fetched user")
             .with_data(json!(users.into_inner()))
             .to_json()),
         Err(_) => Err(CustomError::not_found("No users found".to_string())),
@@ -92,11 +90,5 @@ pub async fn delete_user(connection: Db, id: i32) -> Result<Json<Value>, CustomE
 
 // export all the controllers
 pub fn user_routes() -> Vec<rocket::Route> {
-    routes![
-        get_all_users,
-        get_user_by_id,
-        get_users_by_ids,
-        update_user,
-        delete_user
-    ]
+    routes![get_user_by_id, get_users_by_ids, update_user, delete_user]
 }
