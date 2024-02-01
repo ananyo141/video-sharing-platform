@@ -25,7 +25,7 @@ services:
       - user-db
       - traefik
     labels:
-      - "traefik.http.routers.user-management-dev.rule=Host(`user.localhost`)"
+      - "traefik.http.routers.user-management-dev.rule=(PathPrefix(`/users`) || PathPrefix(`/auth`))"
     networks:
       - video-sharing-platform
     env_file:
@@ -54,7 +54,7 @@ services:
       - media-db
       - traefik
     labels:
-      - "traefik.http.routers.media-handler-dev.rule=Host(`media.localhost`)"
+      - "traefik.http.routers.media-handler-dev.rule=PathPrefix(`/media`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -80,7 +80,7 @@ services:
       - video-redis
       - traefik
     labels:
-      - "traefik.http.routers.video-service-dev.rule=Host(`video.localhost`)"
+      - "traefik.http.routers.video-service-dev.rule=PathPrefix(`/video`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -115,7 +115,7 @@ services:
     depends_on:
       - traefik
     labels:
-      - "traefik.http.routers.web-client-dev.rule=Host(`web.localhost`)"
+      - "traefik.http.routers.web-client-dev.rule=PathPrefix(`/`)"
     networks:
       - video-sharing-platform
   # --- END --- #

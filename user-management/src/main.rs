@@ -27,7 +27,7 @@ fn rocket() -> _ {
     rocket::build()
         .attach(Db::fairing())
         .register("/", get_catchers())
-        .mount("/", routes![index])
+        .mount("/users/healthcheck", routes![index])
         .mount("/users", user_routes())
         .mount("/auth", auth_routes())
 }
