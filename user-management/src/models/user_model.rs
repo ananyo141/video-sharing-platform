@@ -145,7 +145,19 @@ impl User {
     }
 
     pub async fn delete(conn: Db, user_id: i32) -> QueryResult<usize> {
-        conn.run(move |c| diesel::delete(users::table.find(user_id)).execute(c))
-            .await
+        let result = conn
+            .run(move |c| diesel::delete(users::table.find(user_id)).execute(c))
+            .await;
+
+        match result {
+            Ok(count) => {
+                if count == 0 {
+                    Err(diesel::result::Error::NotFound)
+                } else {
+                    Ok(count)
+                }
+            }
+            Err(err) => Err(err),
+        }
     }
 }
