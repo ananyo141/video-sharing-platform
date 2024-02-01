@@ -9,12 +9,12 @@ use rocket::{
 use crate::{
     errors::custom_error::{CustomError, ErrorDetails},
     models::{
-        auth_model::{LoginRequest, Token},
+        auth_model::{Claims, LoginRequest},
         user_model::{NewUser, User, UserView},
     },
     utils::{
         hash_passwd::compare_password,
-        jwt::{generate_token, verify_token},
+        jwt::generate_token,
         res_fmt::ResFmt,
     },
     Db,
@@ -70,25 +70,22 @@ pub async fn login<'a>(
     }
 }
 
-#[post("/verify_token", data = "<token_request>")]
-pub async fn verify_token_handler(
-    connection: Db,
-    token_request: Json<Token>,
-) -> Result<Json<Value>, CustomError> {
-    if let Some(claims) = verify_token(&token_request.access_token) {
-        match User::find_by_id(connection, claims.user_id).await.map(Json) {
-            Ok(user) => Ok(ResFmt::new(true, "user")
-                .with_data(json!(user.into_inner()))
-                .to_json()),
-            Err(_) => Err(CustomError::unauthorized("Invalid token".to_string(), None)),
-        }
-    } else {
-        Err(CustomError::unauthorized(
-            String::from("Invalid token"),
-            None,
-        ))
+#[get("/verify_token")]
+pub async fn verify_token_handler(connection: Db, auth: Claims) -> Result<Json<Value>, CustomError> {
+    match User::find_by_id(connection, auth.user_id).await {
+        Ok(user) => Ok(ResFmt::new(true, "User profile fetched")
+            .with_data(json!(user))
+            .to_json()),
+        Err(err) => Err(CustomError::bad_request(
+            String::from("Unable to find user"),
+            Some(vec![ErrorDetails {
+                field: Some(err.to_string()),
+                message: String::from("Unable to find user"),
+            }]),
+        )),
     }
 }
+
 
 #[post("/register", data = "<user>")]
 pub async fn register<'a>(
