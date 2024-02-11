@@ -11,7 +11,7 @@ COPY . .
 RUN go mod download
 
 # Build the GoFiber app
-RUN go build -o main ./src
+RUN go build -o main
 
 # Expose the port that your GoFiber app will run on
 EXPOSE 3000
