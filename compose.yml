@@ -15,8 +15,13 @@ services:
 
   # User Service #
   user-management-dev:
-    volumes:
-      - ./user-management:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./user-management/src
+          target: /app/src
+          ignore:
+            - target/
     build:
       context: ./user-management
       dockerfile: dev.dockerfile
@@ -42,8 +47,14 @@ services:
 
   # Media Service #
   media-handler-dev:
-    volumes:
-      - ./media-handler:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./media-handler
+          target: /app
+          ignore:
+            - main
+            - media-handler
     build:
       context: ./media-handler
       dockerfile: dev.dockerfile
@@ -65,8 +76,16 @@ services:
 
   # Video Processing Service #
   video-service-dev:
-    volumes:
-      - ./video-processing:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./video-processing/src
+          target: /app/src
+          ignore:
+            - build/
+            - uploads/
+        - action: rebuild
+          path: package.json
     build:
       context: ./video-processing
       dockerfile: dev.dockerfile
@@ -100,8 +119,16 @@ services:
 
   # Web Client #
   web-client-dev:
-    volumes:
-      - ./web-client:/app
+    develop:
+      watch:
+        - action: sync
+          path: ./web-client/src
+          target: /app/src
+          ignore:
+            - node_modules/
+            - .next/
+        - action: rebuild
+          path: package.json
     build:
       context: ./web-client
       dockerfile: dev.dockerfile
