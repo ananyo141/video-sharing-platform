@@ -4,7 +4,6 @@ services:
   # API Gateway #
   traefik:
     image: traefik:v2.10
-    restart: always
     command: --api.insecure=true --providers.docker
     ports:
       - "8001:80"
@@ -39,8 +38,6 @@ services:
       POSTGRES_DB: user-docker-db
     networks:
       - video-sharing-platform
-    # volumes:
-    #   - user-data:/var/lib/postgresql/data
   # --- END --- #
 
   # Media Service #
@@ -64,8 +61,6 @@ services:
     image: mongo:latest
     networks:
       - video-sharing-platform
-    # volumes:
-    #   - media-data:/data/db
   # --- END --- #
 
   # Video Processing Service #
@@ -101,8 +96,6 @@ services:
       - "8003:9001" # Web Interface
     networks:
       - video-sharing-platform
-    # volumes:
-    #   - video-bucket-volume:/data
   # --- END --- #
 
   # Web Client #
@@ -122,7 +115,3 @@ services:
 
 networks:
   video-sharing-platform:
-# volumes:
-# user-data:
-# media-data:
-# video-bucket-volume:
