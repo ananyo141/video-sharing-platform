@@ -9,29 +9,30 @@ import (
 	"media-handler/graph/model"
 )
 
+// FIXME: Add validation to the resolvers
 // CreateVideo is the resolver for the createVideo field.
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
-	return r.DB.CreateVideo(input), nil
+	return r.DB.CreateVideo(input)
 }
 
 // UpdateVideo is the resolver for the updateVideo field.
 func (r *mutationResolver) UpdateVideo(ctx context.Context, id string, input model.UpdateVideoInput) (*model.Video, error) {
-	return r.DB.UpdateVideo(id, input), nil
+	return r.DB.UpdateVideo(id, input)
 }
 
 // DeleteVideo is the resolver for the deleteVideo field.
 func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.Video, error) {
-	return r.DB.DeleteVideo(id), nil
+	return r.DB.DeleteVideo(id)
 }
 
 // Videos is the resolver for the videos field.
 func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
-	return r.DB.GetVideos(), nil
+	return r.DB.GetVideos()
 }
 
 // Video is the resolver for the video field.
 func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, error) {
-	return r.DB.GetVideo(id), nil
+	return r.DB.GetVideo(id)
 }
 
 // Mutation returns MutationResolver implementation.

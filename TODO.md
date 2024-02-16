@@ -8,6 +8,7 @@
 - [ ] Add postman collection json to the repo
 - [ ] Add rate limiting
 - [ ] Kubernetes config for deployment
+- [ ] Validation in api routes
 
 ## Media Handler
 

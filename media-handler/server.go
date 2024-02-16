@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 
+	"context"
 	"encoding/json"
 	"log"
 	"media-handler/db"
@@ -25,6 +27,11 @@ func main() {
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		DB: dbInstance,
 	}}))
+
+	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
+		// notify bug-tracker
+		return gqlerror.Errorf("Internal server error")
+	})
 
 	http.Handle("/media/playground", playground.Handler("GraphQL playground", "/graphql"))
 	http.Handle("/media/graphql", srv)
