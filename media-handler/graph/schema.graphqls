@@ -8,6 +8,17 @@ type Video {
   description: String!
   source: String!
   userId: Int!
+  likes: [Int!]!
+  comments: [Comment!]!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Comment {
+  _id: ID!
+  text: String!
+  userId: Int!
+  videoId: Int!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -21,6 +32,12 @@ type Mutation {
   createVideo(input: CreateVideoInput!): Video!
   updateVideo(id: ID!, input: UpdateVideoInput!): Video!
   deleteVideo(id: ID!): Video!
+
+  likeVideo(id: ID!, userId: Int!): Video!
+
+  createComment(input: CreateCommentInput!): Comment!
+  updateComment(id: ID!, input: UpdateCommentInput!): Comment!
+  deleteComment(id: ID!): Comment!
 }
 
 input CreateVideoInput {
@@ -38,6 +55,22 @@ input UpdateVideoInput {
 }
 
 input DeleteVideoInput {
+  id: ID!
+}
+
+input CreateCommentInput {
+  text: String!
+  userId: Int!
+  videoId: Int!
+}
+
+input UpdateCommentInput {
+  text: String
+  userId: Int
+  videoId: Int
+}
+
+input DeleteCommentInput {
   id: ID!
 }
 

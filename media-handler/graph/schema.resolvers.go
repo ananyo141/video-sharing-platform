@@ -35,6 +35,33 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 	return r.DB.GetVideo(id)
 }
 
+// ********* Comment Resolvers ********* //
+func (r *mutationResolver) CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error) {
+	return nil, nil
+}
+
+func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error) {
+  return nil, nil
+}
+
+func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
+  return nil, nil
+}
+
+func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
+  return nil, nil
+}
+
+func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
+  return nil, nil
+}
+
+// ********* Like Resolver ********* //
+func (r *mutationResolver) LikeVideo(ctx context.Context, videoId string, userid int) (*model.Video, error) {
+  return nil, nil
+}
+
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
