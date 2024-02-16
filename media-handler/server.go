@@ -30,7 +30,7 @@ func main() {
 
 	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
 		// notify bug-tracker
-		return gqlerror.Errorf("Internal server error")
+		return gqlerror.Errorf("Internal server error %s", err)
 	})
 
 	http.Handle("/media/playground", playground.Handler("GraphQL playground", "/graphql"))

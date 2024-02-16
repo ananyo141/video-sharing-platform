@@ -18,7 +18,7 @@ type Comment {
   _id: ID!
   text: String!
   userId: Int!
-  videoId: Int!
+  videoId: String!
   createdAt: Time!
   updatedAt: Time!
 }
@@ -26,6 +26,7 @@ type Comment {
 type Query {
   videos: [Video!]!
   video(id: ID!): Video!
+  comment(id: ID!): Comment!
 }
 
 type Mutation {
@@ -61,13 +62,11 @@ input DeleteVideoInput {
 input CreateCommentInput {
   text: String!
   userId: Int!
-  videoId: Int!
+  videoId: String!
 }
 
 input UpdateCommentInput {
   text: String
-  userId: Int
-  videoId: Int
 }
 
 input DeleteCommentInput {

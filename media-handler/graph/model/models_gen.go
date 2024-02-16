@@ -10,7 +10,7 @@ type Comment struct {
 	ID        string    `json:"_id" bson:"_id"`
 	Text      string    `json:"text" bson:"text"`
 	UserID    int       `json:"userId" bson:"userId"`
-	VideoID   int       `json:"videoId" bson:"videoId"`
+	VideoID   string    `json:"videoId" bson:"videoId"`
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
 }
@@ -18,7 +18,7 @@ type Comment struct {
 type CreateCommentInput struct {
 	Text    string `json:"text" bson:"text"`
 	UserID  int    `json:"userId" bson:"userId"`
-	VideoID int    `json:"videoId" bson:"videoId"`
+	VideoID string `json:"videoId" bson:"videoId"`
 }
 
 type CreateVideoInput struct {
@@ -43,9 +43,7 @@ type Query struct {
 }
 
 type UpdateCommentInput struct {
-	Text    *string `json:"text,omitempty" bson:"text"`
-	UserID  *int    `json:"userId,omitempty" bson:"userId"`
-	VideoID *int    `json:"videoId,omitempty" bson:"videoId"`
+	Text *string `json:"text,omitempty" bson:"text"`
 }
 
 type UpdateVideoInput struct {

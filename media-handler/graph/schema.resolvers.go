@@ -37,7 +37,7 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 
 // ********* Comment Resolvers ********* //
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error) {
-	return nil, nil
+	return r.DB.CreateComment(input)
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error) {
@@ -53,7 +53,7 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) 
 }
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
-  return nil, nil
+  return r.DB.GetComment(id)
 }
 
 // ********* Like Resolver ********* //

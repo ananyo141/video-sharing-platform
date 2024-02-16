@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"media-handler/utils"
 	"time"
 
 	"media-handler/graph/model"
@@ -13,9 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-var collectionName = "videos"
-var dbName = utils.Env["DB_NAME"]
 
 func (db *DB) GetVideo(id string) (*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
