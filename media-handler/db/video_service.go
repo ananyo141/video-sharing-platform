@@ -15,9 +15,10 @@ import (
 )
 
 var collectionName = "videos"
+var dbName = utils.Env["DB_NAME"]
 
 func (db *DB) GetVideo(id string) (*model.Video, error) {
-	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
+	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -32,7 +33,7 @@ func (db *DB) GetVideo(id string) (*model.Video, error) {
 }
 
 func (db *DB) GetVideos() ([]*model.Video, error) {
-	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
+	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	var videos []*model.Video
@@ -49,7 +50,7 @@ func (db *DB) GetVideos() ([]*model.Video, error) {
 }
 
 func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) (*model.Video, error) {
-	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
+	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	inserg, err := videoCollec.InsertOne(ctx,
@@ -79,7 +80,7 @@ func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) (*model.Video, error) 
 }
 
 func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) (*model.Video, error) {
-	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
+	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -113,7 +114,7 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) (*mo
 }
 
 func (db *DB) DeleteVideo(videoId string) (*model.Video, error) {
-	videoCollec := db.client.Database(utils.Env["DB_NAME"]).Collection(collectionName)
+	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
