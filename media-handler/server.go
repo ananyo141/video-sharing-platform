@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 
+	"context"
 	"encoding/json"
 	"log"
 	"media-handler/db"
@@ -26,13 +28,18 @@ func main() {
 		DB: dbInstance,
 	}}))
 
-	http.Handle("/playground", playground.Handler("GraphQL playground", "/graphql"))
-	http.Handle("/graphql", srv)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
+		// notify bug-tracker
+		return gqlerror.Errorf("Internal server error %s", err)
+	})
+
+	http.Handle("/media/playground", playground.Handler("GraphQL playground", "/graphql"))
+	http.Handle("/media/graphql", srv)
+	http.HandleFunc("/media/", func(w http.ResponseWriter, r *http.Request) {
 		var success bool = true
 		var status int = http.StatusOK
 		var message string = "Media Handler API is running!"
-		if r.URL.Path != "/" {
+		if r.URL.Path != "/media/" {
 			success = false
 			status = http.StatusNotFound
 			message = "Please use a valid route"
@@ -50,6 +57,6 @@ func main() {
 		json.NewEncoder(w).Encode(response)
 	})
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Printf("connect to /media/playground for GraphQL playground")
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

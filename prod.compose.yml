@@ -1,17 +1,30 @@
 version: "3"
 
 services:
-  # User Service #
-  user-management-dev:
+  # API Gateway #
+  traefik:
+    image: traefik:v2.10
+    restart: always
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8001:80"
+      - "8002:8080"
     volumes:
-      - ./user-management:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - video-sharing-platform
+
+  # User Service #
+  user-management:
+    restart: always
     build:
       context: ./user-management
-      dockerfile: dev.dockerfile
-    ports:
-      - "8001:8000"
+      dockerfile: Dockerfile
     depends_on:
       - user-db
+      - traefik
+    labels:
+      - "traefik.http.routers.user-management.rule=(PathPrefix(`/users`) || PathPrefix(`/auth`))"
     networks:
       - video-sharing-platform
     env_file:
@@ -19,27 +32,28 @@ services:
 
   user-db:
     image: postgres:15-alpine
+    restart: always
     environment:
       POSTGRES_USER: devdocker
       POSTGRES_PASSWORD: dbpassword
       POSTGRES_DB: user-docker-db
     networks:
       - video-sharing-platform
-    # volumes:
-    #   - user-data:/var/lib/postgresql/data
+    volumes:
+      - user-data:/var/lib/postgresql/data
   # --- END --- #
 
   # Media Service #
-  media-handler-dev:
-    volumes:
-      - ./media-handler:/app
+  media-handler:
+    restart: always
     build:
       context: ./media-handler
-      dockerfile: dev.dockerfile
-    ports:
-      - "8002:3000"
+      dockerfile: Dockerfile
     depends_on:
       - media-db
+      - traefik
+    labels:
+      - "traefik.http.routers.media-handler.rule=PathPrefix(`/media`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -47,24 +61,25 @@ services:
 
   media-db:
     image: mongo:latest
+    restart: always
     networks:
       - video-sharing-platform
-    # volumes:
-    #   - media-data:/data/db
+    volumes:
+      - media-data:/data/db
   # --- END --- #
 
   # Video Processing Service #
-  video-service-dev:
-    volumes:
-      - ./video-processing:/app
+  video-service:
+    restart: always
     build:
       context: ./video-processing
-      dockerfile: dev.dockerfile
-    ports:
-      - "8003:8003"
+      dockerfile: Dockerfile
     depends_on:
       - video-bucket
       - video-redis
+      - traefik
+    labels:
+      - "traefik.http.routers.video-service.rule=PathPrefix(`/video`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -72,39 +87,43 @@ services:
 
   video-redis:
     image: redis:7-alpine
+    restart: always
     networks:
       - video-sharing-platform
 
   video-bucket:
     image: minio/minio
+    restart: always
     command: server /data/ --console-address :9001
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9001:9001" # Web Interface
+      - "8003:9001" # Web Interface
     networks:
       - video-sharing-platform
-    # volumes:
-    #   - video-bucket-volume:/data
+    volumes:
+      - video-bucket-volume:/data
   # --- END --- #
 
   # Web Client #
-  web-client-dev:
-    volumes:
-      - ./web-client:/app
+  web-client:
+    restart: always
     build:
       context: ./web-client
-      dockerfile: dev.dockerfile
-    ports:
-      - "8004:3000"
+      dockerfile: Dockerfile
+    depends_on:
+      - traefik
+    labels:
+      - "traefik.http.routers.web-client.rule=PathPrefix(`/`)"
     networks:
       - video-sharing-platform
   # --- END --- #
 
 networks:
   video-sharing-platform:
-# volumes:
-# user-data:
-# media-data:
-# video-bucket-volume:
+
+volumes:
+  user-data:
+  media-data:
+  video-bucket-volume:

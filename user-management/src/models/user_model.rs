@@ -17,6 +17,15 @@ pub struct User {
     pub role_id: i32,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct UserView {
+    pub id: i32,
+    pub email: String,
+    pub role_id: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
 #[derive(Queryable, Serialize, Deserialize)]
 #[diesel(table_name=users)]
 pub struct UserWithRole {
@@ -39,6 +48,18 @@ pub struct NewUser {
 pub struct UpdateUser {
     pub email: Option<String>,
     pub password: Option<String>,
+}
+
+impl UserView {
+    pub fn from_user(user: User) -> UserView {
+        UserView {
+            id: user.id,
+            email: user.email,
+            role_id: user.role_id,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+        }
+    }
 }
 
 impl User {
@@ -69,6 +90,15 @@ impl User {
         })
     }
 
+    pub async fn find_by_ids(conn: Db, user_ids: Vec<i32>) -> QueryResult<Vec<User>> {
+        conn.run(move |c| {
+            users::table
+                .filter(users::id.eq_any(&user_ids))
+                .load::<User>(c)
+        })
+        .await
+    }
+
     pub async fn find_by_id(conn: Db, user_id: i32) -> QueryResult<UserWithRole> {
         conn.run(move |c| {
             users::table
@@ -87,7 +117,7 @@ impl User {
     }
 
     pub async fn find_by_email(conn: Db, user_email: String) -> QueryResult<User> {
-        conn.run(move |c| users::table.filter(users::email.eq(user_email)).first(c))
+        conn.run(|c| users::table.filter(users::email.eq(user_email)).first(c))
             .await
     }
 
@@ -115,7 +145,19 @@ impl User {
     }
 
     pub async fn delete(conn: Db, user_id: i32) -> QueryResult<usize> {
-        conn.run(move |c| diesel::delete(users::table.find(user_id)).execute(c))
-            .await
+        let result = conn
+            .run(move |c| diesel::delete(users::table.find(user_id)).execute(c))
+            .await;
+
+        match result {
+            Ok(count) => {
+                if count == 0 {
+                    Err(diesel::result::Error::NotFound)
+                } else {
+                    Ok(count)
+                }
+            }
+            Err(err) => Err(err),
+        }
     }
 }

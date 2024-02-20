@@ -9,6 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var dbName = utils.Env["DB_NAME"]
+var collectionName = "videos"
+
 type DB struct {
 	client *mongo.Client
 }

@@ -1,4 +1,5 @@
 // https://github.com/99designs/gqlgen/discussions/1943#discussioncomment-2110715
+// run `go generate` to generate the models_gen.go file
 package main
 
 import (

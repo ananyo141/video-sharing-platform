@@ -24,7 +24,7 @@ const tusServer = new Server({
   datastore: new FileStore({
     directory: "./" + env.UPLOAD_FOLDER,
   }),
-  path: "/uploads",
+  path: "/video/uploads",
   onIncomingRequest,
   onUploadFinish,
 });
@@ -38,7 +38,7 @@ function initMiddleware(): void {
 }
 
 function initRouter(): void {
-  app.use("/uploads", tusServer.handle.bind(tusServer));
+  app.use("/video/uploads", tusServer.handle.bind(tusServer));
   app.use(routeNotFound); // fallback route
   app.use(errorHandler); // error handler
 }
@@ -46,7 +46,7 @@ function initRouter(): void {
 function initServer(): void {
   app.listen(port, () => {
     logger.info(`Server started In ENV: ${JSON.stringify(env, null, 2)}`);
-    logger.info(`Server is running at http://localhost:${port}`);
+    logger.info(`Server is running.`);
   });
   app.on("error", onError);
 }

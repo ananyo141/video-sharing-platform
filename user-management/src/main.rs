@@ -1,7 +1,5 @@
 #[macro_use]
 extern crate rocket;
-#[macro_use]
-extern crate diesel;
 
 use rocket::serde::json::{Json, Value};
 use rocket_sync_db_pools::database;
@@ -12,7 +10,7 @@ mod models;
 mod schema;
 mod utils;
 
-use controllers::user_controller::user_routes;
+use controllers::{auth_controllers::auth_routes, user_controller::user_routes};
 use errors::catchers::get_catchers;
 use utils::res_fmt::ResFmt;
 
@@ -29,6 +27,7 @@ fn rocket() -> _ {
     rocket::build()
         .attach(Db::fairing())
         .register("/", get_catchers())
-        .mount("/", routes![index])
+        .mount("/users/healthcheck", routes![index])
         .mount("/users", user_routes())
+        .mount("/auth", auth_routes())
 }
