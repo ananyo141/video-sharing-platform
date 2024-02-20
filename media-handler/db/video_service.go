@@ -28,12 +28,23 @@ func (db *DB) GetVideo(id string) (*model.Video, error) {
 	return &video, err
 }
 
-func (db *DB) GetVideos() ([]*model.Video, error) {
+func (db *DB) GetVideos(search *string, userId *int) ([]*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+
+	// Initialize the filter with the search condition
+	filter := bson.M{}
+	if search != nil {
+		filter["title"] = primitive.Regex{Pattern: *search, Options: "i"}
+	}
+	// If userId is provided, add it to the filter
+	if userId != nil {
+		filter["userId"] = *userId
+	}
+
 	var videos []*model.Video
-	cursor, err := videoCollec.Find(ctx, bson.D{})
+	cursor, err := videoCollec.Find(ctx, filter)
 	if err != nil {
 		log.Println(err)
 	}

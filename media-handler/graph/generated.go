@@ -70,7 +70,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Comment func(childComplexity int, id string) int
 		Video   func(childComplexity int, id string) int
-		Videos  func(childComplexity int) int
+		Videos  func(childComplexity int, search *string, userID *int) int
 	}
 
 	Video struct {
@@ -96,7 +96,7 @@ type MutationResolver interface {
 	DeleteComment(ctx context.Context, id string) (*model.Comment, error)
 }
 type QueryResolver interface {
-	Videos(ctx context.Context) ([]*model.Video, error)
+	Videos(ctx context.Context, search *string, userID *int) ([]*model.Video, error)
 	Video(ctx context.Context, id string) (*model.Video, error)
 	Comment(ctx context.Context, id string) (*model.Comment, error)
 }
@@ -275,7 +275,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Videos(childComplexity), true
+		args, err := ec.field_Query_videos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Videos(childComplexity, args["search"].(*string), args["userId"].(*int)), true
 
 	case "Video.comments":
 		if e.complexity.Video.Comments == nil {
@@ -644,6 +649,30 @@ func (ec *executionContext) field_Query_video_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_videos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["search"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("search"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["search"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["userId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userId"] = arg1
 	return args, nil
 }
 
@@ -1470,7 +1499,7 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Videos(rctx)
+		return ec.resolvers.Query().Videos(rctx, fc.Args["search"].(*string), fc.Args["userId"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1516,6 +1545,17 @@ func (ec *executionContext) fieldContext_Query_videos(ctx context.Context, field
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Video", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_videos_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }

@@ -26,8 +26,8 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.V
 }
 
 // Videos is the resolver for the videos field.
-func (r *queryResolver) Videos(ctx context.Context) ([]*model.Video, error) {
-	return r.DB.GetVideos()
+func (r *queryResolver) Videos(ctx context.Context, search *string, userId *int) ([]*model.Video, error) {
+	return r.DB.GetVideos(search, userId)
 }
 
 // Video is the resolver for the video field.

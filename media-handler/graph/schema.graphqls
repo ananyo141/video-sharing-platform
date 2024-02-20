@@ -24,7 +24,7 @@ type Comment {
 }
 
 type Query {
-  videos: [Video!]!
+  videos(search: String, userId: Int): [Video!]!
   video(id: ID!): Video!
   comment(id: ID!): Comment!
 }
