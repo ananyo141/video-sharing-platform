@@ -99,28 +99,61 @@ func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput) (*model
 	collection := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	_id, _ := primitive.ObjectIDFromHex(id)
-	filter := bson.M{"_id": _id}
-	update := bson.M{"$set": comment}
-	_, err := collection.UpdateOne(ctx, filter, update)
+
+	_id, hexerr := primitive.ObjectIDFromHex(id)
+	if hexerr != nil {
+		return nil, hexerr
+	}
+
+	filter := bson.M{"comments._id": _id}
+	update := bson.M{"$set": bson.M{"comments.$.text": comment.Text, "comments.$.updatedAt": time.Now()}}
+	options := options.FindOneAndUpdate().SetReturnDocument(options.After)
+	var video model.Video
+	err := collection.FindOneAndUpdate(ctx, filter, update, options).Decode(&video)
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
-	return db.GetComment(id)
+
+	// FIXME: This is O(n) time complexity to return the updated comment
+	for _, comment := range video.Comments {
+		if comment.ID == id {
+			return comment, nil
+		}
+	}
+	return nil, errors.New("Comment not found")
 }
 
+// db.videos.update(
+//
+//	{ "comments._id": ObjectId("65cfabece6f894c8e1e4196b") },
+//	{ $pull: { comments: { _id: ObjectId("65cfabece6f894c8e1e4196b") } } },
+//
+// );
 func (db *DB) DeleteComment(id string) (*model.Comment, error) {
 	collection := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	_id, _ := primitive.ObjectIDFromHex(id)
-	filter := bson.M{"_id": _id}
-	var comment model.Comment
-	err := collection.FindOneAndDelete(ctx, filter).Decode(&comment)
+	_id, hexerr := primitive.ObjectIDFromHex(id)
+	if hexerr != nil {
+		return nil, hexerr
+	}
+
+	filter := bson.M{"comments._id": _id}
+	update := bson.M{"$pull": bson.M{"comments": bson.M{"_id": _id}}}
+	var video model.Video
+	err := collection.FindOneAndUpdate(ctx, filter, update).Decode(&video)
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
-	return &comment, err
+	// FIXME: This is O(n) time complexity to return the deleted comment
+	for _, comment := range video.Comments {
+		if comment.ID == id {
+			return comment, nil
+		}
+	}
+	return nil, errors.New("Comment not found")
 }
 
 func (db *DB) GetCommentsByUserID(userID string) ([]*model.Comment, error) {

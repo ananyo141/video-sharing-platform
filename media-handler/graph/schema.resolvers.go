@@ -41,15 +41,11 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error) {
-  return nil, nil
+  return r.DB.UpdateComment(id, input)
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
-  return nil, nil
-}
-
-func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
-  return nil, nil
+  return r.DB.DeleteComment(id)
 }
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
