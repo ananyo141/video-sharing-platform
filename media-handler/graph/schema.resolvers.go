@@ -41,22 +41,21 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.Create
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error) {
-  return r.DB.UpdateComment(id, input)
+	return r.DB.UpdateComment(id, input)
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
-  return r.DB.DeleteComment(id)
+	return r.DB.DeleteComment(id)
 }
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
-  return r.DB.GetComment(id)
+	return r.DB.GetComment(id)
 }
 
 // ********* Like Resolver ********* //
 func (r *mutationResolver) LikeVideo(ctx context.Context, videoId string, userid int) (*model.Video, error) {
-  return nil, nil
+	return r.DB.LikeVideo(videoId, userid)
 }
-
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }

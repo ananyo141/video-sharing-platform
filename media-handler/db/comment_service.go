@@ -18,7 +18,11 @@ func (db *DB) GetComment(id string) (*model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// db.videos.find({ "comments._id": ObjectId("65cfac9ba0375182ff75accf") }, { "comments.$": 1, "_id": 0 })
+    // NOTE: This is the MongoDB query to find a comment by its ID
+    // db.videos.find(
+    //   { "comments._id": ObjectId("65cfac9ba0375182ff75accf") },
+    //   { "comments.$": 1, _id: 0 },
+    // );
 	_id, hexerr := primitive.ObjectIDFromHex(id)
 	if hexerr != nil {
 		return nil, hexerr
@@ -124,11 +128,10 @@ func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput) (*model
 	return nil, errors.New("Comment not found")
 }
 
+// NOTE: This is the MongoDB query to delete a comment by its ID
 // db.videos.update(
-//
-//	{ "comments._id": ObjectId("65cfabece6f894c8e1e4196b") },
-//	{ $pull: { comments: { _id: ObjectId("65cfabece6f894c8e1e4196b") } } },
-//
+//   { "comments._id": ObjectId("65cfabece6f894c8e1e4196b") },
+//   { $pull: { comments: { _id: ObjectId("65cfabece6f894c8e1e4196b") } } },
 // );
 func (db *DB) DeleteComment(id string) (*model.Comment, error) {
 	collection := db.client.Database(dbName).Collection(collectionName)

@@ -45,16 +45,18 @@ func (db *DB) GetVideos() ([]*model.Video, error) {
 	return videos, err
 }
 
-func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) (*model.Video, error) {
+func (db *DB) CreateVideo(video model.CreateVideoInput) (*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	inserg, err := videoCollec.InsertOne(ctx,
+	insertedVideo, err := videoCollec.InsertOne(ctx,
 		bson.M{
-			"title":       jobInfo.Title,
-			"description": jobInfo.Description,
-			"userId":      jobInfo.UserID,
-			"source":      jobInfo.Source,
+			"title":       video.Title,
+			"description": video.Description,
+			"userId":      video.UserID,
+			"source":      video.Source,
+			"likes":       []int{},
+			"comments":    []model.Comment{},
 			"createdAt":   time.Now(),
 			"updatedAt":   time.Now(),
 		})
@@ -63,13 +65,13 @@ func (db *DB) CreateVideo(jobInfo model.CreateVideoInput) (*model.Video, error) 
 		log.Println(err)
 	}
 
-	insertedID := inserg.InsertedID.(primitive.ObjectID).Hex()
+	insertedID := insertedVideo.InsertedID.(primitive.ObjectID).Hex()
 	// FIXME: use a struct to avoid repeating the same code
 	returnVideo := model.Video{ID: insertedID,
-		Title:       jobInfo.Title,
-		Description: jobInfo.Description,
-		UserID:      jobInfo.UserID,
-		Source:      jobInfo.Source,
+		Title:       video.Title,
+		Description: video.Description,
+		UserID:      video.UserID,
+		Source:      video.Source,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now()}
 	return &returnVideo, err
@@ -124,4 +126,49 @@ func (db *DB) DeleteVideo(videoId string) (*model.Video, error) {
 		return nil, errors.New("Video not found")
 	}
 	return &model.Video{ID: videoId}, err
+}
+
+// NOTE: This is the query to update the likes field in the video collection
+// db.videos.update(
+//
+//	{ _id: ObjectId("65d4b7f6b8524973a51fc399") },
+//	[{
+//	  $set: {
+//	    likes: {
+//	      $cond: {
+//	        if: { $in: [userId, "$likes"] },
+//	        then: { $setDifference: ["$likes", [userId]] },
+//	        else: { $concatArrays: ["$likes", [userId]] },
+//	      }
+//	    }
+//	  }
+//	}]
+//
+// );
+func (db *DB) LikeVideo(videoId string, userId int) (*model.Video, error) {
+	videoCollec := db.client.Database(dbName).Collection(collectionName)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	_id, _ := primitive.ObjectIDFromHex(videoId)
+	filter := bson.M{"_id": _id}
+	update := bson.A{bson.M{
+		"$set": bson.M{
+			"likes": bson.M{
+				"$cond": bson.M{
+					"if":   bson.M{"$in": bson.A{userId, "$likes"}},
+					"then": bson.M{"$setDifference": bson.A{"$likes", bson.A{userId}}},
+					"else": bson.M{"$concatArrays": bson.A{"$likes", bson.A{userId}}},
+				},
+			},
+		},
+	}}
+
+	var video model.Video
+	options := options.FindOneAndUpdate().SetReturnDocument(options.After)
+	err := videoCollec.FindOneAndUpdate(ctx, filter, update, options).Decode(&video)
+	if err != nil {
+		log.Println(err)
+	}
+	return &video, err
 }
