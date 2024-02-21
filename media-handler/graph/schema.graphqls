@@ -8,6 +8,7 @@ type Video {
   description: String!
   source: String!
   userId: Int!
+  user: User
   likes: [Int!]!
   comments: [Comment!]!
   createdAt: Time!
@@ -18,9 +19,20 @@ type Comment {
   _id: ID!
   text: String!
   userId: Int!
+  user: User
   videoId: String!
   createdAt: Time!
   updatedAt: Time!
+}
+
+type User {
+  id: Int!
+  name: String!
+  email: String!
+  role_id: Int!
+  # FIXME: TIME is without timezone; unable to parse
+  # created_at: Time!
+  # updated_at: Time!
 }
 
 type Query {

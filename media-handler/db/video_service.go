@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"media-handler/graph/model"
+	"media-handler/network"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -25,6 +26,26 @@ func (db *DB) GetVideo(id string) (*model.Video, error) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	// create an array of required user ids
+	userIds := make(map[int]bool)
+
+	userIds[video.UserID] = true
+	for i := range video.Comments {
+		userIds[video.Comments[i].UserID] = true
+	}
+
+	userIdsArr := make([]int, 0, len(userIds))
+	for k := range userIds {
+		userIdsArr = append(userIdsArr, k)
+	}
+
+	users, err := network.GetUserByIds(userIdsArr)
+	video.User = users[video.UserID]
+	for i := range video.Comments {
+		video.Comments[i].User = users[video.Comments[i].UserID]
+	}
+
 	return &video, err
 }
 
@@ -51,6 +72,29 @@ func (db *DB) GetVideos(search *string, userId *int) ([]*model.Video, error) {
 
 	if err = cursor.All(context.TODO(), &videos); err != nil {
 		panic(err)
+	}
+
+	// create an array of required user ids
+	userIds := make(map[int]bool)
+
+	for _, video := range videos {
+		userIds[video.UserID] = true
+		for i := range video.Comments {
+			userIds[video.Comments[i].UserID] = true
+		}
+	}
+
+	userIdsArr := make([]int, 0, len(userIds))
+	for k := range userIds {
+		userIdsArr = append(userIdsArr, k)
+	}
+
+	users, err := network.GetUserByIds(userIdsArr)
+	for vi, video := range videos {
+		videos[vi].User = users[video.UserID]
+		for i := range video.Comments {
+			video.Comments[i].User = users[video.Comments[i].UserID]
+		}
 	}
 
 	return videos, err
