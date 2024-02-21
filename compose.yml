@@ -60,6 +60,7 @@ services:
       dockerfile: dev.dockerfile
     depends_on:
       - media-db
+      - media-cache
       - traefik
     labels:
       - "traefik.http.routers.media-handler.rule=PathPrefix(`/media`)"
