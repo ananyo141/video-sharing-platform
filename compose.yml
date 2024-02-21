@@ -68,6 +68,11 @@ services:
     env_file:
       - ./media-handler/.env.docker
 
+  media-cache:
+    image: redis:7-alpine
+    networks:
+      - video-sharing-platform
+
   media-db:
     image: mongo:latest
     networks:
