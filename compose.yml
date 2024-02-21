@@ -14,7 +14,7 @@ services:
       - video-sharing-platform
 
   # User Service #
-  user-management-dev:
+  user-management:
     develop:
       watch:
         - action: sync
@@ -29,7 +29,7 @@ services:
       - user-db
       - traefik
     labels:
-      - "traefik.http.routers.user-management-dev.rule=(PathPrefix(`/users`) || PathPrefix(`/auth`))"
+      - "traefik.http.routers.user-management.rule=(PathPrefix(`/users`) || PathPrefix(`/auth`))"
     networks:
       - video-sharing-platform
     env_file:
@@ -46,7 +46,7 @@ services:
   # --- END --- #
 
   # Media Service #
-  media-handler-dev:
+  media-handler:
     develop:
       watch:
         - action: sync
@@ -62,7 +62,7 @@ services:
       - media-db
       - traefik
     labels:
-      - "traefik.http.routers.media-handler-dev.rule=PathPrefix(`/media`)"
+      - "traefik.http.routers.media-handler.rule=PathPrefix(`/media`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -75,7 +75,7 @@ services:
   # --- END --- #
 
   # Video Processing Service #
-  video-service-dev:
+  video-service:
     develop:
       watch:
         - action: sync
@@ -94,7 +94,7 @@ services:
       - video-redis
       - traefik
     labels:
-      - "traefik.http.routers.video-service-dev.rule=PathPrefix(`/video`)"
+      - "traefik.http.routers.video-service.rule=PathPrefix(`/video`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -118,7 +118,7 @@ services:
   # --- END --- #
 
   # Web Client #
-  web-client-dev:
+  web-client:
     develop:
       watch:
         - action: sync
@@ -135,7 +135,7 @@ services:
     depends_on:
       - traefik
     labels:
-      - "traefik.http.routers.web-client-dev.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.web-client.rule=PathPrefix(`/`)"
     networks:
       - video-sharing-platform
   # --- END --- #
