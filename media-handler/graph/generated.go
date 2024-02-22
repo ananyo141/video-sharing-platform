@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 		CreateVideo   func(childComplexity int, input model.CreateVideoInput) int
 		DeleteComment func(childComplexity int, id string) int
 		DeleteVideo   func(childComplexity int, id string) int
-		LikeVideo     func(childComplexity int, id string, userID int) int
+		LikeVideo     func(childComplexity int, id string) int
 		UpdateComment func(childComplexity int, id string, input model.UpdateCommentInput) int
 		UpdateVideo   func(childComplexity int, id string, input model.UpdateVideoInput) int
 	}
@@ -99,7 +99,7 @@ type MutationResolver interface {
 	CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error)
 	UpdateVideo(ctx context.Context, id string, input model.UpdateVideoInput) (*model.Video, error)
 	DeleteVideo(ctx context.Context, id string) (*model.Video, error)
-	LikeVideo(ctx context.Context, id string, userID int) (*model.Video, error)
+	LikeVideo(ctx context.Context, id string) (*model.Video, error)
 	CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error)
 	UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error)
 	DeleteComment(ctx context.Context, id string) (*model.Comment, error)
@@ -236,7 +236,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.LikeVideo(childComplexity, args["id"].(string), args["userId"].(int)), true
+		return e.complexity.Mutation.LikeVideo(childComplexity, args["id"].(string)), true
 
 	case "Mutation.updateComment":
 		if e.complexity.Mutation.UpdateComment == nil {
@@ -598,15 +598,6 @@ func (ec *executionContext) field_Mutation_likeVideo_args(ctx context.Context, r
 		}
 	}
 	args["id"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["userId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["userId"] = arg1
 	return args, nil
 }
 
@@ -1325,7 +1316,7 @@ func (ec *executionContext) _Mutation_likeVideo(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().LikeVideo(rctx, fc.Args["id"].(string), fc.Args["userId"].(int))
+		return ec.resolvers.Mutation().LikeVideo(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4374,7 +4365,7 @@ func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"text", "userId", "videoId"}
+	fieldsInOrder := [...]string{"text", "videoId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4388,13 +4379,6 @@ func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context
 				return it, err
 			}
 			it.Text = data
-		case "userId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UserID = data
 		case "videoId":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("videoId"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -4415,7 +4399,7 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "userId", "source"}
+	fieldsInOrder := [...]string{"title", "description", "source"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4436,13 +4420,6 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.Description = data
-		case "userId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			data, err := ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UserID = data
 		case "source":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -4544,7 +4521,7 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "userId", "source"}
+	fieldsInOrder := [...]string{"title", "description", "source"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4565,13 +4542,6 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.Description = data
-		case "userId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UserID = data
 		case "source":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

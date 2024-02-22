@@ -53,7 +53,7 @@ func (db *DB) GetComment(id string) (*model.Comment, error) {
 	return &extractedComment, nil
 }
 
-func (db *DB) CreateComment(comment model.CreateCommentInput) (*model.Comment, error) {
+func (db *DB) CreateComment(comment model.CreateCommentInput, userid int) (*model.Comment, error) {
 	collection := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -64,7 +64,7 @@ func (db *DB) CreateComment(comment model.CreateCommentInput) (*model.Comment, e
 	insertComment := model.Comment{
 		ID:        newCommentID.Hex(),
 		Text:      comment.Text,
-		UserID:    comment.UserID,
+		UserID:    userid,
 		CreatedAt: currTime,
 		UpdatedAt: currTime,
 	}
@@ -80,7 +80,7 @@ func (db *DB) CreateComment(comment model.CreateCommentInput) (*model.Comment, e
 		"$push": bson.M{"comments": bson.M{
 			"_id":       newCommentID,
 			"text":      insertComment.Text,
-			"userId":    insertComment.UserID,
+			"userId":    userid,
 			"createdAt": currTime,
 			"updatedAt": currTime,
 		}},
@@ -99,7 +99,7 @@ func (db *DB) CreateComment(comment model.CreateCommentInput) (*model.Comment, e
 	return &insertComment, nil
 }
 
-func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput) (*model.Comment, error) {
+func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput, userid int) (*model.Comment, error) {
 	collection := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -133,7 +133,7 @@ func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput) (*model
 //   { "comments._id": ObjectId("65cfabece6f894c8e1e4196b") },
 //   { $pull: { comments: { _id: ObjectId("65cfabece6f894c8e1e4196b") } } },
 // );
-func (db *DB) DeleteComment(id string) (*model.Comment, error) {
+func (db *DB) DeleteComment(id string, userid int) (*model.Comment, error) {
 	collection := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

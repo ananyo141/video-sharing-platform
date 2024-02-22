@@ -12,17 +12,29 @@ import (
 // FIXME: Add validation to the resolvers
 // CreateVideo is the resolver for the createVideo field.
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
-	return r.DB.CreateVideo(input)
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.CreateVideo(input, userid)
 }
 
 // UpdateVideo is the resolver for the updateVideo field.
 func (r *mutationResolver) UpdateVideo(ctx context.Context, id string, input model.UpdateVideoInput) (*model.Video, error) {
-	return r.DB.UpdateVideo(id, input)
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.UpdateVideo(id, input, userid)
 }
 
 // DeleteVideo is the resolver for the deleteVideo field.
 func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.Video, error) {
-	return r.DB.DeleteVideo(id)
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.DeleteVideo(id, userid)
 }
 
 // Videos is the resolver for the videos field.
@@ -37,15 +49,27 @@ func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, err
 
 // ********* Comment Resolvers ********* //
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error) {
-	return r.DB.CreateComment(input)
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.CreateComment(input, userid)
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error) {
-	return r.DB.UpdateComment(id, input)
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.UpdateComment(id, input, userid)
 }
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
-	return r.DB.DeleteComment(id)
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.DeleteComment(id, userid)
 }
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
@@ -53,7 +77,11 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment,
 }
 
 // ********* Like Resolver ********* //
-func (r *mutationResolver) LikeVideo(ctx context.Context, videoId string, userid int) (*model.Video, error) {
+func (r *mutationResolver) LikeVideo(ctx context.Context, videoId string) (*model.Video, error) {
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return r.DB.LikeVideo(videoId, userid)
 }
 

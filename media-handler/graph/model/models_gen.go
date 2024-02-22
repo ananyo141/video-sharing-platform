@@ -18,14 +18,12 @@ type Comment struct {
 
 type CreateCommentInput struct {
 	Text    string `json:"text" bson:"text"`
-	UserID  int    `json:"userId" bson:"userId"`
 	VideoID string `json:"videoId" bson:"videoId"`
 }
 
 type CreateVideoInput struct {
 	Title       string `json:"title" bson:"title"`
 	Description string `json:"description" bson:"description"`
-	UserID      int    `json:"userId" bson:"userId"`
 	Source      string `json:"source" bson:"source"`
 }
 
@@ -50,7 +48,6 @@ type UpdateCommentInput struct {
 type UpdateVideoInput struct {
 	Title       *string `json:"title,omitempty" bson:"title"`
 	Description *string `json:"description,omitempty" bson:"description"`
-	UserID      *int    `json:"userId,omitempty" bson:"userId"`
 	Source      *string `json:"source,omitempty" bson:"source"`
 }
 

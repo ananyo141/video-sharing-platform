@@ -25,7 +25,8 @@ func main() {
 	dbInstance := db.Connect()
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
-		DB: dbInstance,
+		DB:         dbInstance,
+		UserHeader: "X-Auth-Id", // This is the header that will be used to get the user id
 	}}))
 
 	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {

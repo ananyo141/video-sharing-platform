@@ -46,7 +46,7 @@ type Mutation {
   updateVideo(id: ID!, input: UpdateVideoInput!): Video!
   deleteVideo(id: ID!): Video!
 
-  likeVideo(id: ID!, userId: Int!): Video!
+  likeVideo(id: ID!): Video!
 
   createComment(input: CreateCommentInput!): Comment!
   updateComment(id: ID!, input: UpdateCommentInput!): Comment!
@@ -56,14 +56,12 @@ type Mutation {
 input CreateVideoInput {
   title: String!
   description: String!
-  userId: Int!
   source: String!
 }
 
 input UpdateVideoInput {
   title: String
   description: String
-  userId: Int
   source: String
 }
 
@@ -73,7 +71,6 @@ input DeleteVideoInput {
 
 input CreateCommentInput {
   text: String!
-  userId: Int!
   videoId: String!
 }
 

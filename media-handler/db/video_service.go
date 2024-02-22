@@ -100,7 +100,7 @@ func (db *DB) GetVideos(search *string, userId *int) ([]*model.Video, error) {
 	return videos, err
 }
 
-func (db *DB) CreateVideo(video model.CreateVideoInput) (*model.Video, error) {
+func (db *DB) CreateVideo(video model.CreateVideoInput, userid int) (*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -108,7 +108,7 @@ func (db *DB) CreateVideo(video model.CreateVideoInput) (*model.Video, error) {
 		bson.M{
 			"title":       video.Title,
 			"description": video.Description,
-			"userId":      video.UserID,
+			"userId":      userid,
 			"source":      video.Source,
 			"likes":       []int{},
 			"comments":    []model.Comment{},
@@ -125,14 +125,14 @@ func (db *DB) CreateVideo(video model.CreateVideoInput) (*model.Video, error) {
 	returnVideo := model.Video{ID: insertedID,
 		Title:       video.Title,
 		Description: video.Description,
-		UserID:      video.UserID,
+		UserID:      userid,
 		Source:      video.Source,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now()}
 	return &returnVideo, err
 }
 
-func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) (*model.Video, error) {
+func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput, userid int) (*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -144,9 +144,6 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) (*mo
 	}
 	if videoInfo.Description != nil {
 		updateVideo["description"] = videoInfo.Description
-	}
-	if videoInfo.UserID != nil {
-		updateVideo["userId"] = videoInfo.UserID
 	}
 	updateVideo["updatedAt"] = time.Now()
 
@@ -166,7 +163,7 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput) (*mo
 	return &video, err
 }
 
-func (db *DB) DeleteVideo(videoId string) (*model.Video, error) {
+func (db *DB) DeleteVideo(videoId string, userid int) (*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
