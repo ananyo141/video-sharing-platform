@@ -4,11 +4,13 @@ FROM golang:1.21-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the GoFiber app files into the container at /app
-COPY . .
+COPY go.mod go.sum ./
 
 # Download GoFiber dependencies
 RUN go mod download
+
+# Copy the GoFiber app files into the container at /app
+COPY . .
 
 # Build the GoFiber app
 RUN go build -o main

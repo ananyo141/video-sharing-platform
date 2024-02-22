@@ -13,12 +13,13 @@ RUN apk --no-cache add git
 # Build the GoFiber app
 RUN go install github.com/githubnemo/CompileDaemon@latest
 
-# Copy the GoFiber app files into the container at /app
-COPY . .
+COPY go.mod go.sum ./
 
 # Download GoFiber dependencies
 RUN go mod download
 
+# Copy the GoFiber app files into the container at /app
+COPY . .
 
 # Expose the port that your GoFiber app will run on
 EXPOSE 3000

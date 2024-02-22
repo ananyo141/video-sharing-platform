@@ -55,6 +55,9 @@ services:
       - traefik
     labels:
       - "traefik.http.routers.media-handler.rule=PathPrefix(`/media`)"
+      - "traefik.http.routers.media-handler.middlewares=user-auth"
+      - "traefik.http.middlewares.user-auth.forwardauth.address=http://traefik/auth/verify_token"
+      - "traefik.http.middlewares.user-auth.forwardauth.authResponseHeadersRegex=^X-Auth-" # Copy Headers starting with X-Auth-
     networks:
       - video-sharing-platform
     env_file:
