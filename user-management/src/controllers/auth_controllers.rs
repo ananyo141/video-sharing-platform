@@ -1,5 +1,9 @@
 use std::error::Error;
 
+use rocket::Response;
+use rocket::request::Request;
+use rocket::response::{self, Responder};
+
 use rocket::{
     http::Status,
     response::status::Created,
@@ -12,11 +16,7 @@ use crate::{
         auth_model::{Claims, LoginRequest},
         user_model::{NewUser, User, UserView},
     },
-    utils::{
-        hash_passwd::compare_password,
-        jwt::generate_token,
-        res_fmt::ResFmt,
-    },
+    utils::{hash_passwd::compare_password, jwt::generate_token, res_fmt::ResFmt},
     Db,
 };
 
@@ -70,12 +70,36 @@ pub async fn login<'a>(
     }
 }
 
+// Return user details in headers to be forwarded to other services
+pub struct AuthResponse {
+    id: String,
+    email: String,
+    role: String,
+    body: ResFmt<'static>,
+}
+impl<'r> Responder<'r, 'static> for AuthResponse {
+    fn respond_to(self, req: &'r Request<'_>) -> response::Result<'static> {
+        Response::build_from(Json(&self.body).respond_to(req)?)
+            .raw_header("X-Auth-ID", self.id)
+            .raw_header("X-Auth-Email", self.email)
+            .raw_header("X-Auth-Role", self.role)
+            .ok()
+    }
+}
+
 #[get("/verify_token")]
-pub async fn verify_token_handler(connection: Db, auth: Claims) -> Result<Json<Value>, CustomError> {
+pub async fn verify_token_handler(
+    connection: Db,
+    auth: Claims,
+) -> Result<AuthResponse, CustomError> {
     match User::find_by_id(connection, auth.user_id).await {
-        Ok(user) => Ok(ResFmt::new(true, "User profile fetched")
-            .with_data(json!(user))
-            .to_json()),
+        Ok(user) => Ok(AuthResponse {
+            id: user.id.to_string(),
+            email: user.email.to_string(),
+            role: user.role.name.to_string(),
+            body: ResFmt::new(true, "User profile fetched")
+                .with_data(json!(user)),
+        }),
         Err(err) => Err(CustomError::bad_request(
             String::from("Unable to find user"),
             Some(vec![ErrorDetails {
@@ -85,7 +109,6 @@ pub async fn verify_token_handler(connection: Db, auth: Claims) -> Result<Json<V
         )),
     }
 }
-
 
 #[post("/register", data = "<user>")]
 pub async fn register<'a>(
