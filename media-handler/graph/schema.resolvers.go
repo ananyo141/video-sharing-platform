@@ -10,6 +10,7 @@ import (
 )
 
 // FIXME: Add validation to the resolvers
+// FIXME: Only allow the user to update or delete their own videos and comments
 // CreateVideo is the resolver for the createVideo field.
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
 	userid, err := r.GetUserHeader(ctx)
