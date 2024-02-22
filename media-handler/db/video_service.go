@@ -148,7 +148,7 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput, user
 	updateVideo["updatedAt"] = time.Now()
 
 	_id, _ := primitive.ObjectIDFromHex(videoId)
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": _id, "userId": userid}
 	update := bson.M{"$set": updateVideo}
 
 	results := videoCollec.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(1))
@@ -169,7 +169,7 @@ func (db *DB) DeleteVideo(videoId string, userid int) (*model.Video, error) {
 	defer cancel()
 
 	_id, _ := primitive.ObjectIDFromHex(videoId)
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": _id, "userId": userid}
 	result, err := videoCollec.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Println(err)

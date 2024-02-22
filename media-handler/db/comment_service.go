@@ -18,11 +18,11 @@ func (db *DB) GetComment(id string) (*model.Comment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-    // NOTE: This is the MongoDB query to find a comment by its ID
-    // db.videos.find(
-    //   { "comments._id": ObjectId("65cfac9ba0375182ff75accf") },
-    //   { "comments.$": 1, _id: 0 },
-    // );
+	// NOTE: This is the MongoDB query to find a comment by its ID
+	// db.videos.find(
+	//   { "comments._id": ObjectId("65cfac9ba0375182ff75accf") },
+	//   { "comments.$": 1, _id: 0 },
+	// );
 	_id, hexerr := primitive.ObjectIDFromHex(id)
 	if hexerr != nil {
 		return nil, hexerr
@@ -109,7 +109,14 @@ func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput, userid 
 		return nil, hexerr
 	}
 
-	filter := bson.M{"comments._id": _id}
+	filter := bson.M{
+		"comments": bson.M{
+			"$elemMatch": bson.M{
+				"_id":    _id,
+				"userId": userid,
+			},
+		},
+	}
 	update := bson.M{"$set": bson.M{"comments.$.text": comment.Text, "comments.$.updatedAt": time.Now()}}
 	options := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	var video model.Video
@@ -130,8 +137,10 @@ func (db *DB) UpdateComment(id string, comment model.UpdateCommentInput, userid 
 
 // NOTE: This is the MongoDB query to delete a comment by its ID
 // db.videos.update(
-//   { "comments._id": ObjectId("65cfabece6f894c8e1e4196b") },
-//   { $pull: { comments: { _id: ObjectId("65cfabece6f894c8e1e4196b") } } },
+//
+//	{ "comments._id": ObjectId("65cfabece6f894c8e1e4196b") },
+//	{ $pull: { comments: { _id: ObjectId("65cfabece6f894c8e1e4196b") } } },
+//
 // );
 func (db *DB) DeleteComment(id string, userid int) (*model.Comment, error) {
 	collection := db.client.Database(dbName).Collection(collectionName)
@@ -142,7 +151,14 @@ func (db *DB) DeleteComment(id string, userid int) (*model.Comment, error) {
 		return nil, hexerr
 	}
 
-	filter := bson.M{"comments._id": _id}
+	filter := bson.M{
+		"comments": bson.M{
+			"$elemMatch": bson.M{
+				"_id":    _id,
+				"userId": userid,
+			},
+		},
+	}
 	update := bson.M{"$pull": bson.M{"comments": bson.M{"_id": _id}}}
 	var video model.Video
 	err := collection.FindOneAndUpdate(ctx, filter, update).Decode(&video)
@@ -157,19 +173,4 @@ func (db *DB) DeleteComment(id string, userid int) (*model.Comment, error) {
 		}
 	}
 	return nil, errors.New("Comment not found")
-}
-
-func (db *DB) GetCommentsByUserID(userID string) ([]*model.Comment, error) {
-	collection := db.client.Database(dbName).Collection(collectionName)
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	var comments []*model.Comment
-	cursor, err := collection.Find(ctx, bson.M{"userId": userID})
-	if err != nil {
-		log.Println(err)
-	}
-	if err = cursor.All(context.TODO(), &comments); err != nil {
-		panic(err)
-	}
-	return comments, err
 }
