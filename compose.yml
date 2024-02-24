@@ -136,7 +136,7 @@ services:
 
   # Events Queue #
   events-queue:
-    image: rabbitmq:3.13-alpine
+    image: rabbitmq:3.13-management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
