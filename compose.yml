@@ -115,16 +115,35 @@ services:
       - video-sharing-platform
 
   video-bucket:
-    image: minio/minio
+    build:
+      context: ./video-processing
+      dockerfile: bucket.dockerfile
     command: server /data/ --console-address :9001
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_NOTIFY_AMQP_ENABLE: "on"
+      MINIO_NOTIFY_AMQP_URL: "amqp://guest:guest@events-queue:5672/"
+      MINIO_NOTIFY_AMQP_EXCHANGE: "minio"
+      MINIO_NOTIFY_AMQP_ROUTING_KEY: "uploads"
+    depends_on:
+      - events-queue
     ports:
       - "8003:9001" # Web Interface
     networks:
       - video-sharing-platform
   # --- END --- #
+
+  # Events Queue #
+  events-queue:
+    image: rabbitmq:3.13-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "8004:15672" # Web Management Interface
+    networks:
+      - video-sharing-platform
 
   # Web Client #
   web-client:
