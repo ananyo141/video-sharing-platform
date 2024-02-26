@@ -19,27 +19,29 @@ const readdirAsync = promisify(fs.readdir);
 
 const MinioClient = new Minio.Client(MinioConfig);
 
-MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
-  if (err) {
-    logger.error(err);
-    process.exit(1);
-  }
+export const initBucket = () => {
+  MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
+    if (err) {
+      logger.error(err);
+      process.exit(1);
+    }
 
-  if (!exists) {
-    MinioClient.makeBucket(env.MINIO_BUCKET, "", (err) => {
-      if (err) {
-        logger.error(err);
-        process.exit(1);
-      }
-      logger.info(`Bucket "${env.MINIO_BUCKET}" created successfully.`);
-    });
-  }
-});
+    if (!exists) {
+      MinioClient.makeBucket(env.MINIO_BUCKET, "", (err) => {
+        if (err) {
+          logger.error(err);
+          process.exit(1);
+        }
+        logger.info(`Bucket "${env.MINIO_BUCKET}" created successfully.`);
+      });
+    }
+  });
+};
 
 // Function to recursively upload a folder and its contents to Minio
 export async function uploadFolderBucket(
   localFolderPath: string,
-  remoteFolderPath: string
+  remoteFolderPath: string,
 ): Promise<void> {
   // Get a list of files in the local folder
   const files = await readdirAsync(localFolderPath);
@@ -65,7 +67,7 @@ export async function uploadFolderBucket(
 // Function to upload a file to Minio
 export async function uploadToBucket(
   objectName: string,
-  filePath: string
+  filePath: string,
 ): Promise<{
   objectName: string;
   filePath: string;
@@ -84,7 +86,7 @@ export async function uploadToBucket(
         details: {
           etag: string;
           versionId: string;
-        }
+        },
       ) => {
         if (err) {
           logger.error(`Error uploading file: ${err}`);
@@ -97,10 +99,10 @@ export async function uploadToBucket(
               objectName,
               filePath,
               etag: details.etag,
-            })
+            }),
           );
         }
-      }
+      },
     );
   });
 }

@@ -12,6 +12,7 @@ import { errorHandler } from "@/middleware/errorhandler.middleware";
 import { routeNotFound } from "@/middleware/notfound.middleware";
 import { onUploadFinish } from "@/middleware/uploadvideo.middleware";
 import { onIncomingRequest } from "@/middleware/uploadauth.middleware";
+import { initBucket } from "./lib/uploadBucket";
 
 // Create upload folder if doesn't exist
 if (!fs.existsSync(env.UPLOAD_FOLDER)) {
@@ -54,6 +55,7 @@ function initServer(): void {
 export async function init(): Promise<void> {
   try {
     logger.info("init");
+	initBucket();
     initMiddleware();
     initRouter();
     initServer();
