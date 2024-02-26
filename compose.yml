@@ -123,10 +123,11 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
       MINIO_NOTIFY_AMQP_ENABLE_PRIMARY: "on"
+      MINIO_NOTIFY_AMQP_DURABLE_PRIMARY: "on" 
       MINIO_NOTIFY_AMQP_URL_PRIMARY: "amqp://guest:guest@events-queue:5672"
       MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY: "fanout"
-      MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY: "minio"
-      MINIO_NOTIFY_AMQP_ROUTING_KEY_PRIMARY: "uploads"
+      MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY: "uploadevents"
+      MINIO_NOTIFY_AMQP_ROUTING_KEY_PRIMARY: "uploadlogs"
     depends_on:
       - events-queue
     ports:
