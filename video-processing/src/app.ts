@@ -1,18 +1,15 @@
 import compression from "compression";
 import amqp from "amqplib";
-import { Server } from "@tus/server";
-import { FileStore } from "@tus/file-store";
 import cors from "cors";
 import express, { Express } from "express";
 import fs from "fs";
 import morgan from "morgan";
 
+import videoRouter from "@/routes/video.route";
 import logger from "@utils/logger";
 import env from "./environment";
 import { errorHandler } from "@/middleware/errorhandler.middleware";
 import { routeNotFound } from "@/middleware/notfound.middleware";
-import { onUploadFinish } from "@/middleware/uploadvideo.middleware";
-import { onIncomingRequest } from "@/middleware/uploadauth.middleware";
 import { initBucket } from "./lib/uploadBucket";
 
 // Create upload folder if doesn't exist
@@ -22,14 +19,6 @@ if (!fs.existsSync(env.UPLOAD_FOLDER)) {
 
 const port = env.PORT;
 const app: Express = express();
-const tusServer = new Server({
-  datastore: new FileStore({
-    directory: "./" + env.UPLOAD_FOLDER,
-  }),
-  path: "/video/uploads",
-  onIncomingRequest,
-  onUploadFinish,
-});
 
 function initMiddleware(): void {
   app.use(compression());
@@ -40,7 +29,7 @@ function initMiddleware(): void {
 }
 
 function initRouter(): void {
-  app.use("/video/uploads", tusServer.handle.bind(tusServer));
+  app.use("/video", videoRouter);
   app.use(routeNotFound); // fallback route
   app.use(errorHandler); // error handler
 }

@@ -6,7 +6,7 @@ import { promisify } from "util";
 import env from "@/environment";
 import logger from "@/utils/logger";
 
-const MinioConfig: Minio.ClientOptions = {
+export const MinioConfig: Minio.ClientOptions = {
   endPoint: env.MINIO_ENDPOINT,
   port: parseInt(env.MINIO_PORT),
   useSSL: env.MINIO_SSL === "true",
@@ -17,7 +17,7 @@ const MinioConfig: Minio.ClientOptions = {
 // Promisify fs.readdir to use it with async/await
 const readdirAsync = promisify(fs.readdir);
 
-const MinioClient = new Minio.Client(MinioConfig);
+export const MinioClient = new Minio.Client(MinioConfig);
 
 export const initBucket = () => {
   MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
@@ -35,6 +35,21 @@ export const initBucket = () => {
         logger.info(`Bucket "${env.MINIO_BUCKET}" created successfully.`);
       });
     }
+    const policy = {
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Effect: "Allow",
+          Principal: "*",
+          Action: ["s3:GetObject"],
+          Resource: [`arn:aws:s3:::${env.MINIO_BUCKET}/*`],
+        },
+      ],
+    };
+
+    MinioClient.setBucketPolicy(env.MINIO_BUCKET, JSON.stringify(policy)).catch(
+      (err) => logger.error(err.message || err),
+    );
   });
 };
 
