@@ -19,20 +19,20 @@ const readdirAsync = promisify(fs.readdir);
 
 export const MinioClient = new Minio.Client(MinioConfig);
 
-export const initBucket = () => {
-  MinioClient.bucketExists(env.MINIO_BUCKET, (err, exists) => {
+const createBucket = (bucketName: string) => {
+  MinioClient.bucketExists(bucketName, (err, exists) => {
     if (err) {
       logger.error(err);
       process.exit(1);
     }
 
     if (!exists) {
-      MinioClient.makeBucket(env.MINIO_BUCKET, "", (err) => {
+      MinioClient.makeBucket(bucketName, "", (err) => {
         if (err) {
           logger.error(err);
           process.exit(1);
         }
-        logger.info(`Bucket "${env.MINIO_BUCKET}" created successfully.`);
+        logger.info(`Bucket "${bucketName}" created successfully.`);
       });
     }
     const policy = {
@@ -42,21 +42,27 @@ export const initBucket = () => {
           Effect: "Allow",
           Principal: "*",
           Action: ["s3:GetObject"],
-          Resource: [`arn:aws:s3:::${env.MINIO_BUCKET}/*`],
+          Resource: [`arn:aws:s3:::${bucketName}/*`],
         },
       ],
     };
 
-    MinioClient.setBucketPolicy(env.MINIO_BUCKET, JSON.stringify(policy)).catch(
+    MinioClient.setBucketPolicy(bucketName, JSON.stringify(policy)).catch(
       (err) => logger.error(err.message || err),
     );
   });
+};
+
+export const initBucket = () => {
+  createBucket(env.MINIO_BUCKET);
+  createBucket(env.MINIO_PROCESSED_BUCKET);
 };
 
 // Function to recursively upload a folder and its contents to Minio
 export async function uploadFolderBucket(
   localFolderPath: string,
   remoteFolderPath: string,
+  bucketName: string = env.MINIO_PROCESSED_BUCKET,
 ): Promise<void> {
   // Get a list of files in the local folder
   const files = await readdirAsync(localFolderPath);
@@ -70,11 +76,11 @@ export async function uploadFolderBucket(
     const stats = fs.statSync(filePath);
     if (stats.isFile()) {
       // Upload file
-      await uploadToBucket(objectName, filePath);
+      await uploadToBucket(objectName, filePath, bucketName);
       logger.info(`Uploaded file: ${objectName}`);
     } else if (stats.isDirectory()) {
       // Recursively upload contents of subdirectory
-      await uploadFolderBucket(filePath, objectName);
+      await uploadFolderBucket(filePath, objectName, bucketName);
     }
   }
 }
@@ -83,14 +89,13 @@ export async function uploadFolderBucket(
 export async function uploadToBucket(
   objectName: string,
   filePath: string,
+  bucketName: string = env.MINIO_PROCESSED_BUCKET,
 ): Promise<{
   objectName: string;
   filePath: string;
   etag: string;
 }> {
   return new Promise((resolve, reject) => {
-    // Check if the bucket exists, and create it if not
-    const bucketName = env.MINIO_BUCKET;
     // Upload the file
     MinioClient.fPutObject(
       bucketName,

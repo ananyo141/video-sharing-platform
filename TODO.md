@@ -9,6 +9,9 @@
 - [ ] Add rate limiting
 - [ ] Kubernetes config for deployment
 - [ ] Validation in api routes
+- [ ] Decouple Video Processing service  
+       - [ ] Separate Bucket Endpoints (like upload, presigned urls) in a bucket service  
+       - [ ] Transcode video by listening to S3 events in separate service
 
 ## Media Handler
 
@@ -16,7 +19,7 @@
 - [ ] (No Eager fetching)[https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user]
 - [ ] Add Pagination
 - [ ] Graphql subscriptions to tell user video processing state
-- [ ] Add Redis for user caching
+- [x] Add Redis for user caching
 
 ## User Management
 

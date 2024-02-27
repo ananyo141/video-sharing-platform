@@ -5,6 +5,7 @@ import express, { Express } from "express";
 import fs from "fs";
 import morgan from "morgan";
 
+import jobQueue from "@/lib/jobQueue";
 import videoRouter from "@/routes/video.route";
 import logger from "@utils/logger";
 import env from "./environment";
@@ -79,6 +80,7 @@ async function listenQueue(): Promise<void> {
         (msg) => {
           if (msg?.content) {
             const message = msg.content.toString();
+            jobQueue.add("upload", { message });
             console.log(`Received message: ${message}`);
           }
         },

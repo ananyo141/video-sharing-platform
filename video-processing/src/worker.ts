@@ -1,7 +1,7 @@
 import fs from "fs";
+import path from "path";
 import { Worker } from "bullmq";
 
-import logger from "@/utils/logger";
 import { uploadFolderBucket } from "@/lib/uploadBucket";
 import convertToHLS from "@/lib/convertHLS";
 import env from "@/environment";
@@ -9,26 +9,21 @@ import env from "@/environment";
 const VideoWorker = new Worker(
   env.JOB_QUEUE_NAME,
   async (job: any) => {
-    const filename = job.data.filename;
+    const message = JSON.parse(job.data.message);
+    const filename = message.Key;
+    const fileUrl = "http://video-bucket:9000/" + message.Key;
 
     try {
       // transcode video
-      await convertToHLS(filename);
-      // delete original file
-      fs.unlink(filename, (err) => {
-        if (err) logger.error(err);
-      });
-      fs.unlink(filename + ".json", (err) => {
-        if (err) logger.error(err);
-      });
+      const folderPath = await convertToHLS(fileUrl);
       // upload to minio
-      await uploadFolderBucket(filename + "_hls", filename);
+      await uploadFolderBucket(folderPath, 'hls_encoded/' + path.basename(filename));
       // delete muxed file
-      fs.rm(filename + "_hls", { recursive: true }, (err) => {
-        if (err) logger.error(err);
+      fs.rm(folderPath, { recursive: true }, (err) => {
+        if (err) console.error(err);
       });
     } catch (err) {
-      logger.error(err);
+      console.error(err);
     }
   },
   {
@@ -36,7 +31,8 @@ const VideoWorker = new Worker(
       host: env.REDIS_HOST,
       port: parseInt(env.REDIS_PORT),
     },
-  }
+    concurrency: 5,
+  },
 );
 
 export default VideoWorker;

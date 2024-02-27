@@ -3,11 +3,15 @@ import fs from "fs";
 import path from "path";
 
 import logger from "@/utils/logger";
+import env from "@/environment";
 
 // Function to convert video to HLS format
-export default function convertToHLS(inputPath: string): Promise<void> {
+export default function convertToHLS(inputPath: string): Promise<string> {
   // Create the hls folder if it doesn't exist
-  const inputPathDir = inputPath + "_hls";
+  const inputPathDir = path.join(
+    env.UPLOAD_FOLDER,
+    path.basename(inputPath) + "_hls",
+  );
   if (!fs.existsSync(inputPathDir)) {
     fs.mkdirSync(inputPathDir);
   }
@@ -29,9 +33,9 @@ export default function convertToHLS(inputPath: string): Promise<void> {
       ])
       .output(playlistPath)
       .on("progress", (progress) =>
-        logger.info(`Progress: ${progress.percent}%`)
+        logger.info(`Progress: ${progress.percent}%`),
       )
-      .on("end", () => resolve())
+      .on("end", () => resolve(inputPathDir))
       .on("error", (err, stdout, stderr) => {
         // Log detailed error information
         logger.error("Error:" + err);
