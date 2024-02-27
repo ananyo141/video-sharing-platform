@@ -137,7 +137,22 @@ services:
       - "traefik.http.routers.video-bucket.rule=PathPrefix(`/bucket`)"
     ports:
       - "8003:9001" # Web Interface
-      - "9000:9000" # For debugging
+      - "9000:9000" # For s3 access
+    networks:
+      - video-sharing-platform
+
+  bucket-publish-events:
+    image: minio/mc
+    depends_on:
+      - video-bucket
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      /usr/bin/mc config host add miniobucket http://video-bucket:9000 minioadmin minioadmin;
+      /usr/bin/mc mb miniobucket/video-bucket;
+      /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put;
+      exit 0;
+      "
     networks:
       - video-sharing-platform
   # --- END --- #
