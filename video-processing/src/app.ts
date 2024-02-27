@@ -1,11 +1,10 @@
 import compression from "compression";
-import amqp from "amqplib";
 import cors from "cors";
 import express, { Express } from "express";
 import fs from "fs";
 import morgan from "morgan";
 
-import jobQueue from "@/lib/jobQueue";
+import { listenQueue } from "@/lib/eventQueue";
 import videoRouter from "@/routes/video.route";
 import logger from "@utils/logger";
 import env from "./environment";
@@ -43,57 +42,6 @@ function initServer(): void {
   app.on("error", onError);
 }
 
-async function listenQueue(): Promise<void> {
-  const queueName = "minio";
-  const exchangeName = "uploadevents"; // Replace with your exchange name
-  const routingKey = "uploadlogs"; // Replace with your routing key
-
-  (async () => {
-    try {
-      const connection = await amqp.connect(
-        "amqp://guest:guest@events-queue:5672",
-      );
-      const channel = await connection.createChannel();
-
-      process.once("SIGINT", async () => {
-        await channel.close();
-        await connection.close();
-      });
-
-      // Declare the exchange
-      await channel.assertExchange(exchangeName, "fanout", { durable: true });
-      const assertQueueResponse = await channel.assertQueue(queueName, {
-        durable: true,
-      });
-
-      await channel.bindQueue(
-        assertQueueResponse.queue,
-        exchangeName,
-        routingKey,
-      );
-      console.log(
-        `Waiting for messages from exchange: ${exchangeName} with routing key: ${routingKey}`,
-      );
-
-      channel.consume(
-        assertQueueResponse.queue,
-        (msg) => {
-          if (msg?.content) {
-            const message = msg.content.toString();
-            jobQueue.add("upload", { message });
-            console.log(`Received message: ${message}`);
-          }
-        },
-        { noAck: true },
-      ); // Set noAck to false if you want to manually acknowledge messages
-
-      console.log(" [*] Waiting for messages. To exit press CTRL+C");
-    } catch (err) {
-      console.warn(err);
-    }
-  })();
-}
-
 export async function init(): Promise<void> {
   try {
     logger.info("init");
@@ -101,7 +49,7 @@ export async function init(): Promise<void> {
     initMiddleware();
     initRouter();
     initServer();
-    listenQueue();
+    listenQueue("minio", "uploadevents", "uploadlogs");
   } catch (err: any) {
     logger.error("Unable to initialize app: ", err.message);
     logger.error(err);

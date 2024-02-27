@@ -4,10 +4,27 @@ import path from "path";
 
 import logger from "@/utils/logger";
 import env from "@/environment";
+import { connectToRabbitMQ } from "./eventQueue";
 
 // Function to convert video to HLS format
-export default function convertToHLS(inputPath: string): Promise<string> {
-  // Create the hls folder if it doesn't exist
+export default async function convertToHLS(inputPath: string): Promise<string> {
+  const { channel } = await connectToRabbitMQ();
+
+  // Function to send progress updates to RabbitMQ
+  const sendProgressUpdate = async (progress: number) => {
+    try {
+      // You can customize the message structure based on your needs
+      const message = { progress, file: path.basename(inputPath) };
+      const queueName = "progress_updates_queue";
+
+      await channel.assertQueue(queueName, { durable: true });
+      channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)));
+      logger.info(`Progress update sent: ${progress}%`);
+    } catch (err) {
+      logger.error("Error sending progress update to RabbitMQ:", err);
+    }
+  };
+
   const inputPathDir = path.join(
     env.UPLOAD_FOLDER,
     path.basename(inputPath) + "_hls",
@@ -32,10 +49,14 @@ export default function convertToHLS(inputPath: string): Promise<string> {
         `-hls_segment_filename ${path.join(inputPathDir, "segment%03d.ts")}`,
       ])
       .output(playlistPath)
-      .on("progress", (progress) =>
-        logger.info(`Progress: ${progress.percent}%`),
-      )
-      .on("end", () => resolve(inputPathDir))
+      .on("progress", (progress) => {
+        // Send progress update every 10%
+        sendProgressUpdate(progress.percent);
+      })
+      .on("end", () => {
+        sendProgressUpdate(100);
+        return resolve(inputPathDir);
+      })
       .on("error", (err, stdout, stderr) => {
         // Log detailed error information
         logger.error("Error:" + err);
