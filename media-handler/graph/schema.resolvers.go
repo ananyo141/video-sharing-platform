@@ -9,7 +9,6 @@ import (
 	"media-handler/graph/model"
 )
 
-// FIXME: Add validation to the resolvers
 // CreateVideo is the resolver for the createVideo field.
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
 	userid, err := r.GetUserHeader(ctx)
@@ -37,14 +36,13 @@ func (r *mutationResolver) DeleteVideo(ctx context.Context, id string) (*model.V
 	return r.DB.DeleteVideo(id, userid)
 }
 
-// Videos is the resolver for the videos field.
-func (r *queryResolver) Videos(ctx context.Context, search *string, userId *int) ([]*model.Video, error) {
-	return r.DB.GetVideos(search, userId)
-}
-
-// Video is the resolver for the video field.
-func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, error) {
-	return r.DB.GetVideo(id)
+// ********* Like Resolver ********* //
+func (r *mutationResolver) LikeVideo(ctx context.Context, id string) (*model.Video, error) {
+	userid, err := r.GetUserHeader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.DB.LikeVideo(id, userid)
 }
 
 // ********* Comment Resolvers ********* //
@@ -56,6 +54,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.Create
 	return r.DB.CreateComment(input, userid)
 }
 
+// UpdateComment is the resolver for the updateComment field.
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input model.UpdateCommentInput) (*model.Comment, error) {
 	userid, err := r.GetUserHeader(ctx)
 	if err != nil {
@@ -64,6 +63,7 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, input m
 	return r.DB.UpdateComment(id, input, userid)
 }
 
+// DeleteComment is the resolver for the deleteComment field.
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
 	userid, err := r.GetUserHeader(ctx)
 	if err != nil {
@@ -72,17 +72,19 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model
 	return r.DB.DeleteComment(id, userid)
 }
 
-func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
-	return r.DB.GetComment(id)
+// Videos is the resolver for the videos field.
+func (r *queryResolver) Videos(ctx context.Context, search *string, userID *int) ([]*model.Video, error) {
+	return r.DB.GetVideos(search, userID)
 }
 
-// ********* Like Resolver ********* //
-func (r *mutationResolver) LikeVideo(ctx context.Context, videoId string) (*model.Video, error) {
-	userid, err := r.GetUserHeader(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return r.DB.LikeVideo(videoId, userid)
+// Video is the resolver for the video field.
+func (r *queryResolver) Video(ctx context.Context, id string) (*model.Video, error) {
+	return r.DB.GetVideo(id)
+}
+
+// Comment is the resolver for the comment field.
+func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
+	return r.DB.GetComment(id)
 }
 
 // Mutation returns MutationResolver implementation.
