@@ -41,6 +41,9 @@ type Mutation struct {
 type Query struct {
 }
 
+type Subscription struct {
+}
+
 type UpdateCommentInput struct {
 	Text *string `json:"text,omitempty" bson:"text"`
 }
@@ -69,4 +72,11 @@ type Video struct {
 	Comments    []*Comment `json:"comments" bson:"comments"`
 	CreatedAt   time.Time  `json:"createdAt" bson:"createdAt"`
 	UpdatedAt   time.Time  `json:"updatedAt" bson:"updatedAt"`
+}
+
+type VideoProgress struct {
+	VideoID   string    `json:"videoId" bson:"videoId"`
+	UserID    int       `json:"userId" bson:"userId"`
+	Progress  int       `json:"progress" bson:"progress"`
+	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
 }

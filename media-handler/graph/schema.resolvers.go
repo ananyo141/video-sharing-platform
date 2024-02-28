@@ -6,7 +6,9 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"media-handler/graph/model"
+	"time"
 )
 
 // CreateVideo is the resolver for the createVideo field.
@@ -87,11 +89,65 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment,
 	return r.DB.GetComment(id)
 }
 
+// VideoProgress is the resolver for the videoProgress field.
+func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string) (<-chan *model.VideoProgress, error) {
+	// panic(fmt.Errorf("not implemented: VideoProgress - videoProgress"))
+	// First you'll need to `make()` your channel. Use your type here!
+	ch := make(chan *model.VideoProgress)
+
+	// You can (and probably should) handle your channels in a central place outside of `schema.resolvers.go`.
+	// For this example we'll simply use a Goroutine with a simple loop.
+	go func() {
+		// Handle deregistration of the channel here. Note the `defer`
+		defer close(ch)
+
+		count := 0
+		for {
+			count++
+			// In our example we'll send the current time every second.
+			time.Sleep(1 * time.Second)
+			fmt.Println("Tick")
+
+			// Prepare your object.
+			currentTime := time.Now()
+			t := &model.VideoProgress{
+				VideoID:   videoID,
+				UserID:    1,
+				UpdatedAt: currentTime,
+				Progress:  count,
+			}
+
+			if count == 100 {
+				return
+			}
+
+			// The subscription may have got closed due to the client disconnecting.
+			// Hence we do send in a select block with a check for context cancellation.
+			// This avoids goroutine getting blocked forever or panicking,
+			select {
+			case <-ctx.Done(): // This runs when context gets cancelled. Subscription closes.
+				fmt.Println("Subscription Closed")
+				// Handle deregistration of the channel here. `close(ch)`
+				return // Remember to return to end the routine.
+
+			case ch <- t: // This is the actual send.
+				// Our message went through, do nothing
+			}
+		}
+	}()
+	// We return the channel and no error.
+	return ch, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Subscription returns SubscriptionResolver implementation.
+func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }

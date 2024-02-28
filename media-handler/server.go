@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 
@@ -34,7 +35,9 @@ func main() {
 		return gqlerror.Errorf("Internal server error %s", err)
 	})
 
-	http.Handle("/media/playground", playground.Handler("GraphQL playground", "/graphql"))
+	srv.AddTransport(&transport.Websocket{})
+
+	http.Handle("/media/playground", playground.Handler("GraphQL playground", "/media/graphql"))
 	http.Handle("/media/graphql", srv)
 	http.HandleFunc("/media/", func(w http.ResponseWriter, r *http.Request) {
 		var success bool = true

@@ -53,6 +53,17 @@ type Mutation {
   deleteComment(id: ID!): Comment!
 }
 
+type VideoProgress {
+  videoId: ID!
+  userId: Int!
+  progress: Int!
+  updatedAt: Time!
+}
+
+type Subscription {
+  videoProgress(videoId: ID!): VideoProgress!
+}
+
 input CreateVideoInput {
   title: String!
   description: String!
