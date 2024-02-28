@@ -3,6 +3,7 @@ package graph
 
 import (
 	"context"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"media-handler/db"
 	"strconv"
 
@@ -16,6 +17,7 @@ import (
 type Resolver struct {
 	DB         *db.DB
 	UserHeader string
+	RabbitMQ   *amqp.Connection
 }
 
 func (r *Resolver) GetUserHeader(ctx context.Context) (int, error) {

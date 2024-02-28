@@ -6,7 +6,9 @@ package graph
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"media-handler/graph/model"
 	"time"
 )
@@ -91,34 +93,66 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment,
 
 // VideoProgress is the resolver for the videoProgress field.
 func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string) (<-chan *model.VideoProgress, error) {
-	// panic(fmt.Errorf("not implemented: VideoProgress - videoProgress"))
-	// First you'll need to `make()` your channel. Use your type here!
-	ch := make(chan *model.VideoProgress)
-
-	// You can (and probably should) handle your channels in a central place outside of `schema.resolvers.go`.
-	// For this example we'll simply use a Goroutine with a simple loop.
+	channel := make(chan *model.VideoProgress)
+	failOnError := func(err error, msg string) {
+		if err != nil {
+			log.Panicf("%s: %s", msg, err)
+		}
+	}
 	go func() {
 		// Handle deregistration of the channel here. Note the `defer`
-		defer close(ch)
+		defer close(channel)
 
-		count := 0
+		rabbitCh, err := r.RabbitMQ.Channel()
+		failOnError(err, "Failed to open a channel")
+		defer rabbitCh.Close()
+
+		q, err := rabbitCh.QueueDeclare(
+			"progress_updates_queue", // name
+			true,                     // durable
+			false,                    // delete when unused
+			false,                    // exclusive
+			false,                    // no-wait
+			nil,                      // arguments
+		)
+		failOnError(err, "Failed to declare a queue")
+
+		msgs, err := rabbitCh.Consume(
+			q.Name, // queue
+			"",     // consumer
+			false,  // auto-ack
+			false,  // exclusive
+			false,  // no-local
+			false,  // no-wait
+			nil,    // args
+		)
+		failOnError(err, "Failed to consume messages from RabbitMQ")
 		for {
-			count++
-			// In our example we'll send the current time every second.
-			time.Sleep(1 * time.Second)
-			fmt.Println("Tick")
-
-			// Prepare your object.
-			currentTime := time.Now()
-			t := &model.VideoProgress{
-				VideoID:   videoID,
-				UserID:    1,
-				UpdatedAt: currentTime,
-				Progress:  count,
+			msg, ok := <-msgs
+			if !ok {
+				log.Println("End of messages")
+				return
 			}
 
-			if count == 100 {
-				return
+			log.Printf("Received a message: %s", msg.Body)
+
+			type Payload struct {
+				Progress float64 `json:"progress"`
+				File     string  `json:"file"`
+			}
+			// Prepare your object.
+			currentTime := time.Now()
+			var payload Payload
+			err := json.Unmarshal(msg.Body, &payload)
+			if err != nil {
+				log.Printf("Failed to parse message: %s", err)
+				continue
+			}
+			t := &model.VideoProgress{
+				VideoID:   payload.File,
+				UserID:    1,
+				UpdatedAt: currentTime,
+				Progress:  int(payload.Progress),
 			}
 
 			// The subscription may have got closed due to the client disconnecting.
@@ -130,13 +164,16 @@ func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string
 				// Handle deregistration of the channel here. `close(ch)`
 				return // Remember to return to end the routine.
 
-			case ch <- t: // This is the actual send.
-				// Our message went through, do nothing
+			case channel <- t: // This is the actual send.
+				msg.Ack(true) // Acknowledge the message.
+			}
+			if int(payload.Progress) == 100 {
+				return
 			}
 		}
 	}()
 	// We return the channel and no error.
-	return ch, nil
+	return channel, nil
 }
 
 // Mutation returns MutationResolver implementation.

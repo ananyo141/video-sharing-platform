@@ -4,6 +4,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 
 	"context"
@@ -22,12 +23,21 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	rabbitMQConn, err := amqp.Dial("amqp://guest:guest@events-queue:5672")
 
+	if err != nil {
+		log.Panicf("Failed to connect to RabbitMQ: %s", err)
+	} else {
+		log.Println("Connected to RabbitMQ")
+	}
+
+	defer rabbitMQConn.Close()
 	dbInstance := db.Connect()
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		DB:         dbInstance,
 		UserHeader: "X-Auth-Id", // This is the header that will be used to get the user id
+		RabbitMQ:   rabbitMQConn,
 	}}))
 
 	srv.SetRecoverFunc(func(ctx context.Context, err interface{}) error {
