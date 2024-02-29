@@ -101,9 +101,6 @@ services:
     depends_on:
       - video-bucket
       - video-redis
-      - traefik
-    labels:
-      - "traefik.http.routers.video-service.rule=PathPrefix(`/video`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -146,10 +143,13 @@ services:
     depends_on:
       - video-bucket
     entrypoint: >
-      /bin/sh -c "
-      sleep 10;
-      /usr/bin/mc config host add miniobucket http://video-bucket:9000 minioadmin minioadmin;
-      /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put;
+      /bin/bash -c "
+      sleep 15;
+      /usr/bin/mc mb miniobucket/{images,misc,video-bucket,transcoded-bucket};
+      /usr/bin/mc anonymous set download miniobucket/images;
+      /usr/bin/mc anonymous set download miniobucket/misc;
+      /usr/bin/mc anonymous set download miniobucket/video-bucket;
+      /usr/bin/mc anonymous set download miniobucket/transcoded-bucket;
       exit 0;
       "
     networks:
@@ -164,6 +164,24 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     ports:
       - "8004:15672" # Web Management Interface
+    networks:
+      - video-sharing-platform
+
+  # S3 Service
+  s3-service:
+    build:
+      context: ./s3-service
+      dockerfile: dev.dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ./s3-service/src
+          target: /app/src
+    depends_on:
+      - traefik
+    env_file: ./s3-service/.env.docker
+    labels:
+      - "traefik.http.routers.video-service.rule=PathPrefix(`/assets`)"
     networks:
       - video-sharing-platform
 
