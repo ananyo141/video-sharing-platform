@@ -1,6 +1,8 @@
 package com.bucketservice.service.controllers;
 
+import com.bucketservice.service.utils.HttpResponse;
 import com.bucketservice.service.utils.MinioService;
+import com.bucketservice.service.utils.UrlManipulation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,41 +27,48 @@ public class PresignedUrl {
 
   @GetMapping("/assets/presignedUrl")
   public ResponseEntity<?> getPresignedUrl(@RequestParam String filename) {
-    String bucketName = "videos";
-    String objectName = filename;
+    try {
 
-    // Extract file extension
-    String fileExtension = getFileExtension(filename);
+      String bucketName = MinioService.MINIO_VIDEOUPLOAD_BUCKET;
+      String objectName = filename;
 
-    // Check if the file extension is allowed
-    if (!isAllowedExtension(fileExtension)) {
-      return ResponseEntity.badRequest().body(
-          Map.of(
-              "success", false,
-              "error", "Invalid file extension. Allowed extensions: " + ALLOWED_EXTENSIONS));
-    }
-    if (!minioService.bucketExists(bucketName)) {
+      // Extract file extension
+      String fileExtension = getFileExtension(filename);
+
+      // Check if the file extension is allowed
+      if (!isAllowedExtension(fileExtension)) {
+        return ResponseEntity.badRequest().body(
+            HttpResponse.respond(false, "Invalid file extension. Allowed extensions: " + ALLOWED_EXTENSIONS, null));
+      }
+      if (!minioService.bucketExists(bucketName)) {
+        return ResponseEntity.internalServerError().body(
+            HttpResponse.respond(false, "Bucket does not exist", null));
+      }
+
+      // Obtain a presigned URL for uploading the object to the bucket.
+      String presignedUrl = null;
+      try {
+        presignedUrl = minioService.getPresignedUrl(bucketName, objectName);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.internalServerError().body(
+            HttpResponse.respond(false, "Failed to obtain presigned URL", null));
+      }
+
+      if (presignedUrl != null) {
+        // Return a JSON response with success true and the presigned URL.
+        String urlWithoutHost = UrlManipulation.removehost(presignedUrl);
+        return ResponseEntity.ok().body(
+            HttpResponse.respond(true, "Presigned URL obtained successfully",
+                Map.of("presignedUrl", urlWithoutHost, "objectName", objectName)));
+      } else {
+        // Handle the case where obtaining the presigned URL failed.
+        return ResponseEntity.internalServerError().body(
+            HttpResponse.respond(false, "Failed to obtain presigned URL", null));
+      }
+    } catch (Exception e) {
       return ResponseEntity.internalServerError().body(
-          Map.of(
-              "success", false,
-              "error", "Bucket does not exist."));
-    }
-
-    // Obtain a presigned URL for uploading the object to the bucket.
-    String presignedUrl = minioService.getPresignedUrl(bucketName, objectName);
-
-    if (presignedUrl != null) {
-      // Return a JSON response with success true and the presigned URL.
-      return ResponseEntity.ok().body(
-          Map.of(
-              "success", true,
-              "data", Map.of("presignedUrl", presignedUrl)));
-    } else {
-      // Handle the case where obtaining the presigned URL failed.
-      return ResponseEntity.status(500).body(
-          Map.of(
-              "success", false,
-              "error", "Failed to obtain presigned URL."));
+          HttpResponse.respond(false, "Error obtaining presigned URL: " + e.getMessage(), null));
     }
   }
 

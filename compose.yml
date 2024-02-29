@@ -138,18 +138,21 @@ services:
     networks:
       - video-sharing-platform
 
-  bucket-publish-events:
+  bucket-initialize:
     image: minio/mc
     depends_on:
       - video-bucket
+    # FIXME (SECURITY!): `download` access allows listing of bucket contents
     entrypoint: >
       /bin/bash -c "
       sleep 15;
+      /usr/bin/mc config host add miniobucket http://video-bucket:9000 minioadmin minioadmin;
       /usr/bin/mc mb miniobucket/{images,misc,video-bucket,transcoded-bucket};
       /usr/bin/mc anonymous set download miniobucket/images;
       /usr/bin/mc anonymous set download miniobucket/misc;
       /usr/bin/mc anonymous set download miniobucket/video-bucket;
       /usr/bin/mc anonymous set download miniobucket/transcoded-bucket;
+      /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put;
       exit 0;
       "
     networks:
