@@ -35,7 +35,7 @@ export async function listenQueue(
     });
 
     // Declare the exchange
-    await channel.assertExchange(exchangeName, "fanout", { durable: true });
+    await channel.assertExchange(exchangeName, "direct", { durable: true });
     const assertQueueResponse = await channel.assertQueue(queueName, {
       durable: true,
     });

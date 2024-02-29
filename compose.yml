@@ -128,9 +128,9 @@ services:
       MINIO_NOTIFY_AMQP_ENABLE_PRIMARY: "on"
       MINIO_NOTIFY_AMQP_DURABLE_PRIMARY: "on"
       MINIO_NOTIFY_AMQP_URL_PRIMARY: "amqp://guest:guest@events-queue:5672"
-      MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY: "fanout"
       MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY: "uploadevents"
       MINIO_NOTIFY_AMQP_ROUTING_KEY_PRIMARY: "uploadlogs"
+      MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY: "direct"
     depends_on:
       - events-queue
     labels:
@@ -149,7 +149,6 @@ services:
       /bin/sh -c "
       sleep 10;
       /usr/bin/mc config host add miniobucket http://video-bucket:9000 minioadmin minioadmin;
-      /usr/bin/mc mb miniobucket/video-bucket;
       /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put;
       exit 0;
       "

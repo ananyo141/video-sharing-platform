@@ -9,26 +9,26 @@ import { connectToRabbitMQ } from "./eventQueue";
 // Function to convert video to HLS format
 export default async function convertToHLS(inputPath: string): Promise<string> {
   const { channel } = await connectToRabbitMQ();
+  const exchangeName = "video_processing_exchange";
+  await channel.assertExchange(exchangeName, "direct", { durable: false });
 
+  const filebasename = path.basename(inputPath);
   // Function to send progress updates to RabbitMQ
   const sendProgressUpdate = async (progress: number) => {
     try {
-      // You can customize the message structure based on your needs
-      const message = { progress, file: path.basename(inputPath) };
-      const queueName = "progress_updates_queue";
-
-      await channel.assertQueue(queueName, { durable: true });
-      channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)));
+      const message = { progress, file: filebasename };
+      channel.publish(
+        exchangeName,
+        filebasename, // routing key
+        Buffer.from(JSON.stringify(message)),
+      );
       logger.info(`Progress update sent: ${progress}%`);
     } catch (err) {
       logger.error("Error sending progress update to RabbitMQ:", err);
     }
   };
 
-  const inputPathDir = path.join(
-    env.UPLOAD_FOLDER,
-    path.basename(inputPath) + "_hls",
-  );
+  const inputPathDir = path.join(env.UPLOAD_FOLDER, filebasename + "_hls");
   if (!fs.existsSync(inputPathDir)) {
     fs.mkdirSync(inputPathDir);
   }

@@ -107,15 +107,33 @@ func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string
 		failOnError(err, "Failed to open a channel")
 		defer rabbitCh.Close()
 
+		err = rabbitCh.ExchangeDeclare(
+			"video_processing_exchange", // name
+			"direct",                    // type
+			false,                       // durable
+			false,                       // auto-deleted
+			false,                       // internal
+			false,                       // no-wait
+			nil,                         // arguments
+		)
+		failOnError(err, "Failed to declare an exchange")
+
 		q, err := rabbitCh.QueueDeclare(
-			"progress_updates_queue", // name
-			true,                     // durable
-			false,                    // delete when unused
-			false,                    // exclusive
-			false,                    // no-wait
-			nil,                      // arguments
+			"",    // name -- empty string creates a unique queue name
+			false, // durable
+			true,  // delete when unused
+			false, // exclusive
+			false, // no-wait
+			nil,   // arguments
 		)
 		failOnError(err, "Failed to declare a queue")
+		err = rabbitCh.QueueBind(
+			q.Name,                      // queue name
+			videoID,                     // routing key -- filename
+			"video_processing_exchange", // exchange
+			false,
+			nil)
+		failOnError(err, "Failed to bind a queue")
 
 		msgs, err := rabbitCh.Consume(
 			q.Name, // queue
@@ -127,6 +145,7 @@ func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string
 			nil,    // args
 		)
 		failOnError(err, "Failed to consume messages from RabbitMQ")
+
 		for {
 			msg, ok := <-msgs
 			if !ok {
