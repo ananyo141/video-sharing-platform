@@ -4,6 +4,9 @@
 
 Vimero is a modern and feature-rich video sharing service that allows users to upload, share, and discover a wide range of video content. Whether you are a content creator looking to showcase your work or an avid viewer searching for captivating videos, Vimero provides a seamless platform to connect users through the power of video.
 
+## Architecture
+![diagram](https://github.com/ananyo141/video-sharing-platform/assets/74728797/f47e48c5-d368-4b72-8911-311e7f842874)
+
 ## Features
 
 - **User Profiles:** Create personalized profiles to manage your uploaded videos and interact with the community.
@@ -19,13 +22,13 @@ To run Vimero locally for development or testing purposes, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/vimero.git
+   git clone https://github.com/ananyo141/video-sharing-platform
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd vimero
+   cd video-sharing-platform
    ```
 
 3. Use docker compose to run locally:
@@ -33,13 +36,17 @@ To run Vimero locally for development or testing purposes, follow these steps:
    ```bash
    docker compose up -d
    ```
+   or run the production build
+  ```bash
+   docker compose -f prod.compose.yml up -d
+   ```
 
-4. Visit `http://localhost:3000` in your browser to access Vimero.
+4. Visit `http://localhost:8001` in your Postman to access Vimero APIs, by importing the collection given in the repo.
 
 ## Technologies Used
 
-- Frontend: Next.js
-- Backend: Go, Rust
+- Frontend: Next.js (WIP)
+- Backend: Go, Rust, Java, Typescript
 
 ## Contributing
 
