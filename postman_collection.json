@@ -279,7 +279,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"tfesft\",\n  \"password\": \"da\"\n}\n\n",
+									"raw": "{\n  \"email\": \"test1@co.com\",\n  \"password\": \"da\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -319,7 +319,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"tfesft\",\n  \"password\": \"da\"\n}\n\n",
+									"raw": "{\n  \"email\": \"test1@co.com\",\n  \"password\": \"da\"\n}\n\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -469,12 +469,94 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "query {\n    videos(userId: 2, search: \"nice\") {\n        _id\n        title\n        description\n        userId\n        createdAt\n        updatedAt\n        likes\n        comments {\n            _id\n            text\n            userId\n        }\n    }\n}",
+										"query": "query {\n    videos {\n        _id\n        title\n        description\n        userId\n        createdAt\n        updatedAt\n        user {\n            email\n        }\n        likes\n        comments {\n            _id\n            text\n            user {\n                id\n                email\n                role_id\n            }\n        }\n    }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/media/graphql",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"media",
+										"graphql"
+									]
+								},
+								"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+							},
+							"response": []
+						},
+						{
+							"name": "get video progress",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "subscription {\n    videoProgress(videoId: \"65def3ae05e53bd98dcedc23\") {\n        videoId\n        userId\n        progress\n        updatedAt\n    }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/media/graphql",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"media",
+										"graphql"
+									]
+								},
+								"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+							},
+							"response": []
+						},
+						{
+							"name": "get videos query",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query {\n    videos(userId: 2, search: \"nice\") {\n        _id\n        title\n        description\n        userId\n        createdAt\n        updatedAt\n        user {\n            email\n        }\n        likes\n        comments {\n            _id\n            text\n            user {\n                id\n                email\n                role_id\n            }\n        }\n    }\n}",
 										"variables": ""
 									}
 								},
@@ -508,6 +590,16 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -547,12 +639,22 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation {\n  likeVideo(id: \"65d4c7f7b2dad49080c5a392\", userId: 39) {\n    _id\n    likes\n  }\n}\n",
+										"query": "mutation {\n  likeVideo(id: \"65d4c7f7b2dad49080c5a392\") {\n    _id\n    likes\n  }\n}\n",
 										"variables": ""
 									}
 								},
@@ -625,6 +727,16 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -664,12 +776,22 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation {\n  createVideo(input: {\n    title: \"nice\"\n    description: \"ofk\"\n    source: \"vdfdsd\"\n    userId: 2\n  }) {\n    _id\n    title\n    source\n    description\n    likes\n    comments {\n        _id\n    }\n\tcreatedAt\n    updatedAt\n  }\n}",
+										"query": "mutation {\n  createVideo(\n    input: { title: \"my vlog\", description: \"this is my new vlog\", fileExtension: \"mp4\" }\n  ) {\n    presignedUrl\n    video {\n      _id\n      title\n      userId\n      source\n    }\n  }\n}\n",
 										"variables": ""
 									}
 								},
@@ -720,12 +842,22 @@
 						{
 							"name": "add comment",
 							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation {\n  createComment(input: {\n  text: \"new comment 3\",\n  userId: 3,\n  videoId: \"65cfabcce6f894c8e1e4196a\"\n  }) {\n    _id\n    text\n    createdAt\n    userId\n  }\n}",
+										"query": "mutation {\n  createComment(input: {\n  text: \"new comment 3\",\n  videoId: \"65d7a0b2d80cbc30753c37ff\"\n  }) {\n    _id\n    text\n    createdAt\n    userId\n  }\n}",
 										"variables": ""
 									}
 								},
@@ -829,33 +961,159 @@
 			]
 		},
 		{
-			"name": "video-processing",
+			"name": "s3-service",
 			"item": [
 				{
-					"name": "upload",
+					"name": "get presigned url",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/assets/presignedUrl?filename=user_video.mp4",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"assets",
+								"presignedUrl"
+							],
+							"query": [
+								{
+									"key": "filename",
+									"value": "user_video.mp4"
+								}
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "update video",
+					"name": "upload images",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/ananyo/Desktop/Screenshots/Screenshot 2024-02-29 at 11.54.44 AM.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseurl}}/assets/images",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"assets",
+								"images"
+							]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "delete video",
+					"name": "upload misc",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Users/ananyo/Desktop/cover_letter.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseurl}}/assets/misc",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"assets",
+								"misc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload with presigned url",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Host",
+								"value": "video-bucket:9000",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "file",
+							"file": {
+								"src": "/Users/ananyo/workspace/personal/repositories/tus-video-upload-script/deva.mp4"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9000/video-bucket/uploads/user_video_1709133939450.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20240228%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240228T152539Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=f8994d7af445fd460649bcd82b09257acbb2ee8b549aa142d1df42b07af8362e",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9000",
+							"path": [
+								"video-bucket",
+								"uploads",
+								"user_video_1709133939450.mp4"
+							],
+							"query": [
+								{
+									"key": "X-Amz-Algorithm",
+									"value": "AWS4-HMAC-SHA256"
+								},
+								{
+									"key": "X-Amz-Credential",
+									"value": "minioadmin%2F20240228%2Fus-east-1%2Fs3%2Faws4_request"
+								},
+								{
+									"key": "X-Amz-Date",
+									"value": "20240228T152539Z"
+								},
+								{
+									"key": "X-Amz-Expires",
+									"value": "900"
+								},
+								{
+									"key": "X-Amz-SignedHeaders",
+									"value": "host"
+								},
+								{
+									"key": "X-Amz-Signature",
+									"value": "f8994d7af445fd460649bcd82b09257acbb2ee8b549aa142d1df42b07af8362e"
+								}
+							]
+						}
 					},
 					"response": []
 				}
 			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseurl",
+			"value": "localhost:8002"
 		}
 	]
 }

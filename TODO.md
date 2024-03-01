@@ -5,20 +5,23 @@
        - [x] Dev Environment  
        - [x] Prod Environment
 - [x] Enable data persistence with volumes on production
-- [ ] Add postman collection json to the repo
+- [x] Add postman collection json to the repo
 - [ ] Add rate limiting
 - [ ] Kubernetes config for deployment
 - [ ] Validation in api routes
-- [ ] Decouple Video Processing service  
-       - [ ] Separate Bucket Endpoints (like upload, presigned urls) in a bucket service  
-       - [ ] Transcode video by listening to S3 events in separate service
+- [x] Decouple Video Processing service  
+       - [x] Separate Bucket Endpoints (like upload, presigned urls) in a bucket service  
+       - [x] Transcode video by listening to S3 events in separate service
+- [ ] Add user avatar, name to user object
+- [ ] Rewire video service as solely a transcoder
+- [ ] Add subscriptions (users follow one another)
 
 ## Media Handler
 
 - [ ] Data loaders
 - [ ] (No Eager fetching)[https://gqlgen.com/getting-started/#dont-eagerly-fetch-the-user]
 - [ ] Add Pagination
-- [ ] Graphql subscriptions to tell user video processing state
+- [x] Graphql subscriptions to tell user video processing state
 - [x] Add Redis for user caching
 
 ## User Management
