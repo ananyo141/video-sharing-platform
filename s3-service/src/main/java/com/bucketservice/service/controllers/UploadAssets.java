@@ -32,7 +32,7 @@ public class UploadAssets {
           HttpResponse.respond(true, "Image uploaded successfully", Map.of("objectName", objectName)));
     } catch (Exception e) {
       return ResponseEntity.internalServerError().body(
-          HttpResponse.respond(false, "Error uploading file: " + e.getMessage(), null));
+          HttpResponse.respond(false, "Error uploading file: " + e.getMessage(), Map.of()));
     }
   }
 
@@ -46,7 +46,7 @@ public class UploadAssets {
           HttpResponse.respond(true, "Asset uploaded successfully", Map.of("objectName", objectName)));
     } catch (Exception e) {
       return ResponseEntity.internalServerError().body(
-          HttpResponse.respond(false, "Error uploading file: " + e.getMessage(), null));
+          HttpResponse.respond(false, "Error uploading file: " + e.getMessage(), Map.of()));
     }
   }
 }

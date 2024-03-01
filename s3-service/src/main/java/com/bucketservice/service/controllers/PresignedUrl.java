@@ -38,11 +38,11 @@ public class PresignedUrl {
       // Check if the file extension is allowed
       if (!isAllowedExtension(fileExtension)) {
         return ResponseEntity.badRequest().body(
-            HttpResponse.respond(false, "Invalid file extension. Allowed extensions: " + ALLOWED_EXTENSIONS, null));
+            HttpResponse.respond(false, "Invalid file extension. Allowed extensions: " + ALLOWED_EXTENSIONS, Map.of()));
       }
       if (!minioService.bucketExists(bucketName)) {
         return ResponseEntity.internalServerError().body(
-            HttpResponse.respond(false, "Bucket does not exist", null));
+            HttpResponse.respond(false, "Bucket does not exist", Map.of()));
       }
 
       // Obtain a presigned URL for uploading the object to the bucket.
@@ -52,7 +52,7 @@ public class PresignedUrl {
       } catch (Exception e) {
         e.printStackTrace();
         return ResponseEntity.internalServerError().body(
-            HttpResponse.respond(false, "Failed to obtain presigned URL", null));
+            HttpResponse.respond(false, "Failed to obtain presigned URL", Map.of()));
       }
 
       if (presignedUrl != null) {
@@ -60,15 +60,15 @@ public class PresignedUrl {
         String urlWithoutHost = UrlManipulation.removehost(presignedUrl);
         return ResponseEntity.ok().body(
             HttpResponse.respond(true, "Presigned URL obtained successfully",
-                Map.of("presignedUrl", urlWithoutHost, "objectName", objectName)));
+                Map.of("presignedUrl", urlWithoutHost, "objectName", "/" + bucketName + "/" + objectName)));
       } else {
         // Handle the case where obtaining the presigned URL failed.
         return ResponseEntity.internalServerError().body(
-            HttpResponse.respond(false, "Failed to obtain presigned URL", null));
+            HttpResponse.respond(false, "Failed to obtain presigned URL", Map.of()));
       }
     } catch (Exception e) {
       return ResponseEntity.internalServerError().body(
-          HttpResponse.respond(false, "Error obtaining presigned URL: " + e.getMessage(), null));
+          HttpResponse.respond(false, "Error obtaining presigned URL: " + e.getMessage(), Map.of()));
     }
   }
 

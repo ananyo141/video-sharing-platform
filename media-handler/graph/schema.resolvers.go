@@ -10,16 +10,36 @@ import (
 	"fmt"
 	"log"
 	"media-handler/graph/model"
+	"media-handler/network"
+	"media-handler/utils"
 	"time"
 )
 
 // CreateVideo is the resolver for the createVideo field.
-func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error) {
+func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.CreateVideoPayload, error) {
 	userid, err := r.GetUserHeader(ctx)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
-	return r.DB.CreateVideo(input, userid)
+	var filename = fmt.Sprintf("%s_%d.%s", utils.NormalizeFilename(input.Title),
+		time.Now().UnixMilli(), input.FileExtension)
+	// get the presigned url from the video service
+	objectName, presignedURL, err := network.GetPresignedUrl(filename)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	video, err := r.DB.CreateVideo(input, *objectName, userid)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return &model.CreateVideoPayload{
+		PresignedURL: *presignedURL,
+		Video:        video,
+	}, nil
 }
 
 // UpdateVideo is the resolver for the updateVideo field.

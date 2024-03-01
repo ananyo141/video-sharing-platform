@@ -60,6 +60,11 @@ type ComplexityRoot struct {
 		VideoID   func(childComplexity int) int
 	}
 
+	CreateVideoPayload struct {
+		PresignedURL func(childComplexity int) int
+		Video        func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateComment func(childComplexity int, input model.CreateCommentInput) int
 		CreateVideo   func(childComplexity int, input model.CreateVideoInput) int
@@ -109,7 +114,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.Video, error)
+	CreateVideo(ctx context.Context, input model.CreateVideoInput) (*model.CreateVideoPayload, error)
 	UpdateVideo(ctx context.Context, id string, input model.UpdateVideoInput) (*model.Video, error)
 	DeleteVideo(ctx context.Context, id string) (*model.Video, error)
 	LikeVideo(ctx context.Context, id string) (*model.Video, error)
@@ -193,6 +198,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Comment.VideoID(childComplexity), true
+
+	case "CreateVideoPayload.presignedUrl":
+		if e.complexity.CreateVideoPayload.PresignedURL == nil {
+			break
+		}
+
+		return e.complexity.CreateVideoPayload.PresignedURL(childComplexity), true
+
+	case "CreateVideoPayload.video":
+		if e.complexity.CreateVideoPayload.Video == nil {
+			break
+		}
+
+		return e.complexity.CreateVideoPayload.Video(childComplexity), true
 
 	case "Mutation.createComment":
 		if e.complexity.Mutation.CreateComment == nil {
@@ -1159,6 +1178,116 @@ func (ec *executionContext) fieldContext_Comment_updatedAt(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateVideoPayload_presignedUrl(ctx context.Context, field graphql.CollectedField, obj *model.CreateVideoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateVideoPayload_presignedUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PresignedURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateVideoPayload_presignedUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateVideoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateVideoPayload_video(ctx context.Context, field graphql.CollectedField, obj *model.CreateVideoPayload) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateVideoPayload_video(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Video, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖmediaᚑhandlerᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateVideoPayload_video(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateVideoPayload",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_Video__id(ctx, field)
+			case "title":
+				return ec.fieldContext_Video_title(ctx, field)
+			case "description":
+				return ec.fieldContext_Video_description(ctx, field)
+			case "source":
+				return ec.fieldContext_Video_source(ctx, field)
+			case "userId":
+				return ec.fieldContext_Video_userId(ctx, field)
+			case "user":
+				return ec.fieldContext_Video_user(ctx, field)
+			case "likes":
+				return ec.fieldContext_Video_likes(ctx, field)
+			case "comments":
+				return ec.fieldContext_Video_comments(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Video_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Video_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Video", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createVideo(ctx, field)
 	if err != nil {
@@ -1185,9 +1314,9 @@ func (ec *executionContext) _Mutation_createVideo(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Video)
+	res := resTmp.(*model.CreateVideoPayload)
 	fc.Result = res
-	return ec.marshalNVideo2ᚖmediaᚑhandlerᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+	return ec.marshalNCreateVideoPayload2ᚖmediaᚑhandlerᚋgraphᚋmodelᚐCreateVideoPayload(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createVideo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1198,28 +1327,12 @@ func (ec *executionContext) fieldContext_Mutation_createVideo(ctx context.Contex
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "_id":
-				return ec.fieldContext_Video__id(ctx, field)
-			case "title":
-				return ec.fieldContext_Video_title(ctx, field)
-			case "description":
-				return ec.fieldContext_Video_description(ctx, field)
-			case "source":
-				return ec.fieldContext_Video_source(ctx, field)
-			case "userId":
-				return ec.fieldContext_Video_userId(ctx, field)
-			case "user":
-				return ec.fieldContext_Video_user(ctx, field)
-			case "likes":
-				return ec.fieldContext_Video_likes(ctx, field)
-			case "comments":
-				return ec.fieldContext_Video_comments(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Video_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Video_updatedAt(ctx, field)
+			case "presignedUrl":
+				return ec.fieldContext_CreateVideoPayload_presignedUrl(ctx, field)
+			case "video":
+				return ec.fieldContext_CreateVideoPayload_video(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Video", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CreateVideoPayload", field.Name)
 		},
 	}
 	defer func() {
@@ -4742,7 +4855,7 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "source"}
+	fieldsInOrder := [...]string{"title", "description", "fileExtension"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4763,13 +4876,13 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.Description = data
-		case "source":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+		case "fileExtension":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fileExtension"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Source = data
+			it.FileExtension = data
 		}
 	}
 
@@ -4864,7 +4977,7 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "source"}
+	fieldsInOrder := [...]string{"title", "description"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4885,13 +4998,6 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.Description = data
-		case "source":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Source = data
 		}
 	}
 
@@ -4946,6 +5052,50 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Comment_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var createVideoPayloadImplementors = []string{"CreateVideoPayload"}
+
+func (ec *executionContext) _CreateVideoPayload(ctx context.Context, sel ast.SelectionSet, obj *model.CreateVideoPayload) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createVideoPayloadImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateVideoPayload")
+		case "presignedUrl":
+			out.Values[i] = ec._CreateVideoPayload_presignedUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "video":
+			out.Values[i] = ec._CreateVideoPayload_video(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -5795,6 +5945,20 @@ func (ec *executionContext) unmarshalNCreateCommentInput2mediaᚑhandlerᚋgraph
 func (ec *executionContext) unmarshalNCreateVideoInput2mediaᚑhandlerᚋgraphᚋmodelᚐCreateVideoInput(ctx context.Context, v interface{}) (model.CreateVideoInput, error) {
 	res, err := ec.unmarshalInputCreateVideoInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateVideoPayload2mediaᚑhandlerᚋgraphᚋmodelᚐCreateVideoPayload(ctx context.Context, sel ast.SelectionSet, v model.CreateVideoPayload) graphql.Marshaler {
+	return ec._CreateVideoPayload(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCreateVideoPayload2ᚖmediaᚑhandlerᚋgraphᚋmodelᚐCreateVideoPayload(ctx context.Context, sel ast.SelectionSet, v *model.CreateVideoPayload) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateVideoPayload(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {

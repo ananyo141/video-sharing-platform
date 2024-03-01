@@ -100,20 +100,21 @@ func (db *DB) GetVideos(search *string, userId *int) ([]*model.Video, error) {
 	return videos, err
 }
 
-func (db *DB) CreateVideo(video model.CreateVideoInput, userid int) (*model.Video, error) {
+func (db *DB) CreateVideo(video model.CreateVideoInput, source string, userid int) (*model.Video, error) {
 	videoCollec := db.client.Database(dbName).Collection(collectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+	timeCreated := time.Now()
 	insertedVideo, err := videoCollec.InsertOne(ctx,
 		bson.M{
 			"title":       video.Title,
 			"description": video.Description,
 			"userId":      userid,
-			"source":      video.Source,
+			"source":      source,
 			"likes":       []int{},
 			"comments":    []model.Comment{},
-			"createdAt":   time.Now(),
-			"updatedAt":   time.Now(),
+			"createdAt":   timeCreated,
+			"updatedAt":   timeCreated,
 		})
 
 	if err != nil {
@@ -126,7 +127,7 @@ func (db *DB) CreateVideo(video model.CreateVideoInput, userid int) (*model.Vide
 		Title:       video.Title,
 		Description: video.Description,
 		UserID:      userid,
-		Source:      video.Source,
+		Source:      source,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now()}
 	return &returnVideo, err

@@ -22,9 +22,14 @@ type CreateCommentInput struct {
 }
 
 type CreateVideoInput struct {
-	Title       string `json:"title" bson:"title"`
-	Description string `json:"description" bson:"description"`
-	Source      string `json:"source" bson:"source"`
+	Title         string `json:"title" bson:"title"`
+	Description   string `json:"description" bson:"description"`
+	FileExtension string `json:"fileExtension" bson:"fileExtension"`
+}
+
+type CreateVideoPayload struct {
+	PresignedURL string `json:"presignedUrl" bson:"presignedUrl"`
+	Video        *Video `json:"video" bson:"video"`
 }
 
 type DeleteCommentInput struct {
@@ -51,7 +56,6 @@ type UpdateCommentInput struct {
 type UpdateVideoInput struct {
 	Title       *string `json:"title,omitempty" bson:"title"`
 	Description *string `json:"description,omitempty" bson:"description"`
-	Source      *string `json:"source,omitempty" bson:"source"`
 }
 
 type User struct {

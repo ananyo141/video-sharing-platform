@@ -42,7 +42,7 @@ type Query {
 }
 
 type Mutation {
-  createVideo(input: CreateVideoInput!): Video!
+  createVideo(input: CreateVideoInput!): CreateVideoPayload!
   updateVideo(id: ID!, input: UpdateVideoInput!): Video!
   deleteVideo(id: ID!): Video!
 
@@ -67,13 +67,17 @@ type Subscription {
 input CreateVideoInput {
   title: String!
   description: String!
-  source: String!
+  fileExtension: String!
+}
+
+type CreateVideoPayload {
+  presignedUrl: String!
+  video: Video!
 }
 
 input UpdateVideoInput {
   title: String
   description: String
-  source: String
 }
 
 input DeleteVideoInput {
