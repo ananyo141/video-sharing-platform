@@ -4,7 +4,7 @@ services:
   # API Gateway #
   traefik:
     image: traefik:v2.10
-    restart: always
+    restart: unless-stopped
     command: --api.insecure=true --providers.docker
     ports:
       - "8001:80"
@@ -16,7 +16,7 @@ services:
 
   # User Service #
   user-management:
-    restart: always
+    restart: unless-stopped
     build:
       context: ./user-management
       dockerfile: Dockerfile
@@ -32,7 +32,7 @@ services:
 
   user-db:
     image: postgres:15-alpine
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: devdocker
       POSTGRES_PASSWORD: dbpassword
@@ -70,7 +70,7 @@ services:
 
   media-db:
     image: mongo:latest
-    restart: always
+    restart: unless-stopped
     networks:
       - video-sharing-platform
     volumes:
@@ -79,16 +79,13 @@ services:
 
   # Video Processing Service #
   video-service:
-    restart: always
+    restart: unless-stopped
     build:
       context: ./video-processing
       dockerfile: Dockerfile
     depends_on:
       - video-bucket
       - video-redis
-      - traefik
-    labels:
-      - "traefik.http.routers.video-service.rule=PathPrefix(`/video`)"
     networks:
       - video-sharing-platform
     env_file:
@@ -96,35 +93,81 @@ services:
 
   video-redis:
     image: redis:7-alpine
-    restart: always
+    restart: unless-stopped
     networks:
       - video-sharing-platform
 
   video-bucket:
-    image: minio/minio
-    restart: always
+    build:
+      context: ./video-processing
+      dockerfile: bucket.dockerfile
     command: server /data/ --console-address :9001
+    restart: unless-stopped
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      # For Proxy
+      # MINIO_SERVER_URL: http://localhost:8001
+      # MINIO_BROWSER_REDIRECT_URL: http://localhost:8001
+      MINIO_NOTIFY_AMQP_ENABLE_PRIMARY: "on"
+      MINIO_NOTIFY_AMQP_DURABLE_PRIMARY: "on"
+      MINIO_NOTIFY_AMQP_URL_PRIMARY: "amqp://guest:guest@events-queue:5672"
+      MINIO_NOTIFY_AMQP_EXCHANGE_PRIMARY: "uploadevents"
+      MINIO_NOTIFY_AMQP_ROUTING_KEY_PRIMARY: "uploadlogs"
+      MINIO_NOTIFY_AMQP_EXCHANGE_TYPE_PRIMARY: "direct"
+    depends_on:
+      - events-queue
     ports:
       - "8003:9001" # Web Interface
+      - "9000:9000" # For s3 access
     networks:
       - video-sharing-platform
+    labels:
+      - "traefik.http.routers.video-bucket.rule=PathPrefix(`/bucket`)"
     volumes:
       - video-bucket-volume:/data
   # --- END --- #
 
-  # Web Client #
-  web-client:
-    restart: always
+  bucket-initialize:
+    image: minio/mc
+    depends_on:
+      - video-bucket
+    # FIXME (SECURITY!): `download` access allows listing of bucket contents
+    entrypoint: >
+      /bin/bash -c "
+      sleep 15;
+      /usr/bin/mc config host add miniobucket http://video-bucket:9000 minioadmin minioadmin;
+      /usr/bin/mc mb miniobucket/{images,misc,video-bucket,transcoded-bucket};
+      /usr/bin/mc anonymous set download miniobucket/images;
+      /usr/bin/mc anonymous set download miniobucket/misc;
+      /usr/bin/mc anonymous set download miniobucket/video-bucket;
+      /usr/bin/mc anonymous set download miniobucket/transcoded-bucket;
+      /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put;
+      exit 0;
+      "
+    networks:
+      - video-sharing-platform
+  # --- END --- #
+
+  # Events Queue #
+  events-queue:
+    image: rabbitmq:3.13-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - video-sharing-platform
+
+  # S3 Service
+  s3-service:
     build:
-      context: ./web-client
-      dockerfile: Dockerfile
+      context: ./s3-service
+      dockerfile: dev.dockerfile
     depends_on:
       - traefik
+    env_file: ./s3-service/.env.docker
     labels:
-      - "traefik.http.routers.web-client.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.video-service.rule=PathPrefix(`/assets`)"
     networks:
       - video-sharing-platform
   # --- END --- #

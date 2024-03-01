@@ -1,7 +1,6 @@
-# Use the official Go image as a base image
-FROM golang:1.21-alpine
+# Stage 1: Build stage
+FROM golang:1.21-alpine AS build
 
-# Set the working directory inside the container
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -9,11 +8,18 @@ COPY go.mod go.sum ./
 # Download GoFiber dependencies
 RUN go mod download
 
-# Copy the GoFiber app files into the container at /app
 COPY . .
 
-# Build the GoFiber app
-RUN go build -o main
+# Build the GoFiber app with optimizations
+RUN go build -o main -ldflags="-s -w"
+
+# Stage 2: Production stage
+FROM alpine:3.14
+
+WORKDIR /app
+
+# Copy only the necessary files from the build stage
+COPY --from=build /app/main /app/.env.docker ./
 
 # Expose the port that your GoFiber app will run on
 EXPOSE 3000
