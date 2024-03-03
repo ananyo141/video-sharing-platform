@@ -101,14 +101,15 @@ services:
     build:
       context: ./video-processing
       dockerfile: bucket.dockerfile
-    command: server /data/ --console-address :9001
+    command: server /data/ 
+      # --console-address :9001
     restart: unless-stopped
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
       # For Proxy
-      # MINIO_SERVER_URL: http://localhost:8001
-      # MINIO_BROWSER_REDIRECT_URL: http://localhost:8001
+      MINIO_SERVER_URL: https://videosite.ddns.net
+      # MINIO_BROWSER_REDIRECT_URL: https://videosite.ddns.net
       MINIO_NOTIFY_AMQP_ENABLE_PRIMARY: "on"
       MINIO_NOTIFY_AMQP_DURABLE_PRIMARY: "on"
       MINIO_NOTIFY_AMQP_URL_PRIMARY: "amqp://guest:guest@events-queue:5672"
@@ -118,12 +119,16 @@ services:
     depends_on:
       - events-queue
     ports:
-      - "8003:9001" # Web Interface
+      # - "8003:9001" # Web Interface
       - "9000:9000" # For s3 access
     networks:
       - video-sharing-platform
     labels:
       - "traefik.http.routers.video-bucket.rule=PathPrefix(`/bucket`)"
+      - "traefik.http.routers.video-bucket.middlewares=path-rewrite"
+      - "traefik.http.middlewares.path-rewrite.replacepathregex.regex=^/bucket(.*)$$"
+      - "traefik.http.middlewares.path-rewrite.replacepathregex.replacement=$${1}"
+
     volumes:
       - video-bucket-volume:/data
   # --- END --- #
