@@ -15,8 +15,8 @@ RUN cargo install diesel_cli --no-default-features --features postgres
 COPY Cargo.toml Cargo.lock ./
 
 # Build the Rust app without the actual source code to cache dependencies
-RUN mkdir src && echo "fn main() {println!(\"dummy build to cache dependencies\")}" > src/main.rs
-RUN cargo build
+# RUN mkdir src && echo "fn main() {println!(\"dummy build to cache dependencies\")}" > src/main.rs
+# RUN cargo build
 
 # Copy the Rocket app files into the container at /app
 COPY . .
