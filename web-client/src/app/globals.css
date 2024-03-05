@@ -2,3 +2,4 @@
 @tailwind components;
 @tailwind utilities;
 
+html {overflow-y: hidden;}

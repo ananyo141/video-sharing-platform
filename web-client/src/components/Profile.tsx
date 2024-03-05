@@ -3,19 +3,12 @@
 import { StaticImageData } from "next/image";
 import React from "react";
 import Image from "next/image";
+import IconFallback from "./IconFallback";
 
 interface ProfileProps {
   name: string;
   icon?: StaticImageData | string;
 }
-
-const IconFallback = ({ word }: { word: string }) => {
-  return (
-    <div className="bg-secondary rounded-full h-24 w-24 flex justify-center items-center select-none">
-      <span className="text-red font-semibold text-5xl">{word.at(0)?.toUpperCase()}</span>
-    </div>
-  );
-};
 
 const Profile = (props: ProfileProps) => {
   return (

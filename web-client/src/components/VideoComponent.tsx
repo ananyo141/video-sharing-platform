@@ -20,8 +20,7 @@ const VideoComponent = (props: Props) => {
           scale: 1.05,
           zIndex: 100
         }}
-        className="shadow h-[200px] relative rounded"
-        style={{ overflow: 'hidden' }}
+        className="shadow h-[200px] relative rounded overflow-hidden"
       >
         <div className="relative w-full h-full">
           {props.thumbnail ? (
@@ -35,7 +34,7 @@ const VideoComponent = (props: Props) => {
             <div className="bg-green-300 h-full w-full"></div>
           )}
         </div>
-        <span className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white">{props.title}</span>
+        <span className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white bg-opacity-60 shadow-lg z-20">{props.title}</span>
       </motion.div>
     </Link>
   );
