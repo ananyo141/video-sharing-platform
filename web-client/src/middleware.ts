@@ -8,12 +8,12 @@ export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Logic for redirecting logged-in users from "/login"
-  if (JWT_TOKEN && path === "/login") {
+  if (JWT_TOKEN && (path === "/login" || path === "/register")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Logic for redirecting unauthenticated users to "/login" (excluding "/login" itself)
-  if (!JWT_TOKEN && path !== "/login") {
+  if (!JWT_TOKEN && !(path === "/login" || path === "/register")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -25,5 +25,6 @@ export const config = {
   matcher: [
     "/",
     "/login",
+    "/register",
   ],
 };
