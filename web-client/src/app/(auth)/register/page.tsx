@@ -6,7 +6,6 @@ import Illustration from "@/components/Illustration";
 import illustration1 from "/public/assets/illustration/fill-rolls.svg";
 import illustration2 from "/public/assets/illustration/live-collabration.svg";
 import illustration3 from "/public/assets/illustration/video-upload.svg";
-import illustration4 from "/public/assets/illustration/videographer.svg";
 
 const RegisterPage = () => {
   // State for form inputs
@@ -37,14 +36,14 @@ const RegisterPage = () => {
 
       <main className="bg-background flex items-center justify-center h-screen">
         <div className="bg-secondary flex flex-col item-center text-center p-10 px-24 rounded-lg w-[36rem] z-10 shadow">
-          <h2 className="text-red text-2xl font-semibold p-5 select-none">
+          <h2 className="text-tertiary text-2xl font-semibold p-5 select-none">
             Create an Account
           </h2>
 
           <input
             type="password"
             placeholder="Enter Username"
-            className="input w-full p-2 px-4 mb-6 rounded-full text-sm"
+            className="input w-full p-2 px-4 mb-6 rounded-full text-sm outline-tertiary"
             value={value.username}
             onChange={handleChange}
             name="username"
@@ -53,7 +52,7 @@ const RegisterPage = () => {
           <input
             type="text"
             placeholder="Enter Your Email"
-            className="input w-full p-2 px-4 mb-6 rounded-full border-0 outline-1 text-sm"
+            className="input w-full p-2 px-4 mb-6 rounded-full border-0 outline-1 text-sm outline-tertiary"
             value={value.email}
             onChange={handleChange}
             name="email"
@@ -69,7 +68,7 @@ const RegisterPage = () => {
           />
 
           <button
-            className="text-white bg-red rounded-full p-2 w-40 self-center hover:bg-background hover:text-red transition active:scale-95"
+            className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
             onClick={handleRegister}
           >
             Register
@@ -79,7 +78,7 @@ const RegisterPage = () => {
             {"Already have an account? "}
             <Link
               href={"/login"}
-              className="font-semibold text-red hover:underline"
+              className="font-semibold text-tertiary hover:underline"
             >
               Login
             </Link>

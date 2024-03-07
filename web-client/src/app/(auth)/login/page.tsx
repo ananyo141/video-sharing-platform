@@ -31,13 +31,13 @@ const Page = () => {
       <Illustration src={illustration4} className="top-32 left-5" />
       <main className="bg-background flex items-center justify-center h-screen">
         <div className="bg-secondary flex flex-col item-center text-center p-10 px-24 rounded-lg w-[36rem] z-10 shadow">
-          <h2 className="text-red text-2xl font-semibold p-5 select-none">
-            Welcome to Vimero
+          <h2 className="text-tertiary text-2xl font-semibold p-5 select-none">
+            Welcome Back to Vimero
           </h2>
           <input
             type="text"
             placeholder="Enter Your Email"
-            className="input w-full p-2 px-4 mb-6 rounded-full border-0 outline-1 text-sm"
+            className="input w-full p-2 px-4 mb-6 rounded-full border-0 outline-1 text-sm outline-tertiary"
             value={value.email}
             onChange={handleChange}
             name="email"
@@ -45,13 +45,13 @@ const Page = () => {
           <input
             type="password"
             placeholder="Enter Your Passwod"
-            className="input w-full p-2 px-4 mb-6 rounded-full text-sm"
+            className="input w-full p-2 px-4 mb-6 rounded-full text-sm outline-tertiary"
             value={value.password}
             onChange={handleChange}
             name="password"
           />
           <button
-            className="text-white bg-red rounded-full p-2 w-40 self-center hover:bg-background hover:text-red transition active:scale-95"
+            className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
             onClick={handleLogin}
           >
             Login
@@ -60,7 +60,7 @@ const Page = () => {
             {"Don't Have an Account? "}
             <Link
               href={"/register"}
-              className="font-semibold text-red hover:underline"
+              className="font-semibold text-tertiary hover:underline"
             >
               Register
             </Link>
