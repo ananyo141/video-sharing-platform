@@ -6,10 +6,13 @@ import Illustration from "@/components/Illustration";
 import illustration1 from "/public/assets/illustration/fill-rolls.svg";
 import illustration2 from "/public/assets/illustration/live-collabration.svg";
 import illustration3 from "/public/assets/illustration/video-upload.svg";
+import useAuth from "@/hooks/useAuth";
+import { RegisterInterface } from "@/interface/auth.interface";
 
 const RegisterPage = () => {
   // State for form inputs
-  const [value, setValue] = useState({
+  const { handleRegister, error } = useAuth<RegisterInterface>();
+  const [value, setValue] = useState<RegisterInterface>({
     username: "",
     email: "",
     password: "",
@@ -22,7 +25,11 @@ const RegisterPage = () => {
     });
   };
 
-  const handleRegister = () => {};
+  const handleOnRegister = async () => {
+    console.log(value)
+    const data = await handleRegister(value)
+    console.log(data)
+  };
 
   return (
     <>
@@ -69,7 +76,7 @@ const RegisterPage = () => {
 
           <button
             className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
-            onClick={handleRegister}
+            onClick={handleOnRegister}
           >
             Register
           </button>

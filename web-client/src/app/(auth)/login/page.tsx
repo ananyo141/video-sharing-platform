@@ -7,9 +7,15 @@ import illustration1 from "/public/assets/illustration/fill-rolls.svg";
 import illustration2 from "/public/assets/illustration/live-collabration.svg";
 import illustration3 from "/public/assets/illustration/video-upload.svg";
 import illustration4 from "/public/assets/illustration/videographer.svg";
+import useAuth from "@/hooks/useAuth";
+import { LoginInterface } from "@/interface/auth.interface";
 
 const Page = () => {
-  const [value, setValue] = useState({ email: "", password: "" });
+  const [value, setValue] = useState<LoginInterface>({
+    email: "",
+    password: "",
+  });
+  const { handleLogin, error } = useAuth<LoginInterface>();
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue({
       ...value,
@@ -17,7 +23,12 @@ const Page = () => {
     });
   };
 
-  const handleLogin = () => {};
+  const handleOnLogin = async () => {
+    console.log(value)
+    const data = await handleLogin(value);
+
+    console.log(data)
+  };
 
   return (
     <>
@@ -52,7 +63,7 @@ const Page = () => {
           />
           <button
             className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
-            onClick={handleLogin}
+            onClick={handleOnLogin}
           >
             Login
           </button>
