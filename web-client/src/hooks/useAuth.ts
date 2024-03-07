@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { setCookie } from "@/utils/handleCookies";
 import urlJoin from "url-join";
+import publicRequest from "@/utils/publicRequest";
+import LoginRequest from "@/interface/login.interface";
 
 interface AuthResponse {
   success: boolean;
@@ -14,26 +16,24 @@ const useAuth = <T>() => {
 
   const authUrl = urlJoin(baseUrl, "auth");
 
-  const handleLogin = async (credentials: T): Promise<AuthResponse> => {
+  const handleLogin = async (credentials: any): Promise<AuthResponse> => {
     const loginUrl = urlJoin(authUrl, "/login");
     try {
-      const response = await fetch(loginUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
-      const data = await response.json();
-      if (!response.ok) {
+      const data: LoginRequest = await publicRequest(
+        loginUrl,
+        "POST",
+        credentials
+      );
+      if (!data.success) {
         setError(data.message || "Login failed");
-        return data;
+      } else {
+        setError(null);
+        setCookie("jwt-token", data.data.access_token);
+        setCookie("email", credentials.email); //not working
       }
-      setError(null);
-      setCookie("jwt-token", data.data.access_token);
       return data;
     } catch (error) {
-      setError("An error occurred during login");
+      setError(String(error));
       return { success: false };
     }
   };
@@ -41,17 +41,8 @@ const useAuth = <T>() => {
   const handleRegister = async (credentials: T): Promise<AuthResponse> => {
     const registerUrl = urlJoin(authUrl, "/register");
     try {
-      const response = await fetch(registerUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-        // mode: "no-cors",
-      });
-      const data = await response.json();
-      console.log(data)
-      if (!response.ok) {
+      const data = await publicRequest(registerUrl, "POST", credentials);
+      if (!data.success) {
         setError(data.message || "Registration failed");
         return { success: false };
       }

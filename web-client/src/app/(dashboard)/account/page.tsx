@@ -5,11 +5,13 @@ import VideoComponent from "@/components/VideoComponent";
 import img_example from "/public/assets/image.png";
 import { GoUpload } from "react-icons/go";
 import { motion } from "framer-motion";
+import { useUser } from "@/components/LayoutProvider";
 
 const Page = () => {
+  const { user } = useUser();
   return (
     <div>
-      <Profile name="Arup Basak" />
+      <Profile name={user.email} />
       <div className="flex flex-row justify-between py-2">
         <p className="font-semibold text-2xl">Your Videos</p>
         <motion.button

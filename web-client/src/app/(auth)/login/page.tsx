@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import Link from "next/link";
 import Illustration from "@/components/Illustration";
 import illustration1 from "/public/assets/illustration/fill-rolls.svg";
@@ -15,6 +15,7 @@ const Page = () => {
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const { handleLogin, error } = useAuth<LoginInterface>();
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue({
@@ -24,11 +25,20 @@ const Page = () => {
   };
 
   const handleOnLogin = async () => {
-    console.log(value)
+    // if (!online) {
+    //   setErrorMessage("No Internet Connection");
+    //   return;
+    // }
     const data = await handleLogin(value);
 
-    console.log(data)
+    console.log(data);
   };
+
+  useEffect(() => {
+    if (error) {
+      setErrorMessage(error);
+    }
+  }, [error]);
 
   return (
     <>
@@ -61,6 +71,9 @@ const Page = () => {
             onChange={handleChange}
             name="password"
           />
+          <span className="font-semibold text-red-600 text-sm">
+            {errorMessage}
+          </span>
           <button
             className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
             onClick={handleOnLogin}

@@ -1,26 +1,23 @@
-import axios, { AxiosRequestConfig } from "axios";
+import publicRequest from "./publicRequest";
+
+enum HttpMethod {
+  GET = "GET",
+  POST = "POST",
+  DELETE = "DELETE",
+  PUT = "PUT",
+}
 
 const privateRequest = async (
   url: string,
-  method: "GET" | "POST" | "DELETE" | "PUT",
+  method: HttpMethod,
   token: string,
   body?: any
 ): Promise<any> => {
-  const config: AxiosRequestConfig = {
-    method,
-    url,
-    headers: {
-      Authorization: token,
-    },
-    data: body,
+  const headers = {
+    Authorization: token,
   };
 
-  try {
-    const response = await axios(config);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  return publicRequest(url, method, body, headers);
 };
 
 export default privateRequest;
