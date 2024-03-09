@@ -8,8 +8,8 @@ const setCookie = (key: string, value: string) => {
   cookiesStore.set(key, value);
 };
 
-const getCookie = (key: string) => {
-  const value = cookiesStore.get(key)?.value;
+const getCookie = async (key: string) => {
+  const value = await cookiesStore.get(key)?.value;
   return value;
 };
 

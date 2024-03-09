@@ -9,8 +9,10 @@ import illustration3 from "/public/assets/illustration/video-upload.svg";
 import illustration4 from "/public/assets/illustration/videographer.svg";
 import useAuth from "@/hooks/useAuth";
 import { LoginInterface } from "@/interface/auth.interface";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const { push } = useRouter();
   const [value, setValue] = useState<LoginInterface>({
     email: "",
     password: "",
@@ -30,6 +32,9 @@ const Page = () => {
     //   return;
     // }
     const data = await handleLogin(value);
+    if (data.success) {
+      push("/");
+    }
 
     console.log(data);
   };

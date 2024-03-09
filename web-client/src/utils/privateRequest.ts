@@ -1,20 +1,20 @@
 import publicRequest from "./publicRequest";
 
-enum HttpMethod {
-  GET = "GET",
-  POST = "POST",
-  DELETE = "DELETE",
-  PUT = "PUT",
-}
+// enum HttpMethod {
+//   GET = "GET",
+//   POST = "POST",
+//   DELETE = "DELETE",
+//   PUT = "PUT",
+// }
 
 const privateRequest = async (
   url: string,
-  method: HttpMethod,
+  method: "GET" | "POST",
   token: string,
   body?: any
 ): Promise<any> => {
   const headers = {
-    Authorization: token,
+    Authorization: `Bearer ${token}`,
   };
 
   return publicRequest(url, method, body, headers);
