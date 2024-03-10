@@ -6,6 +6,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -17,7 +18,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
           # scp -rvo "StrictHostKeyChecking=no" $GITHUB_WORKSPACE ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/repo-name
-          rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" $GITHUB_WORKSPACE/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/video-sharing-platform
+          rsync -avzhP -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" $GITHUB_WORKSPACE/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/video-sharing-platform
 
 
     - name: Deploy Backend
