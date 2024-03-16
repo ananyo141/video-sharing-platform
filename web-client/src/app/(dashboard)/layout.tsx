@@ -1,6 +1,10 @@
 import LeftNavbar from "@/components/navbars/LeftNavbar";
 import TopNavBar from "@/components/navbars/TopNavBar";
 
+
+
+
+
 export default function DashboardLayout({
   children,
 }: {
