@@ -167,48 +167,62 @@ func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string
 		)
 		failOnError(err, "Failed to consume messages from RabbitMQ")
 
+		// Set a timeout for the subscription.
+		timeout := 3 * time.Second
+		timer := time.NewTimer(timeout)
 		for {
-			msg, ok := <-msgs
-			if !ok {
-				log.Println("End of messages")
-				return
-			}
-
-			log.Printf("Received a message: %s", msg.Body)
-
-			type Payload struct {
-				Progress float64 `json:"progress"`
-				File     string  `json:"file"`
-			}
-			// Prepare your object.
-			currentTime := time.Now()
-			var payload Payload
-			err := json.Unmarshal(msg.Body, &payload)
-			if err != nil {
-				log.Printf("Failed to parse message: %s", err)
-				continue
-			}
-			t := &model.VideoProgress{
-				VideoID:   payload.File,
-				UserID:    1,
-				UpdatedAt: currentTime,
-				Progress:  int(payload.Progress),
-			}
-
-			// The subscription may have got closed due to the client disconnecting.
-			// Hence we do send in a select block with a check for context cancellation.
-			// This avoids goroutine getting blocked forever or panicking,
 			select {
-			case <-ctx.Done(): // This runs when context gets cancelled. Subscription closes.
-				fmt.Println("Subscription Closed")
-				// Handle deregistration of the channel here. `close(ch)`
-				return // Remember to return to end the routine.
-
-			case channel <- t: // This is the actual send.
-				msg.Ack(true) // Acknowledge the message.
-			}
-			if int(payload.Progress) == 100 {
+			case <-timer.C:
+				log.Println("Timed out waiting for messages.")
 				return
+			case msg, ok := <-msgs:
+				if !ok {
+					log.Println("End of messages")
+					return
+				}
+
+				log.Printf("Received a message: %s", msg.Body)
+
+				type Payload struct {
+					Progress float64 `json:"progress"`
+					File     string  `json:"file"`
+				}
+				// Prepare your object.
+				currentTime := time.Now()
+				var payload Payload
+				err := json.Unmarshal(msg.Body, &payload)
+				if err != nil {
+					log.Printf("Failed to parse message: %s", err)
+					continue
+				}
+				t := &model.VideoProgress{
+					VideoID:   payload.File,
+					UserID:    1,
+					UpdatedAt: currentTime,
+					Progress:  int(payload.Progress),
+				}
+
+				// The subscription may have got closed due to the client disconnecting.
+				// Hence we do send in a select block with a check for context cancellation.
+				// This avoids goroutine getting blocked forever or panicking,
+				select {
+				case <-ctx.Done(): // This runs when context gets cancelled. Subscription closes.
+					fmt.Println("Subscription Closed")
+					// Handle deregistration of the channel here. `close(ch)`
+					return // Remember to return to end the routine.
+
+				case channel <- t: // This is the actual send.
+					msg.Ack(true) // Acknowledge the message.
+				}
+				if int(payload.Progress) == 100 {
+					return
+				}
+
+				// Reset the timer
+				if !timer.Stop() {
+					<-timer.C
+				}
+				timer.Reset(timeout)
 			}
 		}
 	}()
