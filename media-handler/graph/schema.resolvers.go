@@ -31,6 +31,7 @@ func (r *mutationResolver) CreateVideo(ctx context.Context, input model.CreateVi
 		return nil, err
 	}
 
+	// save with the transcoded_url
 	video, err := r.DB.CreateVideo(input, *objectName, userid)
 	if err != nil {
 		log.Println(err)

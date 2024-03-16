@@ -93,16 +93,17 @@ type ComplexityRoot struct {
 	}
 
 	Video struct {
-		Comments    func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Likes       func(childComplexity int) int
-		Source      func(childComplexity int) int
-		Title       func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		User        func(childComplexity int) int
-		UserID      func(childComplexity int) int
+		Comments      func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		Description   func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Likes         func(childComplexity int) int
+		Source        func(childComplexity int) int
+		Title         func(childComplexity int) int
+		TranscodedURL func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+		User          func(childComplexity int) int
+		UserID        func(childComplexity int) int
 	}
 
 	VideoProgress struct {
@@ -421,6 +422,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.Title(childComplexity), true
+
+	case "Video.transcodedUrl":
+		if e.complexity.Video.TranscodedURL == nil {
+			break
+		}
+
+		return e.complexity.Video.TranscodedURL(childComplexity), true
 
 	case "Video.updatedAt":
 		if e.complexity.Video.UpdatedAt == nil {
@@ -1269,6 +1277,8 @@ func (ec *executionContext) fieldContext_CreateVideoPayload_video(ctx context.Co
 				return ec.fieldContext_Video_description(ctx, field)
 			case "source":
 				return ec.fieldContext_Video_source(ctx, field)
+			case "transcodedUrl":
+				return ec.fieldContext_Video_transcodedUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1396,6 +1406,8 @@ func (ec *executionContext) fieldContext_Mutation_updateVideo(ctx context.Contex
 				return ec.fieldContext_Video_description(ctx, field)
 			case "source":
 				return ec.fieldContext_Video_source(ctx, field)
+			case "transcodedUrl":
+				return ec.fieldContext_Video_transcodedUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1473,6 +1485,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteVideo(ctx context.Contex
 				return ec.fieldContext_Video_description(ctx, field)
 			case "source":
 				return ec.fieldContext_Video_source(ctx, field)
+			case "transcodedUrl":
+				return ec.fieldContext_Video_transcodedUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1550,6 +1564,8 @@ func (ec *executionContext) fieldContext_Mutation_likeVideo(ctx context.Context,
 				return ec.fieldContext_Video_description(ctx, field)
 			case "source":
 				return ec.fieldContext_Video_source(ctx, field)
+			case "transcodedUrl":
+				return ec.fieldContext_Video_transcodedUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1840,6 +1856,8 @@ func (ec *executionContext) fieldContext_Query_videos(ctx context.Context, field
 				return ec.fieldContext_Video_description(ctx, field)
 			case "source":
 				return ec.fieldContext_Video_source(ctx, field)
+			case "transcodedUrl":
+				return ec.fieldContext_Video_transcodedUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1917,6 +1935,8 @@ func (ec *executionContext) fieldContext_Query_video(ctx context.Context, field 
 				return ec.fieldContext_Video_description(ctx, field)
 			case "source":
 				return ec.fieldContext_Video_source(ctx, field)
+			case "transcodedUrl":
+				return ec.fieldContext_Video_transcodedUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -2566,6 +2586,47 @@ func (ec *executionContext) _Video_source(ctx context.Context, field graphql.Col
 }
 
 func (ec *executionContext) fieldContext_Video_source(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Video",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Video_transcodedUrl(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_transcodedUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TranscodedURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Video_transcodedUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Video",
 		Field:      field,
@@ -5434,6 +5495,8 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "transcodedUrl":
+			out.Values[i] = ec._Video_transcodedUrl(ctx, field, obj)
 		case "userId":
 			out.Values[i] = ec._Video_userId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"path/filepath"
 	"time"
 
 	"media-handler/graph/model"
@@ -105,16 +106,18 @@ func (db *DB) CreateVideo(video model.CreateVideoInput, source string, userid in
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	timeCreated := time.Now()
+	transcodedPath := "/transcoded-bucket/hls_encoded/" + filepath.Base(source) + "/playlist.m3u8"
 	insertedVideo, err := videoCollec.InsertOne(ctx,
 		bson.M{
-			"title":       video.Title,
-			"description": video.Description,
-			"userId":      userid,
-			"source":      source,
-			"likes":       []int{},
-			"comments":    []model.Comment{},
-			"createdAt":   timeCreated,
-			"updatedAt":   timeCreated,
+			"title":         video.Title,
+			"description":   video.Description,
+			"userId":        userid,
+			"source":        source,
+			"transcodedUrl": transcodedPath,
+			"likes":         []int{},
+			"comments":      []model.Comment{},
+			"createdAt":     timeCreated,
+			"updatedAt":     timeCreated,
 		})
 
 	if err != nil {
@@ -124,12 +127,13 @@ func (db *DB) CreateVideo(video model.CreateVideoInput, source string, userid in
 	insertedID := insertedVideo.InsertedID.(primitive.ObjectID).Hex()
 	// FIXME: use a struct to avoid repeating the same code
 	returnVideo := model.Video{ID: insertedID,
-		Title:       video.Title,
-		Description: video.Description,
-		UserID:      userid,
-		Source:      source,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now()}
+		Title:         video.Title,
+		Description:   video.Description,
+		UserID:        userid,
+		Source:        source,
+		TranscodedURL: &transcodedPath,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now()}
 	return &returnVideo, err
 }
 
