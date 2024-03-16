@@ -132,6 +132,9 @@ services:
       - events-queue
     labels:
       - "traefik.http.routers.video-bucket.rule=PathPrefix(`/bucket`)"
+      - "traefik.http.routers.video-bucket.middlewares=path-rewrite"
+      - "traefik.http.middlewares.path-rewrite.replacepathregex.regex=^/bucket(.*)$$"
+      - "traefik.http.middlewares.path-rewrite.replacepathregex.replacement=$${1}"
     ports:
       - "8003:9001" # Web Interface
       - "9000:9000" # For s3 access
