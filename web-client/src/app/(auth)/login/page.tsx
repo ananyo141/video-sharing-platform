@@ -8,6 +8,7 @@ import illustration2 from "/public/assets/illustration/live-collabration.svg";
 import illustration3 from "/public/assets/illustration/video-upload.svg";
 import illustration4 from "/public/assets/illustration/videographer.svg";
 import useAuth from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import { LoginInterface } from "@/interface/auth.interface";
 
 const Page = () => {
@@ -23,14 +24,16 @@ const Page = () => {
       [e.target.name]: e.target.value,
     });
   };
-
+  const router = useRouter();
   const handleOnLogin = async () => {
     // if (!online) {
     //   setErrorMessage("No Internet Connection");
     //   return;
     // }
     const data = await handleLogin(value);
-
+    if (data.success) {
+      router.refresh();
+    }
     console.log(data);
   };
 

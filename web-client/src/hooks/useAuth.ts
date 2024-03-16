@@ -47,6 +47,7 @@ const useAuth = <T>() => {
         return { success: false };
       }
       setError(null);
+      
       return { success: true };
     } catch (error) {
       setError("An error occurred during registration");
