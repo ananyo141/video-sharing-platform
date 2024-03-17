@@ -174,6 +174,14 @@ func (r *subscriptionResolver) VideoProgress(ctx context.Context, videoID string
 			select {
 			case <-timer.C:
 				log.Println("Timed out waiting for messages.")
+				// Send a message to the channel to indicate no progress is
+				// received
+				channel <- &model.VideoProgress{
+					VideoID:   videoID,
+					UserID:    0,
+					Progress:  -1,
+					UpdatedAt: time.Now(),
+				}
 				return
 			case msg, ok := <-msgs:
 				if !ok {
