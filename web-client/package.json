@@ -16,6 +16,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.0.1",
+    "react-player": "^2.15.1",
     "sharp": "^0.33.2",
     "url-join": "^5.0.0"
   },

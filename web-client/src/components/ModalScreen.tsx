@@ -10,7 +10,8 @@ interface Props {
 const ModalScreen = ({ children, visible = true, onClose }: Props) => {
   return (
     <div
-      className={`h-screen z-50 w-full p-10 absolute top-0 left-0 flex items-center justify-center ${
+      className={`h-screen z-50 w-full p-10 absolute top-0 left-0 flex items-center justify-center
+       ${
         visible ? "" : "hidden"
       } bg-black bg-opacity-80 z-20`}
       onClick={onClose}

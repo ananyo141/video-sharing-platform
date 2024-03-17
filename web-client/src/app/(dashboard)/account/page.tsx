@@ -12,15 +12,15 @@ import { useUser } from "@/components/LayoutProvider";
 const Page = () => {
   const { user } = useUser();
   const [modal, setModal] = useState(false);
+
+  const closeModal = () => {
+    setModal(false);
+  };
+
   return (
     <>
       <ModalScreen visible={modal} onClose={() => setModal(false)}>
-        <div className="h-full w-full">
-          <h1 className="text-center text-lg">Upload your video{"(s)"}</h1>
-          <div className="flex w-full justify-center">
-            <DropBox />
-          </div>
-        </div>
+      <DropBox closeModal={closeModal} />
       </ModalScreen>
       <div>
         <Profile name={user.email} />
