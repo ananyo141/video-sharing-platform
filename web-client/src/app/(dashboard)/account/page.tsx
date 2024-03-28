@@ -7,7 +7,7 @@ import ModalScreen from "@/components/ModalScreen";
 import img_example from "/public/assets/image.png";
 import { GoUpload } from "react-icons/go";
 import { motion } from "framer-motion";
-import { useUser } from "@/components/LayoutProvider";
+import { useUser } from "@/provider/LayoutProvider";
 
 const Page = () => {
   const { user } = useUser();

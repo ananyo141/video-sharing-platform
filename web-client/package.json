@@ -14,6 +14,8 @@
     "framer-motion": "^11.0.3",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
+    "graphql-tag": "^2.12.6",
+    "js-cookie": "^3.0.5",
     "next": "14.1.0",
     "ra-data-graphql": "^4.16.12",
     "react": "^18",
@@ -24,6 +26,7 @@
     "url-join": "^5.0.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -32,6 +35,7 @@
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "webpack-graphql-loader": "^1.0.2"
   }
 }

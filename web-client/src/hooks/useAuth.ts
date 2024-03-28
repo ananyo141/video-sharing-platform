@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { setCookie } from "@/utils/handleCookies";
 import urlJoin from "url-join";
 import publicRequest from "@/utils/publicRequest";
 import LoginRequest from "@/interface/login.interface";
+import Cookies from "js-cookie";
 
 interface AuthResponse {
   success: boolean;
@@ -28,8 +28,8 @@ const useAuth = <T>() => {
         setError(data.message || "Login failed");
       } else {
         setError(null);
-        setCookie("jwt-token", data.data.access_token);
-        setCookie("email", credentials.email); //not working
+        Cookies.set("jwt-token", data.data.access_token);
+        Cookies.set("email", credentials.email);
       }
       return data;
     } catch (error) {
