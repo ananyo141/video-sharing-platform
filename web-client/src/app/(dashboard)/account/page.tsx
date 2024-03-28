@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Profile from "@/components/Profile";
 import VideoComponent from "@/components/VideoComponent";
 import DropBox from "@/components/video/DropBox";
@@ -11,7 +12,9 @@ import { useUser } from "@/provider/LayoutProvider";
 
 const Page = () => {
   const { user } = useUser();
-  const [modal, setModal] = useState(false);
+  const searchParams = useSearchParams().get("modal");
+  const [modal, setModal] = useState(searchParams === "true");
+
 
   const closeModal = () => {
     setModal(false);
@@ -20,7 +23,7 @@ const Page = () => {
   return (
     <>
       <ModalScreen visible={modal} onClose={() => setModal(false)}>
-      <DropBox closeModal={closeModal} />
+        <DropBox closeModal={closeModal} />
       </ModalScreen>
       <div>
         <Profile name={user.email} />
