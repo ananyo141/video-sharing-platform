@@ -10,11 +10,11 @@ export default function Page({ params }: { params: { slug: string } }) {
           <VideoPlayer />
         </div>
       </div>
-
+      
       <div className="flex flex-col gap-2 overflow-y-scroll">
         {Array.from({ length: 30 }).map((_, index) => (
           <VideoComponent
-            title="This is Video Title"
+            title="This is Video Title uploaded by user from the dashboard"
             url={`/watch/${index}`}
             thumbnail={img_example}
             key={index}

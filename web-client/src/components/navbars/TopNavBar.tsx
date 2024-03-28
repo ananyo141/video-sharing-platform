@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import IconFallback from "../IconFallback";
 import { IoIosSearch } from "react-icons/io";
+import { RiVideoAddLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
 
 const TopNavbar: React.FC = () => {
@@ -37,18 +38,23 @@ const TopNavbar: React.FC = () => {
           Search
         </button>
       </div>
-      <div className="" onBlur={toggleMenu}>
-        <IconFallback onClick={() => push("/account")} size="sm" word="A" />
-        <div
-          className={`mt-2 bg-white rounded p-2 absolute right-0 z-10 ${
-            isMenuOpen ? "block" : "hidden"
-          }`}
-        >
-          <div className="m-2 p-2 px-4 hover:bg-slate-200 select-none cursor-pointer rounded-lg">
-            Sign Out
-          </div>
-          <div className="m-2 p-2 px-4 hover:bg-slate-200 select-none cursor-pointer rounded-lg">
-            Sign Out
+      <div className="flex gap-4 items-center">
+        <div className="hover:bg-slate-400 p-2 rounded-full cursor-pointer">
+          <RiVideoAddLine size={25} onClick={() => push("/account?modal=true")} />
+        </div>
+        <div className="" onBlur={toggleMenu}>
+          <IconFallback onClick={() => push("/account")} size="sm" word="A" />
+          <div
+            className={`mt-2 bg-white rounded p-2 absolute right-0 z-10 ${
+              isMenuOpen ? "block" : "hidden"
+            }`}
+          >
+            <div className="m-2 p-2 px-4 hover:bg-slate-200 select-none cursor-pointer rounded-lg">
+              Sign Out
+            </div>
+            <div className="m-2 p-2 px-4 hover:bg-slate-200 select-none cursor-pointer rounded-lg">
+              Sign Out
+            </div>
           </div>
         </div>
       </div>

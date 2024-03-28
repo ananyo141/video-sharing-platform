@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import RatLoader from "../loader/RatLoader";
+import createVideo, { VideoInput } from "@/network/createVideo";
 
 interface DropBoxProps {
   closeModal: () => void;
@@ -16,6 +17,21 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
       const file = files[0];
       setFileName(file.name);
       simulateUploadProgress();
+
+      // Call createVideo function here
+      const videoInput: VideoInput = {
+        title: file.name,
+        description: "Description placeholder",
+        fileExtension: ".mp4",
+      };
+      createVideo(videoInput)
+        .then((data) => {
+
+        })
+        .catch((error) => {
+          // Handle error if needed
+          console.log(error);
+        });
     }
   };
 
@@ -25,6 +41,18 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
       const file = files[0];
       setFileName(file.name);
       simulateUploadProgress();
+
+      // Call createVideo function here
+      const videoInput: VideoInput = {
+        title: file.name,
+        description: "Description placeholder", // You can customize this
+        fileExtension: file.name.split(".").pop() || "", // Extract file extension
+      };
+      createVideo(videoInput)
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((error) => {});
     }
   };
 
