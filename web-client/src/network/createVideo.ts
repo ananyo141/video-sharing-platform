@@ -21,7 +21,6 @@ export interface VideoInput {
 async function createVideo(videoInput: VideoInput): Promise<any> {
   try {
     const JWT_TOKEN = getCookie("jwt-token");
-    console.log(JWT_TOKEN);
 
     if (!JWT_TOKEN) {
       throw new Error("JWT token is missing");
