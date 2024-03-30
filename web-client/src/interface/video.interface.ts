@@ -1,15 +1,15 @@
 export default interface Video {
   _id: string;
+  title: string;
+  userId: number;
+  likes: any[];
   comments: any[];
   createdAt: string;
   description: string;
-  likes: any[];
   source: string;
-  title: string;
   transcodedUrl: string;
   updatedAt: string;
   user: {
     email: string;
   };
-  userId: number;
 }

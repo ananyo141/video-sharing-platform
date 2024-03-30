@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 interface UserContextType {
   user: { email: string; token: string };
@@ -23,13 +23,9 @@ const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
     token: "",
   });
 
-  const router = useRouter();
-
   useEffect(() => {
-    if (user.token.length === 0) {
-      router.push("/login");
-    }
-  }, [user.token, router]);
+    setUser({ ...user, token: Cookies.get("jwt-token") as string });
+  }, []);
 
   return (
     <>

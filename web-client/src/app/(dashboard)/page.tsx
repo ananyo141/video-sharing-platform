@@ -11,7 +11,6 @@ type Response = {
 
 const Page = () => {
   const { data, isLoading, error } = useFetchAllVideos<Response>();
-  console.log(data)
   return (
     <div className="flex flex-col justify-center">
       <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">

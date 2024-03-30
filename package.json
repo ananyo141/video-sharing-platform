@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "graphql-request": "^6.1.0",
-    "js-cookie": "^3.0.5",
-    "url-join": "^5.0.0"
-  }
-}
