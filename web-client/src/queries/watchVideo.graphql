@@ -3,6 +3,7 @@ query GetVideo($id: ID!) {
     _id
     title
     userId
+    description
     likes
     source
     transcodedUrl

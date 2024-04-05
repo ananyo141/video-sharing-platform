@@ -65,8 +65,9 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
       .then((data) => {
         console.log(data);
         setPresignedUrl(data.createVideo.presignedUrl);
-        // closeModal();
+        closeModal();
         uploadVideo(data, file);
+        alert("Video uploaded successfully");
       })
       .catch((error) => {
         const errorMessage =
@@ -96,7 +97,6 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
         <span className="text-xl text-center w-full font-medium text-red-500">
           {error}
         </span>
-        {presignedUrl}
         <div className="flex">
           <span className="text-xl p-2 w-[200px]">Video title -</span>
           <input

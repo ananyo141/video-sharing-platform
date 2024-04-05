@@ -6,14 +6,14 @@ import { useFetchAllVideos } from "@/hooks/useFetch";
 import Video from "@/interface/video.interface";
 
 type Response = {
-  videos: Video[]
-}
+  videos: Video[];
+};
 
 const Page = () => {
   const { data, isLoading, error } = useFetchAllVideos<Response>();
   return (
-    <div className="flex flex-col justify-center">
-      <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="flex flex-col justify-center py-20">
+      <div className="grid sm:grid-cols-1 md:grid-cols-3x gap-4 mb-10">
         {/* {Array.from({ length: 30 }).map((_, index) => (
           <VideoComponent
             title="This is Video Title"
@@ -22,14 +22,16 @@ const Page = () => {
             key={index}
           />
         ))} */}
-        {data && data.videos && data.videos.map((item) => (
-          <VideoComponent
-            key={item._id}
-            title={item.title}
-            url={`watch/${item._id}`}
-            thumbnail={img_example}
-          />
-        ))}
+        {data &&
+          data.videos &&
+          data.videos.map((item) => (
+            <VideoComponent
+              key={item._id}
+              title={item.title}
+              url={`watch/${item._id}`}
+              thumbnail={img_example}
+            />
+          ))}
       </div>
     </div>
   );
