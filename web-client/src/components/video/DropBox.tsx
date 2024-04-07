@@ -12,7 +12,6 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [videoDescription, setVideoDescription] = useState<string>("");
-  const [presignedUrl, setPresignedUrl] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
 
@@ -64,7 +63,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
     createVideo(videoInput)
       .then((data) => {
         console.log(data);
-        setPresignedUrl(data.createVideo.presignedUrl);
+
         closeModal();
         uploadVideo(data, file);
         alert("Video uploaded successfully");

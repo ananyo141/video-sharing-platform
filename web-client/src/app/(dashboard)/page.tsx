@@ -13,7 +13,7 @@ const Page = () => {
   const { data, isLoading, error } = useFetchAllVideos<Response>();
   return (
     <div className="flex flex-col justify-center py-20">
-      <div className="grid sm:grid-cols-1 md:grid-cols-3x gap-4 mb-10">
+      <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         {/* {Array.from({ length: 30 }).map((_, index) => (
           <VideoComponent
             title="This is Video Title"
