@@ -1,41 +1,39 @@
-"use client";
-
 import React from "react";
 import { motion } from "framer-motion";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 
-interface Props {
-  thumbnail?: string | StaticImageData;
+interface VideoComponentProps {
+  thumbnail?: string; // Adjust for StaticImageData if needed
   title: string;
   url: string;
 }
 
-const VideoComponent = (props: Props) => {
+const VideoComponent: React.FC<VideoComponentProps> = ({
+  thumbnail,
+  title,
+  url,
+}) => {
   return (
-    <Link href={props.url}>
-      <motion.div
-        whileHover={{
-          transition: { delay: 0.5 },
-          scale: 1.05,
-          zIndex: 100
-        }}
-        className="shadow h-[200px] relative rounded overflow-hidden"
+    <Link href={url} passHref>
+      <motion.a
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.97 }}
+        className="block shadow-md rounded-md overflow-hidden transition-transform duration-200 ease-in-out"
+        style={{ position: "relative", width: "100%", height: "200px" }}
       >
-        <div className="relative w-full h-full">
-          {props.thumbnail ? (
-            <Image
-              alt={props.title}
-              src={props.thumbnail}
-              layout="fill"
-              objectFit="cover"
-            />
-          ) : (
-            <div className="bg-green-300 h-full w-full"></div>
-          )}
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-transparent">
+          <span className="absolute bottom-0 left-0 right-0 p-4 text-white text-shadow">
+            {title}
+          </span>
         </div>
-        <span className="absolute bottom-0 left-0 right-0 p-2 bg-black text-white bg-opacity-60 shadow-lg z-20">{props.title}</span>
-      </motion.div>
+
+        {thumbnail ? (
+          <Image alt={title} src={thumbnail} layout="fill" objectFit="cover" />
+        ) : (
+          <div className="bg-gray-200 h-full w-full" />
+        )}
+      </motion.a>
     </Link>
   );
 };
