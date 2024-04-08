@@ -19,14 +19,15 @@ export default async function middleware(request: NextRequest) {
 }
 
 const authPaths = ["/login", "/register"];
-const dashboardPaths = [
-  "account",
-  "history",
-  "subscription",
-  "watch/:path*",
-  "watch-later",
-];
 
 export const config = {
-  matcher: [...authPaths, ...dashboardPaths],
+  matcher: [
+    "/account",
+    "/history",
+    "/subscription",
+    "/watch/:path*",
+    "/watch-later",
+    "/login",
+    "/register",
+  ],
 };

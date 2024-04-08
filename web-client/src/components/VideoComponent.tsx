@@ -3,15 +3,16 @@ import { StaticImageData } from "next/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import sample_thumbnail from "/public/assets/thumbnail.jpg";
 
 interface VideoComponentProps {
-  thumbnail: StaticImageData | null;
+  thumbnail?: StaticImageData | string | any
   title: string;
   url: string;
 }
 
 const VideoComponent: React.FC<VideoComponentProps> = ({
-  thumbnail,
+  thumbnail = sample_thumbnail,
   title,
   url,
 }) => {
