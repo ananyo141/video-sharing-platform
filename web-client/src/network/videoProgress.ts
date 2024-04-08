@@ -9,6 +9,7 @@ interface VideoProgress {
 
 async function subscribeToVideoProgress(videoId: string) {
     const endpoint = 'YOUR_GRAPHQL_ENDPOINT';
+    
     const subscriptionQuery = gql`
         subscription {
             videoProgress(videoId: "${videoId}") {

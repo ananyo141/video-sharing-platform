@@ -9,6 +9,8 @@ interface DropBoxProps {
 
 const DropBox = ({ closeModal }: DropBoxProps) => {
 
+
+
   const [fileName, setFileName] = useState<string>("");
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [videoDescription, setVideoDescription] = useState<string>("");
@@ -67,6 +69,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
         closeModal();
         uploadVideo(data, file);
         alert("Video uploaded successfully");
+        
       })
       .catch((error) => {
         const errorMessage =

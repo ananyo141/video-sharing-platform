@@ -1,10 +1,11 @@
 import React from "react";
+import { StaticImageData } from "next/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
 interface VideoComponentProps {
-  thumbnail?: string; // Adjust for StaticImageData if needed
+  thumbnail: StaticImageData | null;
   title: string;
   url: string;
 }
