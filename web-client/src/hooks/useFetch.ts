@@ -38,7 +38,7 @@ const useFetch = <T>(query: any, method: "GET" | "POST", variables?: any) => {
     };
 
     fetchData();
-  }, [key]);
+  }, [key,client,query,variables]);
 
   return { data, isLoading, error, refresh };
 };

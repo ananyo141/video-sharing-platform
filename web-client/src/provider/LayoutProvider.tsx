@@ -25,7 +25,7 @@ const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setUser({ ...user, token: Cookies.get("jwt-token") as string });
-  }, []);
+  }, [user]);
 
   return (
     <>
