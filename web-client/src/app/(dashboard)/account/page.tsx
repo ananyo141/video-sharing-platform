@@ -8,10 +8,11 @@ import ModalScreen from "@/components/ModalScreen";
 import { GoUpload } from "react-icons/go";
 import { motion } from "framer-motion";
 import { useUser } from "@/provider/LayoutProvider";
-import { useFetchByUserId } from "@/hooks/useFetch";
+import getVideoByUser from "@/queries/getVideByUser.graphql";
 import Video from "@/interface/video.interface";
+import { gql, useQuery } from "@apollo/client";
 
-interface VideoInterface {
+interface Response {
   videos: Video[];
 }
 
@@ -19,7 +20,11 @@ const Page = () => {
   const { user } = useUser();
   const [modal, setModal] = useState(false);
 
-  const { data, isLoading, error } = useFetchByUserId<VideoInterface>(9);
+  const { data, loading, error } = useQuery<Response>(
+    gql`
+      ${getVideoByUser}
+    `
+  );
 
   useEffect(() => {
     console.log(data);
@@ -48,7 +53,7 @@ const Page = () => {
           </motion.button>
         </div>
         <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-16">
-          {!isLoading &&
+          {!loading &&
             data &&
             data?.videos.map((item) => (
               <VideoComponent

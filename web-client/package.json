@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.9.10",
     "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.6.7",
     "framer-motion": "^11.0.24",
