@@ -2,13 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  gql,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import urlJoin from "url-join";
+import { ToastContainer } from "react-toastify";
 
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
 
@@ -48,6 +44,7 @@ const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
     <ApolloProvider client={client}>
       <UserContext.Provider value={{ user, setUser }}>
         {children}
+        <ToastContainer />
       </UserContext.Provider>
     </ApolloProvider>
   );

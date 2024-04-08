@@ -1,16 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import RatLoader from "../loader/RatLoader";
 import createVideo, { VideoInput } from "@/network/createVideo";
 import uploadVideo from "@/network/uploadVideo";
+import { toast } from "react-toastify";
+import { LuUploadCloud } from "react-icons/lu";
+import ProgressBar from "../ProgressBar";
 
 interface DropBoxProps {
   closeModal: () => void;
 }
 
 const DropBox = ({ closeModal }: DropBoxProps) => {
-
-
-
   const [fileName, setFileName] = useState<string>("");
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [videoDescription, setVideoDescription] = useState<string>("");
@@ -69,7 +69,6 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
         closeModal();
         uploadVideo(data, file);
         alert("Video uploaded successfully");
-        
       })
       .catch((error) => {
         const errorMessage =
@@ -92,127 +91,99 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
     }, 200);
   };
 
+  useEffect(() => {
+    if (error.length !== 0) toast(error);
+  }, [error]);
 
   return (
-    <>
-      <div className="">
-        <span className="text-xl text-center w-full font-medium text-red-500">
-          {error}
-        </span>
-        <div className="flex">
-          <span className="text-xl p-2 w-[200px]">Video title -</span>
-          <input
-            type="text"
-            name="video_title"
-            className={`border ml-1 p-1 rounded-lg w-3/4
-            ${error && videoTitle == "" ? "border-red-500 border-2" : ""}
-            `}
-            placeholder="Video Title"
-            onChange={(e) => setVideoTitle(e.target.value)}
-            required
-          />
-        </div>
-        <div className="flex mt-4">
-          <span
-            className={`text-xl whitespace-nowrap p-2 w-[200px]
-          `}
-          >
-            Video description -
-          </span>
-
-          <textarea
-            name="video_description"
-            placeholder="Enter your Message"
-            className={`border ml-1 p-1 rounded-lg w-3/4
-            ${error && videoDescription == "" ? "border-red-500 border-2" : ""}
-            `}
-            onChange={(e) => setVideoDescription(e.target.value)}
-            required
-          />
-        </div>
-        <div className="flex justify-center w-full">
-          <button
-            onClick={handleUpload}
-            type="submit"
-            className="text-white px-4 mt-2 bg-sky-500 hover:bg-sky-600 rounded-lg p-2"
-          >
-            Upload
-          </button>
-        </div>
-      </div>
-      <div
-        className="w-full p-3"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-      >
-        <label
-          className={`flex justify-center h-full md:h-52 lg:h-64 px-4 transition bg-white border-2
-       border-gray-300 border-dashed rounded-md appearance-none cursor-pointer
-        hover:border-gray-400 focus:outline-none
-        ${error && !fileName ? "border-red-500 border-2" : ""}
-        `}
-        >
-          <span className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6 text-gray-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+    <div className="flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-8 sm:p-10 lg:p-12">
+          <div className="space-y-6">
+            <div>
+              <label
+                htmlFor="video_title"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Video Title
+              </label>
+              <input
+                type="text"
+                name="video_title"
+                className={`p-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-tertiary focus:ring focus:ring-tertiary focus:ring-opacity-50
+            ${error && videoTitle === "" ? "border-red-500" : ""}`}
+                placeholder="Enter video title"
+                onChange={(e) => setVideoTitle(e.target.value)}
+                required
               />
-            </svg>
-            <div className="flex flex-col justify-center font-medium text-gray-600 p-3">
-              {fileName ? (
-                `Uploading ${fileName}...`
-              ) : (
-                <>
-                  <span className="md:block hidden">
-                    Drop your file to Attach, or
-                  </span>
-                  <span className="md:hidden">
-                    Click here to choose your file
-                  </span>
-                </>
-              )}
-              {!fileName && (
-                <span className="text-blue-600 text-center ml-2 underline">
-                  browse
-                </span>
-              )}
             </div>
-            {uploadProgress < 100 && uploadProgress != 0 && (
-              <div className="bg-slate-800 ml-4 rounded-full">
-                <RatLoader />
-              </div>
-            )}
-          </span>
-
-          <input
-            type="file"
-            name="file_upload"
-            className="hidden"
-            onChange={handleFileSelect}
-          />
-        </label>
-      </div>
-
-      {uploadProgress > 0 && (
-        <div className="w-[90%] mx-auto h-6 mt-1 bg-gray-200 rounded-lg">
-          <div
-            className="h-full text-white text-center rounded-lg bg-green-600"
-            style={{ width: `${uploadProgress}%` }}
-          >
-            {fileName && `${uploadProgress}%`}
+            <div>
+              <label
+                htmlFor="video_description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Video Description
+              </label>
+              <textarea
+                name="video_description"
+                rows={4}
+                className={`p-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-tertiary focus:ring focus:ring-tertiary focus:ring-opacity-50
+            ${error && videoDescription === "" ? "border-red-500" : ""}`}
+                placeholder="Enter video description"
+                onChange={(e) => setVideoDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex justify-center items-center">
+              <button
+                onClick={handleUpload}
+                className="w-full sm:w-auto px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-tertiary hover:bg-secondary hover:text-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tertiary"
+              >
+                Upload
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </>
+        <div className="bg-gray-50 px-6 py-4 sm:px-10 lg:px-12">
+          <div
+            className={`border-2 border-dashed rounded-lg ${
+              error && !fileName ? "border-red-500" : "border-gray-300"
+            } hover:border-gray-400`}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <label className="flex justify-center items-center h-48 cursor-pointer">
+              <div className="text-center">
+                <LuUploadCloud size={24} className="mx-auto text-gray-400" />
+                <div className="flex flex-col items-center">
+                  <span className="mt-1 block text-sm text-gray-600">
+                    {fileName
+                      ? `Uploading ${fileName}...`
+                      : "Drag and drop files here, or click to select files"}
+                  </span>
+                  {uploadProgress > 0 && uploadProgress < 100 && (
+                    <div className="mt-2">
+                      <RatLoader />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <input
+                type="file"
+                name="file_upload"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+            </label>
+          </div>
+          {uploadProgress > 0 && (
+            <div className="mt-4">
+              <ProgressBar percentage={uploadProgress} />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,41 +1,32 @@
 "use client";
 
-import VideoComponent from "@/components/VideoComponent";
-import img_example from "/public/assets/image.png";
-import VideoPlayer from "@/components/video/VideoPlayer";
-import useFetch from "@/hooks/useFetch";
 import watchVideo from "@/queries/watchVideo.graphql";
 import urlJoin from "url-join";
 import Video from "@/interface/video.interface";
 import ReactPlayer from "react-player";
 import CubesLoader from "@/components/loader/CubesLoader";
+import { gql, useQuery } from "@apollo/client";
 
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
 
 export default function Page({ params }: { params: { slug: string } }) {
-  const { data, isLoading } = useFetch<{ video: Video }>(watchVideo, "POST", {
-    id: params.slug,
-  });
-
+  const { data, loading } = useQuery<{ video: Video }>(
+    gql`
+      ${watchVideo}
+    `,
+    { variables: { id: params.slug } }
+  );
 
   return (
     <div className="h-full">
       <div className="grid md:grid-cols-[1fr_400px] overflow-hidden h-full">
-        {isLoading && (
-          <>
-            <CubesLoader />{" "}
-          </>
-        )}
+        {loading && <CubesLoader />}
         <div className="p-3 h-full">
           <div className="z-50 flex w-full justify-center">
             {data && data.video.transcodedUrl && data.video.source && (
               <div className="">
                 <ReactPlayer
-                  url={urlJoin(
-                    "https://videosite.ddns.net/",
-                    "/bucket",
-                    data.video.source
-                  )}
+                  url={urlJoin(baseURL, "/bucket", data.video.source)}
                   controls
                   width="1000px"
                   height="500px"
