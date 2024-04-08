@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState,Suspense } from "react";
 import Profile from "@/components/Profile";
 import VideoComponent from "@/components/VideoComponent";
 import DropBox from "@/components/video/DropBox";
@@ -12,8 +11,7 @@ import { useUser } from "@/provider/LayoutProvider";
 
 const Page = () => {
   const { user } = useUser();
-  const searchParams = useSearchParams().get("modal");
-  const [modal, setModal] = useState(searchParams === "true");
+  const [modal, setModal] = useState(false);
 
 
   const closeModal = () => {
@@ -49,7 +47,7 @@ const Page = () => {
           ))}
         </div>
       </div>
-    </>
+      </>
   );
 };
 
