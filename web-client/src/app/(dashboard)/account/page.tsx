@@ -1,18 +1,29 @@
 "use client";
-import { useState,Suspense } from "react";
+
+import { useState, useEffect } from "react";
 import Profile from "@/components/Profile";
 import VideoComponent from "@/components/VideoComponent";
 import DropBox from "@/components/video/DropBox";
 import ModalScreen from "@/components/ModalScreen";
-import img_example from "/public/assets/image.png";
 import { GoUpload } from "react-icons/go";
 import { motion } from "framer-motion";
 import { useUser } from "@/provider/LayoutProvider";
+import { useFetchByUserId } from "@/hooks/useFetch";
+import Video from "@/interface/video.interface";
+
+interface VideoInterface {
+  videos: Video[];
+}
 
 const Page = () => {
   const { user } = useUser();
   const [modal, setModal] = useState(false);
 
+  const { data, isLoading, error } = useFetchByUserId<VideoInterface>(9);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   const closeModal = () => {
     setModal(false);
@@ -36,18 +47,19 @@ const Page = () => {
             Upload a Video
           </motion.button>
         </div>
-        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2">
-          {Array.from({ length: 30 }).map((_, index) => (
-            <VideoComponent
-              title="This is Video Title"
-              url={`watch/${index}`}
-              thumbnail={img_example}
-              key={index}
-            />
-          ))}
+        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-16">
+          {!isLoading &&
+            data &&
+            data?.videos.map((item) => (
+              <VideoComponent
+                title={item.title}
+                url={`watch/${item._id}`}
+                key={item._id}
+              />
+            ))}
         </div>
       </div>
-      </>
+    </>
   );
 };
 

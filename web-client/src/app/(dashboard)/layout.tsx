@@ -9,7 +9,7 @@ export default function DashboardLayout({
   return (
     <main className="overflow-hidden">
       <TopNavBar />
-      <div className="flex flex-col-reverse md:flex-row" style={{height: "calc(100vh - 3.5rem)"}}>
+      <div className="flex flex-col-reverse md:flex-row" style={{height: "calc(100vh - 4.5rem)"}}>
         <LeftNavbar />
         <div className="p-2 h-screen flex-1 overflow-y-scroll">{children}</div>
       </div>

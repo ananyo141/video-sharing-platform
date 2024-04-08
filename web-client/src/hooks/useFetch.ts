@@ -1,56 +1,58 @@
-"use client";
-
 import { GraphQLClient } from "graphql-request";
 import { useEffect, useState } from "react";
 import urlJoin from "url-join";
 import Cookies from "js-cookie";
 import getVideoGQLQuery from "@/queries/getVideos.graphql";
+import getVideoByUser from "@/queries/getVideByUser.graphql";
+import Video from "@/interface/video.interface";
 
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
 
-const useFetch = <T>(query: any, method: "GET" | "POST", variables?: any) => {
+const useFetch = <T>(
+  query: string | any,
+  method: "GET" | "POST",
+  variables?: Record<string, any>
+) => {
   const [isLoading, setLoading] = useState(true);
-  const [key, setKey] = useState(0);
   const [error, setError] = useState<string>("");
-  const [data, setData] = useState<T>();
-
-  const refresh = () => {
-    setKey((prevKey) => prevKey + 1);
-  };
+  const [data, setData] = useState<T | undefined>();
 
   const endpoint = urlJoin(baseURL, "/media/graphql");
 
-  const client = new GraphQLClient(endpoint, {
-    method,
-    headers: {
-      authorization: `Bearer ${Cookies.get("jwt-token")}`,
-    },
-  });
   useEffect(() => {
+    const client = new GraphQLClient(endpoint, {
+      method,
+      headers: {
+        authorization: `Bearer ${Cookies.get("jwt-token")}`,
+      },
+    });
+
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response: T = await client.request(query, variables);
         setData(response);
       } catch (error: any) {
-        setError(String(error));
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchData();
-  }, [key,client,query,variables]);
+  }, [method]);
 
-  return { data, isLoading, error, refresh };
+  return { data, isLoading, error };
 };
 
 const useFetchAllVideos = <T>() => {
   return useFetch<T>(getVideoGQLQuery, "POST");
 };
 
-// const useFetchSingleVideoById = <T>(id: string) => {
-//   return useFetch<T>(watchVideo, "POST", { id: id });
-// };
+const useFetchByUserId = <T>(userId: string | number) => {
+  return useFetch<T>(getVideoByUser, "POST", { userId });
+};
 
-export { useFetchAllVideos };
+export { useFetchAllVideos, useFetchByUserId };
 
 export default useFetch;
