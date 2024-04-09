@@ -32,8 +32,14 @@ export default function Page({ params }: { params: { slug: string } }) {
                   controls
                   width="1000px"
                   height="500px"
+                  playing={true}
                   playIcon={<Playbutton />}
                   light={img_example.src}
+                  config={{ file: { 
+                    attributes: {
+                      controlsList: 'nodownload'
+                    }
+                  }}}
                 />
                 <div className="py-4 h-full space-y-2 rounded-lg">
                   <span className="text-2xl font-medium px-4 ">
