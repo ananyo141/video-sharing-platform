@@ -6,6 +6,8 @@ import Video from "@/interface/video.interface";
 import ReactPlayer from "react-player";
 import CubesLoader from "@/components/loader/CubesLoader";
 import { gql, useQuery } from "@apollo/client";
+import Playbutton from "@/components/video/PlayButton";
+import img_example from "/public/assets/thumbnail.jpg";
 
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
 
@@ -30,6 +32,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                   controls
                   width="1000px"
                   height="500px"
+                  playIcon={<Playbutton />}
+                  light={img_example.src}
                 />
                 <div className="py-4 h-full space-y-2 rounded-lg">
                   <span className="text-2xl font-medium px-4 ">
