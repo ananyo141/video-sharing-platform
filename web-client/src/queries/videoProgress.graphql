@@ -1,0 +1,17 @@
+# subscription($id: String) {
+#     videoProgress(videoId: $id) {
+#         videoId
+#         userId
+#         progress
+#         updatedAt
+#     }
+# }
+
+  subscription {
+    videoProgress(videoId: "65e6d3eedf8c484691146e87") {
+      videoId
+      userId
+      progress
+      updatedAt
+    }
+  }

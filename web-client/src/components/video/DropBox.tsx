@@ -1,10 +1,15 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import RatLoader from "../loader/RatLoader";
 import createVideo, { VideoInput } from "@/network/createVideo";
 import uploadVideo from "@/network/uploadVideo";
 import { toast } from "react-toastify";
 import { LuUploadCloud } from "react-icons/lu";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import ProgressBar from "../ProgressBar";
+import { gql, useSubscription } from "@apollo/client";
+import videoProgressGQL from "@/queries/videoProgress.graphql";
 
 interface DropBoxProps {
   closeModal: () => void;
@@ -16,6 +21,21 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
   const [videoDescription, setVideoDescription] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
+
+  const { data } = useSubscription(
+    gql`
+      subscription {
+        videoProgress(videoId: "66183b74e45c4793bc9f0e25") {
+          videoId
+          userId
+          progress
+          updatedAt
+        }
+      }
+    `
+  );
+
+  console.log(data);
 
   const uploadedFileRef = useRef<File | null>(null);
 
@@ -68,7 +88,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
 
         closeModal();
         uploadVideo(data, file);
-        alert("Video uploaded successfully");
+        toast("Video uploaded successfully");
       })
       .catch((error) => {
         const errorMessage =

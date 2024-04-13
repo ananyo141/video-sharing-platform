@@ -11,11 +11,13 @@
   "dependencies": {
     "@apollo/client": "^3.9.10",
     "@uidotdev/usehooks": "^2.4.1",
+    "apollo-link-ws": "^1.0.20",
     "axios": "^1.6.7",
     "framer-motion": "^11.0.24",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "graphql-tag": "^2.12.6",
+    "graphql-ws": "^5.16.0",
     "js-cookie": "^3.0.5",
     "next": "14.1.4",
     "ra-data-graphql": "^4.16.12",
