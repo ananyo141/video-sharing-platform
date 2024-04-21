@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import urlJoin from "url-join";
 import { ToastContainer } from "react-toastify";
+import TopProgresBar from "@/components/loader/TopProgressBar";
 
 const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
 
@@ -43,6 +44,7 @@ const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ApolloProvider client={client}>
       <UserContext.Provider value={{ user, setUser }}>
+        <TopProgresBar/>
         {children}
         <ToastContainer />
       </UserContext.Provider>

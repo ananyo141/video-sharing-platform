@@ -18,6 +18,7 @@
     "graphql-tag": "^2.12.6",
     "js-cookie": "^3.0.5",
     "next": "14.1.4",
+    "nextjs-toploader": "^1.6.11",
     "ra-data-graphql": "^4.16.12",
     "react": "^18",
     "react-dom": "^18",
