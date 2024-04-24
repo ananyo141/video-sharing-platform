@@ -23,6 +23,7 @@ type CreateCommentInput struct {
 
 type CreateVideoInput struct {
 	Title         string `json:"title" bson:"title"`
+	ThumbnailURL  string `json:"thumbnailUrl" bson:"thumbnailUrl"`
 	Description   string `json:"description" bson:"description"`
 	FileExtension string `json:"fileExtension" bson:"fileExtension"`
 }
@@ -54,8 +55,9 @@ type UpdateCommentInput struct {
 }
 
 type UpdateVideoInput struct {
-	Title       *string `json:"title,omitempty" bson:"title"`
-	Description *string `json:"description,omitempty" bson:"description"`
+	Title        *string `json:"title,omitempty" bson:"title"`
+	ThumbnailURL *string `json:"thumbnailUrl,omitempty" bson:"thumbnailUrl"`
+	Description  *string `json:"description,omitempty" bson:"description"`
 }
 
 type User struct {
@@ -71,6 +73,7 @@ type Video struct {
 	Description   string     `json:"description" bson:"description"`
 	Source        string     `json:"source" bson:"source"`
 	TranscodedURL *string    `json:"transcodedUrl,omitempty" bson:"transcodedUrl"`
+	ThumbnailURL  *string    `json:"thumbnailUrl,omitempty" bson:"thumbnailUrl"`
 	UserID        int        `json:"userId" bson:"userId"`
 	User          *User      `json:"user,omitempty" bson:"user"`
 	Likes         []int      `json:"likes" bson:"likes"`

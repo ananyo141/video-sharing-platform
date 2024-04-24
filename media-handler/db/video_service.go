@@ -112,6 +112,7 @@ func (db *DB) CreateVideo(video model.CreateVideoInput, source string, userid in
 			"title":         video.Title,
 			"description":   video.Description,
 			"userId":        userid,
+			"thumbnailUrl":  video.ThumbnailURL,
 			"source":        source,
 			"transcodedUrl": transcodedPath,
 			"likes":         []int{},
@@ -129,6 +130,7 @@ func (db *DB) CreateVideo(video model.CreateVideoInput, source string, userid in
 	returnVideo := model.Video{ID: insertedID,
 		Title:         video.Title,
 		Description:   video.Description,
+		ThumbnailURL:  &video.ThumbnailURL,
 		UserID:        userid,
 		Source:        source,
 		TranscodedURL: &transcodedPath,
@@ -146,6 +148,9 @@ func (db *DB) UpdateVideo(videoId string, videoInfo model.UpdateVideoInput, user
 
 	if videoInfo.Title != nil {
 		updateVideo["title"] = videoInfo.Title
+	}
+	if videoInfo.ThumbnailURL != nil {
+		updateVideo["thumbnailUrl"] = videoInfo.ThumbnailURL
 	}
 	if videoInfo.Description != nil {
 		updateVideo["description"] = videoInfo.Description

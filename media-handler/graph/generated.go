@@ -99,6 +99,7 @@ type ComplexityRoot struct {
 		ID            func(childComplexity int) int
 		Likes         func(childComplexity int) int
 		Source        func(childComplexity int) int
+		ThumbnailURL  func(childComplexity int) int
 		Title         func(childComplexity int) int
 		TranscodedURL func(childComplexity int) int
 		UpdatedAt     func(childComplexity int) int
@@ -415,6 +416,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.Source(childComplexity), true
+
+	case "Video.thumbnailUrl":
+		if e.complexity.Video.ThumbnailURL == nil {
+			break
+		}
+
+		return e.complexity.Video.ThumbnailURL(childComplexity), true
 
 	case "Video.title":
 		if e.complexity.Video.Title == nil {
@@ -1279,6 +1287,8 @@ func (ec *executionContext) fieldContext_CreateVideoPayload_video(ctx context.Co
 				return ec.fieldContext_Video_source(ctx, field)
 			case "transcodedUrl":
 				return ec.fieldContext_Video_transcodedUrl(ctx, field)
+			case "thumbnailUrl":
+				return ec.fieldContext_Video_thumbnailUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1408,6 +1418,8 @@ func (ec *executionContext) fieldContext_Mutation_updateVideo(ctx context.Contex
 				return ec.fieldContext_Video_source(ctx, field)
 			case "transcodedUrl":
 				return ec.fieldContext_Video_transcodedUrl(ctx, field)
+			case "thumbnailUrl":
+				return ec.fieldContext_Video_thumbnailUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1487,6 +1499,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteVideo(ctx context.Contex
 				return ec.fieldContext_Video_source(ctx, field)
 			case "transcodedUrl":
 				return ec.fieldContext_Video_transcodedUrl(ctx, field)
+			case "thumbnailUrl":
+				return ec.fieldContext_Video_thumbnailUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1566,6 +1580,8 @@ func (ec *executionContext) fieldContext_Mutation_likeVideo(ctx context.Context,
 				return ec.fieldContext_Video_source(ctx, field)
 			case "transcodedUrl":
 				return ec.fieldContext_Video_transcodedUrl(ctx, field)
+			case "thumbnailUrl":
+				return ec.fieldContext_Video_thumbnailUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1858,6 +1874,8 @@ func (ec *executionContext) fieldContext_Query_videos(ctx context.Context, field
 				return ec.fieldContext_Video_source(ctx, field)
 			case "transcodedUrl":
 				return ec.fieldContext_Video_transcodedUrl(ctx, field)
+			case "thumbnailUrl":
+				return ec.fieldContext_Video_thumbnailUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -1937,6 +1955,8 @@ func (ec *executionContext) fieldContext_Query_video(ctx context.Context, field 
 				return ec.fieldContext_Video_source(ctx, field)
 			case "transcodedUrl":
 				return ec.fieldContext_Video_transcodedUrl(ctx, field)
+			case "thumbnailUrl":
+				return ec.fieldContext_Video_thumbnailUrl(ctx, field)
 			case "userId":
 				return ec.fieldContext_Video_userId(ctx, field)
 			case "user":
@@ -2627,6 +2647,47 @@ func (ec *executionContext) _Video_transcodedUrl(ctx context.Context, field grap
 }
 
 func (ec *executionContext) fieldContext_Video_transcodedUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Video",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Video_thumbnailUrl(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Video_thumbnailUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ThumbnailURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Video_thumbnailUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Video",
 		Field:      field,
@@ -4916,7 +4977,7 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description", "fileExtension"}
+	fieldsInOrder := [...]string{"title", "thumbnailUrl", "description", "fileExtension"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4930,6 +4991,13 @@ func (ec *executionContext) unmarshalInputCreateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.Title = data
+		case "thumbnailUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnailUrl"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ThumbnailURL = data
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -5038,7 +5106,7 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "description"}
+	fieldsInOrder := [...]string{"title", "thumbnailUrl", "description"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5052,6 +5120,13 @@ func (ec *executionContext) unmarshalInputUpdateVideoInput(ctx context.Context, 
 				return it, err
 			}
 			it.Title = data
+		case "thumbnailUrl":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnailUrl"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ThumbnailURL = data
 		case "description":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -5497,6 +5572,8 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "transcodedUrl":
 			out.Values[i] = ec._Video_transcodedUrl(ctx, field, obj)
+		case "thumbnailUrl":
+			out.Values[i] = ec._Video_thumbnailUrl(ctx, field, obj)
 		case "userId":
 			out.Values[i] = ec._Video_userId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

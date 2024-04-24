@@ -8,6 +8,7 @@ type Video {
   description: String!
   source: String!
   transcodedUrl: String
+  thumbnailUrl: String
   userId: Int!
   user: User
   likes: [Int!]!
@@ -67,6 +68,7 @@ type Subscription {
 
 input CreateVideoInput {
   title: String!
+  thumbnailUrl: String!
   description: String!
   fileExtension: String!
 }
@@ -78,6 +80,7 @@ type CreateVideoPayload {
 
 input UpdateVideoInput {
   title: String
+  thumbnailUrl: String
   description: String
 }
 
