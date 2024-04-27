@@ -3556,6 +3556,11 @@ util-deprecate@^1.0.2:
   resolved "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
 
+video-snapshot@^1.0.11:
+  version "1.0.11"
+  resolved "https://registry.npmjs.org/video-snapshot/-/video-snapshot-1.0.11.tgz"
+  integrity sha512-YcMrOnfCTr+bB6Vb9j/VLorauGqBDuOiHEbYmDR9xshK5o8TrLRjZIWh1og3Z/luWnh0h31Acar6EOXOSwBGlQ==
+
 webidl-conversions@^3.0.0:
   version "3.0.1"
   resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz"

@@ -14,6 +14,7 @@ export function getCookie(name: string) {
 
 export interface VideoInput {
   title: string;
+  thumbnailUrl: string;
   description: string;
   fileExtension: string;
 }
@@ -35,10 +36,11 @@ async function createVideo(videoInput: VideoInput): Promise<any> {
     });
 
     const mutation = gql`
-      mutation CreateVideo($title: String!, $description: String!, $fileExtension: String!) {
+      mutation CreateVideo($title: String!,$thumbnailUrl: String!, $description: String!, $fileExtension: String!) {
         createVideo(
           input: {
             title: $title
+            thumbnailUrl: $thumbnailUrl
             description: $description
             fileExtension: $fileExtension
           }
@@ -47,6 +49,7 @@ async function createVideo(videoInput: VideoInput): Promise<any> {
           video {
             _id
             title
+            thumbnailUrl
             userId
             source
           }
@@ -57,6 +60,7 @@ async function createVideo(videoInput: VideoInput): Promise<any> {
     const variables = {
       title: videoInput.title,
       description: videoInput.description,
+      thumbnailUrl: videoInput.thumbnailUrl,
       fileExtension: videoInput.fileExtension,
     };
 

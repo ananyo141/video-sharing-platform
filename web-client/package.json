@@ -26,7 +26,8 @@
     "react-player": "^2.15.1",
     "react-toastify": "^10.0.5",
     "sharp": "^0.33.2",
-    "url-join": "^5.0.0"
+    "url-join": "^5.0.0",
+    "video-snapshot": "^1.0.11"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

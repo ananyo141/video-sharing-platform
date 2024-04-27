@@ -1,8 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
+import VideoSnapshot from "video-snapshot";
+import Image from "next/image";
 import RatLoader from "../loader/RatLoader";
 import createVideo, { VideoInput } from "@/network/createVideo";
 import uploadVideo from "@/network/uploadVideo";
 import { toast } from "react-toastify";
+import uploadImage from "@/network/uploadImage";
 import { LuUploadCloud } from "react-icons/lu";
 import ProgressBar from "../ProgressBar";
 
@@ -13,6 +16,8 @@ interface DropBoxProps {
 const DropBox = ({ closeModal }: DropBoxProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [videoTitle, setVideoTitle] = useState<string>("");
+  const [thumbnail, setThumbnail] = useState<string>("");
+  const [isDragging, setIsDragging] = useState(false);
   const [videoDescription, setVideoDescription] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
@@ -21,7 +26,16 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setIsDragging(false);
     handleFileDrop(e.dataTransfer.files);
+  };
+
+  const handleDragEnter = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleUpload = () => {
@@ -45,22 +59,44 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
     }
   };
 
-  const handleFileDrop = (files: FileList) => {
+  const handleFileDrop = async (files: FileList) => {
     const file = files[0];
-    setFileName(file.name);
+    await handleThumbnail(file);
+    setFileName(file.name + Date.now());
     uploadedFileRef.current = file;
     simulateUploadProgress();
     if (videoTitle === "" || videoDescription === "") return;
 
     handleVideoUpload(file);
+    const resImageUpload = handleUploadImage();
+    console.log("Response from upload image is -",resImageUpload)
+
   };
 
-  const handleVideoUpload = (file: File) => {
+  const handleUploadImage = async ()=>{
+    const response = await fetch(thumbnail);
+    const blob = await response.blob();
+
+    const thumbnailFile = new File([blob], fileName, { type: "image/png" });
+    const responseUploadImage = await uploadImage({ file: thumbnailFile });
+    console.log("Your File Name is ",fileName)
+    console.log("Response from upload image is -")
+    console.log(responseUploadImage);
+
+  }
+
+  const handleVideoUpload = async (file: File) => {
     const videoInput: VideoInput = {
       title: videoTitle,
+      thumbnailUrl: fileName,
       description: videoDescription,
       fileExtension: file.name.split(".").pop() || "",
     };
+
+    
+    const resImageUpload = handleUploadImage();
+    console.log("Response from upload image is -",resImageUpload)
+
 
     createVideo(videoInput)
       .then((data) => {
@@ -68,6 +104,8 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
 
         closeModal();
         uploadVideo(data, file);
+     
+        
         alert("Video uploaded successfully");
       })
       .catch((error) => {
@@ -91,15 +129,41 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
     }, 200);
   };
 
+  const handleThumbnail = async (file: File) => {
+    const videoSnapshot = new VideoSnapshot(file);
+    try {
+      const previewSrc = await videoSnapshot.takeSnapshot(2);
+      setThumbnail(previewSrc);
+
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
+    }
+  };
+
   useEffect(() => {
     if (error.length !== 0) toast(error);
   }, [error]);
 
+  useEffect(() => {
+
+
+  }, [thumbnail]);
+
   return (
-    <div className="flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow overflow-hidden">
+    <div className={`flex items-center justify-center p-4 `}>
+      {thumbnail != "" && (
+        <img src={thumbnail} alt="thumbnail" className="w-[200px] h-[300px]" />
+      )}
+      <div
+        className={`w-full max-w-4xl mx-auto  rounded-lg shadow overflow-hidden
+      `}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={handleDrop}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+      >
         <div className="px-6 py-8 sm:p-10 lg:p-12">
-          <div className="space-y-6">
+          <div className="space-y-2">
             <div>
               <label
                 htmlFor="video_title"
@@ -144,15 +208,13 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
             </div>
           </div>
         </div>
-        <div className="bg-gray-50 px-6 py-4 sm:px-10 lg:px-12">
+        <div className=" px-6  sm:px-10 lg:px-12">
           <div
             className={`border-2 border-dashed rounded-lg ${
               error && !fileName ? "border-red-500" : "border-gray-300"
             } hover:border-gray-400`}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
           >
-            <label className="flex justify-center items-center h-48 cursor-pointer">
+            <label className="flex justify-center items-center  cursor-pointer">
               <div className="text-center">
                 <LuUploadCloud size={24} className="mx-auto text-gray-400" />
                 <div className="flex flex-col items-center">
@@ -183,6 +245,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
           )}
         </div>
       </div>
+      
     </div>
   );
 };
