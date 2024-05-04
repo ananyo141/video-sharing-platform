@@ -1,6 +1,7 @@
 export default interface Video {
   _id: string;
   title: string;
+  thumbnailUrl: string;
   userId: number;
   likes: any[];
   comments: any[];

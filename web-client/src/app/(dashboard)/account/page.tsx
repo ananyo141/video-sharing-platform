@@ -11,6 +11,7 @@ import { useUser } from "@/provider/LayoutProvider";
 import getVideoByUser from "@/queries/getVideByUser.graphql";
 import Video from "@/interface/video.interface";
 import { gql, useQuery } from "@apollo/client";
+import CubesLoader from "@/components/loader/CubesLoader";
 
 interface Response {
   videos: Video[];
@@ -59,9 +60,12 @@ const Page = () => {
               <VideoComponent
                 title={item.title}
                 url={`watch/${item._id}`}
+                thumbnail={item.thumbnailUrl}
                 key={item._id}
               />
             ))}
+
+          {loading && <CubesLoader />}
         </div>
       </div>
     </>

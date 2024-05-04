@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import uploadImage from "@/network/uploadImage";
 import { LuUploadCloud } from "react-icons/lu";
 import ProgressBar from "../ProgressBar";
+import { normalizeFilename } from "@/utils/normalizeFilename";
 
 interface DropBoxProps {
   closeModal: () => void;
@@ -15,11 +16,13 @@ interface DropBoxProps {
 
 const DropBox = ({ closeModal }: DropBoxProps) => {
   const [fileName, setFileName] = useState<string>("");
+  const [loader, setLoader] = useState<boolean>(false);
   const [videoTitle, setVideoTitle] = useState<string>("");
   const [thumbnail, setThumbnail] = useState<string>("");
+  const [thumbnailName, setThumbnailName] = useState<string>("");
+
   const [isDragging, setIsDragging] = useState(false);
   const [videoDescription, setVideoDescription] = useState<string>("");
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
 
   const uploadedFileRef = useRef<File | null>(null);
@@ -48,6 +51,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
       return;
     }
 
+
     if (uploadedFileRef.current) {
       handleVideoUpload(uploadedFileRef.current);
     }
@@ -61,15 +65,12 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
 
   const handleFileDrop = async (files: FileList) => {
     const file = files[0];
+    setFileName(normalizeFilename(videoTitle + Date.now()));
+
     await handleThumbnail(file);
-    setFileName(file.name + Date.now());
     uploadedFileRef.current = file;
-    simulateUploadProgress();
     if (videoTitle === "" || videoDescription === "") return;
 
-    handleVideoUpload(file);
-    const resImageUpload = handleUploadImage();
-    console.log("Response from upload image is -",resImageUpload)
 
   };
 
@@ -77,57 +78,51 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
     const response = await fetch(thumbnail);
     const blob = await response.blob();
 
-    const thumbnailFile = new File([blob], fileName, { type: "image/png" });
-    const responseUploadImage = await uploadImage({ file: thumbnailFile });
-    console.log("Your File Name is ",fileName)
-    console.log("Response from upload image is -")
-    console.log(responseUploadImage);
+    const thumbnailFile = new File([blob], thumbnailName, { type: "image/png" });
+
+    uploadImage({ file: thumbnailFile })
+    .then((data)=>{
+      console.log("Response from upload image is -",data)
+    })
+    .catch((error)=>{
+      console.log("Error uploading image", error);
+    })
 
   }
 
   const handleVideoUpload = async (file: File) => {
     const videoInput: VideoInput = {
       title: videoTitle,
-      thumbnailUrl: fileName,
+      thumbnailUrl:  thumbnailName,
       description: videoDescription,
       fileExtension: file.name.split(".").pop() || "",
     };
 
     
     const resImageUpload = handleUploadImage();
-    console.log("Response from upload image is -",resImageUpload)
-
-
+    console.log("resImageUpload Response from upload image is -",resImageUpload)
+    setLoader(true);
     createVideo(videoInput)
       .then((data) => {
         console.log(data);
-
         closeModal();
         uploadVideo(data, file);
      
         
-        alert("Video uploaded successfully");
+        toast.success("Video uploaded successfully");
       })
       .catch((error) => {
+        setLoader(false);
         const errorMessage =
           error.response?.errors[0]?.message ||
           "File must be in avi, mov, mp4, mkv format";
         setError(errorMessage);
         console.log(errorMessage);
       });
+
   };
 
-  const simulateUploadProgress = () => {
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-
-      if (progress >= 100) {
-        clearInterval(interval);
-      }
-    }, 200);
-  };
+  
 
   const handleThumbnail = async (file: File) => {
     const videoSnapshot = new VideoSnapshot(file);
@@ -163,6 +158,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
         onDragLeave={handleDragLeave}
       >
         <div className="px-6 py-8 sm:p-10 lg:p-12">
+        {!loader && (
           <div className="space-y-2">
             <div>
               <label
@@ -177,7 +173,9 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
                 className={`p-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-tertiary focus:ring focus:ring-tertiary focus:ring-opacity-50
             ${error && videoTitle === "" ? "border-red-500" : ""}`}
                 placeholder="Enter video title"
-                onChange={(e) => setVideoTitle(e.target.value)}
+                onChange={(e) => {setVideoTitle(e.target.value)
+                  setThumbnailName(normalizeFilename(e.target.value + " " + Date.now() ));
+                }}
                 required
               />
             </div>
@@ -207,6 +205,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
               </button>
             </div>
           </div>
+        )}
         </div>
         <div className=" px-6  sm:px-10 lg:px-12">
           <div
@@ -223,7 +222,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
                       ? `Uploading ${fileName}...`
                       : "Drag and drop files here, or click to select files"}
                   </span>
-                  {uploadProgress > 0 && uploadProgress < 100 && (
+                  {loader == true && (
                     <div className="mt-2">
                       <RatLoader />
                     </div>
@@ -238,11 +237,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
               />
             </label>
           </div>
-          {uploadProgress > 0 && (
-            <div className="mt-4">
-              <ProgressBar percentage={uploadProgress} />
-            </div>
-          )}
+ 
         </div>
       </div>
       

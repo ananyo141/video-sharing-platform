@@ -36,16 +36,16 @@ export interface ImageInput {
         body: formData,
       });
   
-      if (!response.ok) {
-        throw new Error("Failed to upload image");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Failed to upload image");
+      // }
   
       console.log("Image uploaded successfully");
       console.log(response);
   
       return response.json();
     } catch (error) {
-      throw new Error("Error uploading image: " + error);
+        console.log("Error uploading image", error);
     }
   }
   
