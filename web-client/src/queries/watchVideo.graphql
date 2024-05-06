@@ -2,6 +2,7 @@ query GetVideo($id: ID!) {
   video(id: $id) {
     _id
     title
+    thumbnailUrl
     userId
     description
     likes

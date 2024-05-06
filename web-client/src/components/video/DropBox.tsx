@@ -93,7 +93,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
   const handleVideoUpload = async (file: File) => {
     const videoInput: VideoInput = {
       title: videoTitle,
-      thumbnailUrl:  thumbnailName,
+      thumbnailUrl:  `bucket/images/${thumbnailName}`,
       description: videoDescription,
       fileExtension: file.name.split(".").pop() || "",
     };

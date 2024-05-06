@@ -27,6 +27,7 @@ const Page = () => {
     `
   );
 
+
   useEffect(() => {
     console.log(data);
   }, [data]);
@@ -60,7 +61,7 @@ const Page = () => {
               <VideoComponent
                 title={item.title}
                 url={`watch/${item._id}`}
-                thumbnail={item.thumbnailUrl}
+                thumbnailURL={item.thumbnailUrl}
                 key={item._id}
               />
             ))}

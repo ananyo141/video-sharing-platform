@@ -22,7 +22,7 @@ const Page = () => {
               key={item._id}
               title={item.title}
               url={`watch/${item._id}`}
-              thumbnail={img_example}
+              thumbnailURL={item.thumbnailUrl}
             />
           ))}
       </div>

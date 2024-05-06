@@ -2,6 +2,7 @@ query {
   videos {
     _id
     title
+    thumbnailUrl
     description
     userId
     source

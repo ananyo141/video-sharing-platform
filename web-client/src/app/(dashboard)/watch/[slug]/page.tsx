@@ -19,6 +19,8 @@ export default function Page({ params }: { params: { slug: string } }) {
     { variables: { id: params.slug } }
   );
 
+
+
   return (
     <div className="h-full">
       <div className="grid md:grid-cols-[1fr_400px] overflow-hidden h-full">
@@ -34,7 +36,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                   height="500px"
                   playing={true}
                   playIcon={<Playbutton />}
-                  light={img_example.src}
+
+                  light={`${urlJoin(baseURL, data.video.thumbnailUrl)}`}
                   config={{ file: { 
                     attributes: {
                       controlsList: 'nodownload'
@@ -55,6 +58,8 @@ export default function Page({ params }: { params: { slug: string } }) {
                     </div>
                   </div>
                 </div>
+
+           
               </div>
             )}
           </div>

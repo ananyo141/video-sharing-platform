@@ -6,13 +6,13 @@ import Link from "next/link";
 import sample_thumbnail from "/public/assets/thumbnail.jpg";
 
 interface VideoComponentProps {
-  thumbnail: string
+  thumbnailURL: string
   title: string;
   url: string;
 }
 
 const VideoComponent: React.FC<VideoComponentProps> = ({
-  thumbnail,
+  thumbnailURL,
   title,
   url,
 }) => {
@@ -28,9 +28,16 @@ const VideoComponent: React.FC<VideoComponentProps> = ({
           <span className="absolute bottom-0 left-0 right-0 p-4 text-white text-shadow">
             {title}
           </span>
+             
         </div>
-        {thumbnail ? (
-          <Image alt={title} src={`${thumbnail}`} layout="fill" objectFit="cover" />
+
+        {thumbnailURL ? (
+          <Image alt={title} src={`https://videosite.ddns.net/${thumbnailURL}`}
+          layout="fill"
+          objectFit="cover"
+
+
+      />
         ) : (
           <div className="bg-gray-200 h-full w-full" />
         )}

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+
+    images: {
+        domains: ['videosite.ddns.net'], 
+    },
     webpack: (
         config,
         { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }

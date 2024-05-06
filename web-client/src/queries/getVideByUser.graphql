@@ -2,6 +2,7 @@ query ($userId: Int) {
   videos(userId: $userId) {
     _id
     title
+    thumbnailUrl
     description
     userId
     createdAt
