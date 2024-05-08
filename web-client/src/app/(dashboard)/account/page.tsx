@@ -66,7 +66,7 @@ const Page = () => {
               />
             ))}
 
-          {loading && <CubesLoader />}
+
         </div>
       </div>
     </>

@@ -1,9 +1,7 @@
 import React from "react";
-import { StaticImageData } from "next/image";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import sample_thumbnail from "/public/assets/thumbnail.jpg";
 
 interface VideoComponentProps {
   thumbnailURL: string
