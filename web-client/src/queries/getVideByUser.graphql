@@ -1,0 +1,23 @@
+query ($userId: Int) {
+  videos(userId: $userId) {
+    _id
+    title
+    thumbnailUrl
+    description
+    userId
+    createdAt
+    updatedAt
+    user {
+      email
+    }
+    likes
+    comments {
+      _id
+      text
+      user {
+        id
+        role_id
+      }
+    }
+  }
+}

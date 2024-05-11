@@ -1,0 +1,26 @@
+query {
+  videos {
+    _id
+    title
+    thumbnailUrl
+    description
+    userId
+    source
+    transcodedUrl
+    createdAt
+    updatedAt
+    user {
+      email
+    }
+    likes
+    comments {
+      _id
+      text
+      user {
+        id
+        email
+        role_id
+      }
+    }
+  }
+}

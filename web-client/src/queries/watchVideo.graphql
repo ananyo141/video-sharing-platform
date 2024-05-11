@@ -1,0 +1,17 @@
+query GetVideo($id: ID!) {
+  video(id: $id) {
+    _id
+    title
+    thumbnailUrl
+    userId
+    description
+    likes
+    source
+    transcodedUrl
+    comments {
+      _id
+      text
+      userId
+    }
+  }
+}
