@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const uploadVideo = (data:any, file: File) => {
+const uploadVideo = async (data:any, file: File) => {
     const serverURL = "https://videosite.ddns.net/bucket";
     const url = data.createVideo.presignedUrl;
 
