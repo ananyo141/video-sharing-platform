@@ -138,6 +138,7 @@ services:
     ports:
       - "8003:9001" # Web Interface
       - "9000:9000" # For s3 access
+      - "9001:9001" # For minio console
     networks:
       - video-sharing-platform
 
@@ -192,26 +193,26 @@ services:
       - video-sharing-platform
 
   # Web Client #
-  web-client:
-    develop:
-      watch:
-        - action: sync
-          path: ./web-client/src
-          target: /app/src
-          ignore:
-            - node_modules/
-            - .next/
-        - action: rebuild
-          path: package.json
-    build:
-      context: ./web-client
-      dockerfile: dev.dockerfile
-    depends_on:
-      - traefik
-    labels:
-      - "traefik.http.routers.web-client.rule=PathPrefix(`/`)"
-    networks:
-      - video-sharing-platform
+  # web-client:
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./web-client/src
+  #         target: /app/src
+  #         ignore:
+  #           - node_modules/
+  #           - .next/
+  #       - action: rebuild
+  #         path: package.json
+  #   build:
+  #     context: ./web-client
+  #     dockerfile: dev.dockerfile
+  #   depends_on:
+  #     - traefik
+  #   labels:
+  #     - "traefik.http.routers.web-client.rule=PathPrefix(`/`)"
+  #   networks:
+  #     - video-sharing-platform
   # --- END --- #
 
 networks:
