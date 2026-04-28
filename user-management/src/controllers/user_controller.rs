@@ -20,12 +20,17 @@ pub async fn get_users_by_ids(connection: Db, id: Vec<i32>) -> Result<Json<Value
     let user_ids = id;
 
     if user_ids.is_empty() {
-        return match User::find_all_with_roles(connection).await.map(Json) {
-            Ok(users) => Ok(
-                ResFmt::new(true, "Fetched users")
-                    .with_data(json!(users.into_inner()))
-                    .to_json(),
-            ),
+        return match User::find_all_with_roles(connection).await {
+            Ok(users) => {
+                let safe_users: Vec<UserView> =
+                    users.into_iter().map(UserView::from_user_with_role).collect();
+
+                Ok(
+                    ResFmt::new(true, "Fetched users")
+                        .with_data(json!(safe_users))
+                        .to_json(),
+                )
+            }
             Err(_) => Err(CustomError::not_found("No users found".to_string())),
         };
     }
@@ -47,10 +52,10 @@ pub async fn get_users_by_ids(connection: Db, id: Vec<i32>) -> Result<Json<Value
 
 #[get("/<id>")]
 pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Status> {
-    match User::find_by_id(connection, id).await.map(Json) {
+    match User::find_by_id(connection, id).await {
         Ok(user) => Ok(
             ResFmt::new(true, "user")
-                .with_data(json!(user.into_inner()))
+                .with_data(json!(UserView::from_user_with_role(user)))
                 .to_json(),
         ),
         Err(_) => Err(Status::NotFound),
@@ -62,7 +67,7 @@ pub async fn get_user_profile(connection: Db, auth: Claims) -> Result<Json<Value
     match User::find_by_id(connection, auth.user_id).await {
         Ok(user) => Ok(
             ResFmt::new(true, "User profile fetched")
-                .with_data(json!(user))
+                .with_data(json!(UserView::from_user_with_role(user)))
                 .to_json(),
         ),
         Err(err) => Err(CustomError::bad_request(
@@ -108,9 +113,8 @@ pub async fn update_user<'a>(
 #[delete("/profile")]
 pub async fn delete_user(connection: Db, auth: Claims) -> Result<Json<Value>, CustomError> {
     match User::delete(connection, auth.user_id).await {
-        Ok(user) => Ok(
+        Ok(_) => Ok(
             ResFmt::new(true, "User deleted")
-                .with_data(json!(user))
                 .to_json(),
         ),
         Err(err) => Err(CustomError::bad_request(

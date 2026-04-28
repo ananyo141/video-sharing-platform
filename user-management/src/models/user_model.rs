@@ -60,6 +60,16 @@ impl UserView {
             updated_at: user.updated_at,
         }
     }
+
+    pub fn from_user_with_role(user_with_role: UserWithRole) -> UserView {
+        UserView {
+            id: user_with_role.id,
+            email: user_with_role.email,
+            role_id: user_with_role.role.id,
+            created_at: user_with_role.created_at,
+            updated_at: user_with_role.updated_at,
+        }
+    }
 }
 
 impl User {
