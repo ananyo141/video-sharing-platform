@@ -1,13 +1,28 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import Cookies from "js-cookie";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 import urlJoin from "url-join";
 import { ToastContainer } from "react-toastify";
 import TopProgresBar from "@/components/loader/TopProgressBar";
 
-const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
+const resolveServerUrl = () => {
+  const configuredUrl = process.env.NEXT_PUBLIC_SERVER_URL?.trim();
+
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return "http://localhost:5000";
+  }
+
+  throw new Error("NEXT_PUBLIC_SERVER_URL must be set in non-development environments.");
+};
+
+const baseURL = resolveServerUrl();
 
 interface UserContextType {
   user: { email: string; token: string };
@@ -24,27 +39,37 @@ const UserContext = createContext<UserContextType>({
 const useUser = () => useContext(UserContext);
 
 const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
-  const client = new ApolloClient({
-    uri: urlJoin(baseURL, "/media/graphql"),
-    cache: new InMemoryCache(),
-    headers: {
-      authorization: `Bearer ${Cookies.get("jwt-token")}`,
-    },
-  });
+  const client = useMemo(() => {
+    const authLink = setContext((_, { headers }) => {
+      const token = Cookies.get("jwt-token");
+
+      return {
+        headers: {
+          ...headers,
+          ...(token ? { authorization: `Bearer ${token}` } : {}),
+        },
+      };
+    });
+
+    const httpLink = new HttpLink({
+      uri: urlJoin(baseURL, "/media/graphql"),
+    });
+
+    return new ApolloClient({
+      link: ApolloLink.from([authLink, httpLink]),
+      cache: new InMemoryCache(),
+    });
+  }, []);
 
   const [user, setUser] = useState<{ email: string; token: string }>({
     email: "",
     token: "",
   });
 
-  // useEffect(() => {
-  //   setUser({ ...user, token: Cookies.get("jwt-token") as string });
-  // }, [user]);
-
   return (
     <ApolloProvider client={client}>
       <UserContext.Provider value={{ user, setUser }}>
-        <TopProgresBar/>
+        <TopProgresBar />
         {children}
         <ToastContainer />
       </UserContext.Provider>

@@ -9,7 +9,21 @@ interface AuthResponse {
   message?: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL as string;
+const resolveServerUrl = () => {
+  const configuredUrl = process.env.NEXT_PUBLIC_SERVER_URL?.trim();
+
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return "http://localhost:5000";
+  }
+
+  throw new Error("NEXT_PUBLIC_SERVER_URL must be set in non-development environments.");
+};
+
+const baseUrl = resolveServerUrl();
 
 const useAuth = <T>() => {
   const [error, setError] = useState<string | null>(null);
@@ -18,12 +32,14 @@ const useAuth = <T>() => {
 
   const handleLogin = async (credentials: any): Promise<AuthResponse> => {
     const loginUrl = urlJoin(authUrl, "/login");
+
     try {
       const data: LoginRequest = await publicRequest(
         loginUrl,
         "POST",
         credentials
       );
+
       if (!data.success) {
         setError(data.message || "Login failed");
       } else {
@@ -31,6 +47,7 @@ const useAuth = <T>() => {
         Cookies.set("jwt-token", data.data.access_token);
         Cookies.set("email", credentials.email);
       }
+
       return data;
     } catch (error) {
       setError(String(error));
@@ -40,14 +57,16 @@ const useAuth = <T>() => {
 
   const handleRegister = async (credentials: T): Promise<AuthResponse> => {
     const registerUrl = urlJoin(authUrl, "/register");
+
     try {
       const data = await publicRequest(registerUrl, "POST", credentials);
+
       if (!data.success) {
         setError(data.message || "Registration failed");
         return { success: false };
       }
+
       setError(null);
-      
       return { success: true };
     } catch (error) {
       setError("An error occurred during registration");

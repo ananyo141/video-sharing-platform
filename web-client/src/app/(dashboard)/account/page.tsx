@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Profile from "@/components/Profile";
+import Button from "@/components/ui/Button";
 import VideoComponent from "@/components/VideoComponent";
 import DropBox from "@/components/video/DropBox";
 import ModalScreen from "@/components/ModalScreen";
@@ -42,19 +43,21 @@ const Page = () => {
         <DropBox closeModal={closeModal} />
       </ModalScreen>
       <div>
-        <Profile name={user.email} />
-        <div className="flex flex-row justify-between py-2">
-          <p className="font-semibold text-2xl">Your Videos</p>
-          <motion.button
-            className="bg-secondary hover:bg-secondary text-red font-bold py-2 px-4 rounded flex flex-row gap-1 items-center"
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setModal(true)}
-          >
-            <GoUpload />
-            Upload a Video
-          </motion.button>
+        <div className="flex items-center justify-between gap-4">
+          <Profile name={user.email} />
+          <div className="ml-auto">
+            <motion.div whileTap={{ scale: 0.95 }}>
+              <Button onClick={() => setModal(true)}>
+                <span className="mr-2"><GoUpload /></span>
+                Upload
+              </Button>
+            </motion.div>
+          </div>
         </div>
-        <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-2 mb-16">
+        <div className="flex items-center justify-between py-2">
+          <p className="font-semibold text-2xl">Your Videos</p>
+        </div>
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {!loading &&
             data &&
             data?.videos.map((item) => (

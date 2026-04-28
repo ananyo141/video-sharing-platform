@@ -216,12 +216,14 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
                 ${uploadedFileRef ? "mt-20" : ""}
               `}
           >
-            <button
-              onClick={handleUpload}
-              className="w-full sm:w-auto px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-tertiary hover:bg-secondary hover:text-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tertiary"
-            >
-              Upload
-            </button>
+            <div className="w-full sm:w-auto">
+              <button
+                onClick={handleUpload}
+                className="w-full px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-semibold shadow transition-shadow hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary focus-visible:ring-offset-2"
+              >
+                Upload
+              </button>
+            </div>
           </div>
         </div>
 
