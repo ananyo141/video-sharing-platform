@@ -149,18 +149,62 @@ services:
     depends_on:
       - video-bucket
     # FIXME (SECURITY!): `download` access allows listing of bucket contents
-    entrypoint: >
-      /bin/bash -c "
-      sleep 15;
-      /usr/bin/mc config host add miniobucket http://video-bucket:9000 minioadmin minioadmin;
-      /usr/bin/mc mb miniobucket/{images,misc,video-bucket,transcoded-bucket};
-      /usr/bin/mc anonymous set download miniobucket/images;
-      /usr/bin/mc anonymous set download miniobucket/misc;
-      /usr/bin/mc anonymous set download miniobucket/video-bucket;
-      /usr/bin/mc anonymous set download miniobucket/transcoded-bucket;
-      /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put;
-      exit 0;
-      "
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        MAX_RETRIES=30
+        RETRY_DELAY=2
+
+        echo "Waiting for MinIO to be ready..."
+        for i in $(seq 1 $$MAX_RETRIES); do
+          if /usr/bin/mc alias set miniobucket http://video-bucket:9000 minioadmin minioadmin 2>/dev/null; then
+            echo "MinIO is ready"
+            break
+          fi
+          if [ "$$i" -eq "$$MAX_RETRIES" ]; then
+            echo "MinIO did not become ready in time"
+            exit 1
+          fi
+          echo "Attempt $$i/$$MAX_RETRIES failed, retrying in $${RETRY_DELAY}s..."
+          sleep $$RETRY_DELAY
+        done
+
+        echo "Creating buckets..."
+        /usr/bin/mc mb miniobucket/images 2>/dev/null || true
+        /usr/bin/mc mb miniobucket/misc 2>/dev/null || true
+        /usr/bin/mc mb miniobucket/video-bucket 2>/dev/null || true
+        /usr/bin/mc mb miniobucket/transcoded-bucket 2>/dev/null || true
+
+        echo "Setting anonymous download access..."
+        /usr/bin/mc anonymous set download miniobucket/images
+        /usr/bin/mc anonymous set download miniobucket/misc
+        /usr/bin/mc anonymous set download miniobucket/video-bucket
+        /usr/bin/mc anonymous set download miniobucket/transcoded-bucket
+
+        echo "Configuring AMQP event notification..."
+        for i in $(seq 1 $$MAX_RETRIES); do
+          # Check if event already exists (idempotent)
+          EVENT_LIST=$(/usr/bin/mc event list miniobucket/video-bucket 2>/dev/null || true)
+          if [ -n "$$EVENT_LIST" ]; then
+            echo "AMQP event already configured"
+            break
+          fi
+          if /usr/bin/mc event add miniobucket/video-bucket arn:minio:sqs::PRIMARY:amqp --event put 2>/dev/null; then
+            echo "AMQP event configured successfully"
+            break
+          fi
+          if [ "$$i" -eq "$$MAX_RETRIES" ]; then
+            echo "Failed to configure AMQP event"
+            exit 1
+          fi
+          echo "AMQP config attempt $$i/$$MAX_RETRIES failed, retrying in $${RETRY_DELAY}s..."
+          sleep $$RETRY_DELAY
+        done
+
+        echo "Bucket initialization complete"
+        exit 0
     networks:
       - video-sharing-platform
   # --- END --- #

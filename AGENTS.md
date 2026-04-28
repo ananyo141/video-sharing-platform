@@ -89,8 +89,10 @@ docker exec -it video-sharing-platform-media-db-1 mongosh --eval "db.videos.find
 # Redis (Media Cache)
 docker exec -it video-sharing-platform-media-cache-1 redis-cli KEYS '*'
 
-# Redis (Video Processing)
-docker exec -it video-sharing-platform-video-redis-1 redis-cli LRANGE video-queue 0 -1
+# Redis (Video Processing — BullMQ keys)
+docker exec video-sharing-platform-video-redis-1 redis-cli KEYS 'bull:*'
+docker exec video-sharing-platform-video-redis-1 redis-cli HGETALL bull:video-queue:1
+docker exec video-sharing-platform-video-redis-1 redis-cli ZRANGE bull:video-queue:completed 0 -1 WITHSCORES
 ```
 
 ### Pattern 4: Traefik Dashboard Inspection
@@ -119,6 +121,8 @@ curl -s -u guest:guest http://localhost:8004/api/queues | jq '.[].name'
 curl -s -u guest:guest http://localhost:8004/api/queues/%2f/uploadlogs | jq '.messages_ready'
 ```
 
+**Note**: The `uploadlogs` queue is ephemeral — it is created by the video-service consumer when it starts and binds to the `uploadevents` exchange. If the video-service is not running, the queue may not exist and the API call above will return 404.
+
 ### Pattern 6: Object Storage (MinIO)
 
 ```bash
@@ -133,6 +137,33 @@ aws --endpoint-url http://localhost:9000 s3 ls s3://video-bucket/ --profile mini
 
 # Get presigned URL via API
 curl -s "http://localhost:8001/assets/presignedUrl?filename=test.mp4" | jq -r '.data.presignedUrl'
+```
+
+#### Important: Uploading with Presigned URLs
+
+The S3 service intentionally strips the host from presigned URLs (returns path + query only via `UrlManipulation.removehost()`). To upload:
+
+```bash
+# 1. Get the presigned URL path (e.g., /video-bucket/filename.mp4?X-Amz-...)
+PRESIGNED_PATH=$(curl -s "http://localhost:8001/assets/presignedUrl?filename=test.mp4" | jq -r '.data.presignedUrl')
+
+# 2. Upload to localhost:9000 but set Host header to match what MinIO signed for
+curl -X PUT "http://localhost:9000${PRESIGNED_PATH}" \
+  -T /path/to/file.mp4 \
+  -H "Content-Type: video/mp4" \
+  -H "Host: video-bucket:9000"
+```
+
+Without the correct `Host` header, MinIO returns `SignatureDoesNotMatch`.
+
+#### MinIO Event Notification
+
+The `bucket-initialize` container automatically configures MinIO AMQP events on first boot. Verify it worked:
+
+```bash
+docker exec video-sharing-platform-video-bucket-1 mc alias set local http://localhost:9000 minioadmin minioadmin
+docker exec video-sharing-platform-video-bucket-1 mc event list local/video-bucket
+# Expected: arn:minio:sqs::PRIMARY:amqp  s3:ObjectCreated:*  Filter:
 ```
 
 ## Authentication Workflow for Agents
@@ -212,10 +243,13 @@ RESPONSE=$(curl -s -X POST http://localhost:8001/media/graphql \
 PRESIGNED_URL=$(echo "$RESPONSE" | jq -r '.data.createVideo.presignedUrl')
 VIDEO_ID=$(echo "$RESPONSE" | jq -r '.data.createVideo.video._id')
 echo "Video ID: $VIDEO_ID"
-echo "Presigned URL: $PRESIGNED_URL"
+echo "Presigned URL path: $PRESIGNED_URL"
 
-# 3. Upload a test file (if you have a test.mp4 file)
-# curl -X PUT "$PRESIGNED_URL" -T test.mp4
+# 3. Upload a test file to MinIO (presigned URL is path-only; prepend localhost:9000)
+curl -X PUT "http://localhost:9000${PRESIGNED_URL}" \
+  -T /path/to/test.mp4 \
+  -H "Content-Type: video/mp4" \
+  -H "Host: video-bucket:9000"
 
 # 4. Verify video appears in list
 sleep 2
@@ -223,6 +257,10 @@ curl -s -X POST http://localhost:8001/media/graphql \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"query": "query { videos { _id title description } }"}' | jq .
+
+# 5. Verify processing pipeline fired
+docker compose logs video-service --tail=20 | grep "Received message"
+docker exec video-sharing-platform-video-redis-1 redis-cli KEYS 'bull:video-queue:*'
 ```
 
 ### Task: Run Database Migrations or Seeds
@@ -398,6 +436,8 @@ npm run build
 3. Include `Authorization: Bearer <token>` header
 4. Check that Traefik forward auth middleware is configured: `curl -s http://localhost:8002/api/http/middlewares`
 
+The forward auth middleware sends the request to `http://traefik/auth/verify_token`, which Traefik then routes to the user-management service. On success, it forwards `X-Auth-*` response headers to the media handler.
+
 ### MongoDB crashes (exit code 139 or 62)
 1. Ensure `mongo:7.0` is used, not `mongo:latest`
 2. Check for existing volume conflicts: `docker compose down -v` (⚠️ destroys data)
@@ -424,6 +464,27 @@ npm run build
 2. Verify `DOCKER_API_VERSION=1.40` is set in `compose.yml`
 3. Ensure Traefik image is `traefik:latest` or compatible version
 4. Check Docker socket mount: `/var/run/docker.sock:/var/run/docker.sock`
+
+### Docker Compose shows `version is obsolete` warning
+The `compose.yml` contains `version: "3"` which Docker Compose ignores with a warning. This is harmless but can be removed to eliminate noise.
+
+### Postman collection has wrong base URL
+`postman_collection.json` uses `localhost:8002` as the base URL. Update it to `localhost:8001` (the Traefik gateway port).
+
+### MinIO upload returns `SignatureDoesNotMatch`
+The S3 service strips the host from presigned URLs. When uploading, you must:
+1. Prepend `http://localhost:9000` to the presigned URL path
+2. Set `Host: video-bucket:9000` header to match what MinIO signed for
+
+See **Pattern 6: Object Storage** above for the exact curl command.
+
+### Video uploads do not trigger processing
+1. Check that MinIO AMQP events are configured: `docker exec video-sharing-platform-video-bucket-1 mc event list local/video-bucket`
+2. Check video-service logs for `Received message`
+3. Check Redis for BullMQ keys: `docker exec video-sharing-platform-video-redis-1 redis-cli KEYS 'bull:video-queue:*'`
+
+### Video processing worker gets 403 Forbidden
+The worker downloads from `http://video-bucket:9000/<key>` but MinIO buckets are private by default. When testing with a non-real video file, the worker may fail to open the file anyway (ffmpeg requires valid video data). Use a real small `.mp4` file for end-to-end transcoding tests.
 
 ## File Locations for Common Changes
 
