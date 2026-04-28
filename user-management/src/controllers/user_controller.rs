@@ -9,28 +9,38 @@ use crate::{
     errors::custom_error::{CustomError, ErrorDetails},
     models::{
         auth_model::Claims,
-        user_model::{UpdateUser, User},
+        user_model::{UpdateUser, User, UserView},
     },
     utils::res_fmt::ResFmt,
     Db,
 };
 
-// FIXME: Return UserVeiw instead of User, to hide hashed password
 #[get("/?<id>")]
 pub async fn get_users_by_ids(connection: Db, id: Vec<i32>) -> Result<Json<Value>, CustomError> {
     let user_ids = id;
+
     if user_ids.is_empty() {
         return match User::find_all_with_roles(connection).await.map(Json) {
-            Ok(users) => Ok(ResFmt::new(true, "Fetched users")
-                .with_data(json!(users.into_inner()))
-                .to_json()),
+            Ok(users) => Ok(
+                ResFmt::new(true, "Fetched users")
+                    .with_data(json!(users.into_inner()))
+                    .to_json(),
+            ),
             Err(_) => Err(CustomError::not_found("No users found".to_string())),
         };
     }
-    match User::find_by_ids(connection, user_ids).await.map(Json) {
-        Ok(users) => Ok(ResFmt::new(true, "Fetched user")
-            .with_data(json!(users.into_inner()))
-            .to_json()),
+
+    match User::find_by_ids(connection, user_ids).await {
+        Ok(users) => {
+            let safe_users: Vec<UserView> =
+                users.into_iter().map(UserView::from_user).collect();
+
+            Ok(
+                ResFmt::new(true, "Fetched user")
+                    .with_data(json!(safe_users))
+                    .to_json(),
+            )
+        }
         Err(_) => Err(CustomError::not_found("No users found".to_string())),
     }
 }
@@ -38,9 +48,11 @@ pub async fn get_users_by_ids(connection: Db, id: Vec<i32>) -> Result<Json<Value
 #[get("/<id>")]
 pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Status> {
     match User::find_by_id(connection, id).await.map(Json) {
-        Ok(user) => Ok(ResFmt::new(true, "user")
-            .with_data(json!(user.into_inner()))
-            .to_json()),
+        Ok(user) => Ok(
+            ResFmt::new(true, "user")
+                .with_data(json!(user.into_inner()))
+                .to_json(),
+        ),
         Err(_) => Err(Status::NotFound),
     }
 }
@@ -48,9 +60,11 @@ pub async fn get_user_by_id(connection: Db, id: i32) -> Result<Json<Value>, Stat
 #[get("/profile")]
 pub async fn get_user_profile(connection: Db, auth: Claims) -> Result<Json<Value>, CustomError> {
     match User::find_by_id(connection, auth.user_id).await {
-        Ok(user) => Ok(ResFmt::new(true, "User profile fetched")
-            .with_data(json!(user))
-            .to_json()),
+        Ok(user) => Ok(
+            ResFmt::new(true, "User profile fetched")
+                .with_data(json!(user))
+                .to_json(),
+        ),
         Err(err) => Err(CustomError::bad_request(
             String::from("Unable to find user"),
             Some(vec![ErrorDetails {
@@ -68,7 +82,6 @@ pub async fn update_user<'a>(
     auth: Claims,
     user: Result<Json<UpdateUser>, rocket::serde::json::Error<'a>>,
 ) -> Result<Json<Value>, CustomError> {
-    // validate user
     let validated_user = match user {
         Ok(user) => user,
         Err(err) => {
@@ -82,11 +95,12 @@ pub async fn update_user<'a>(
         }
     };
 
-    // update user in the database
     match User::update(connection, auth.user_id, validated_user.into_inner()).await {
-        Ok(user) => Ok(ResFmt::new(true, "User updated")
-            .with_data(json!(user))
-            .to_json()),
+        Ok(user) => Ok(
+            ResFmt::new(true, "User updated")
+                .with_data(json!(UserView::from_user(user)))
+                .to_json(),
+        ),
         Err(err) => Err(CustomError::bad_request(err.to_string(), None)),
     }
 }
@@ -94,9 +108,11 @@ pub async fn update_user<'a>(
 #[delete("/profile")]
 pub async fn delete_user(connection: Db, auth: Claims) -> Result<Json<Value>, CustomError> {
     match User::delete(connection, auth.user_id).await {
-        Ok(user) => Ok(ResFmt::new(true, "User deleted")
-            .with_data(json!(user))
-            .to_json()),
+        Ok(user) => Ok(
+            ResFmt::new(true, "User deleted")
+                .with_data(json!(user))
+                .to_json(),
+        ),
         Err(err) => Err(CustomError::bad_request(
             String::from("Unable to delete user"),
             Some(vec![ErrorDetails {
@@ -107,7 +123,6 @@ pub async fn delete_user(connection: Db, auth: Claims) -> Result<Json<Value>, Cu
     }
 }
 
-// export all the controllers
 pub fn user_routes() -> Vec<rocket::Route> {
     routes![
         get_user_by_id,
