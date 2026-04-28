@@ -10,7 +10,7 @@ const TopNavbar: React.FC = () => {
   const { push } = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -27,11 +27,12 @@ const TopNavbar: React.FC = () => {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    }
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = savedTheme === "dark" || (!savedTheme && prefersDark) ? "dark" : "light";
+
+    document.documentElement.classList.toggle("dark", initialTheme === "dark");
+    setTheme(initialTheme);
   }, []);
 
   const toggleTheme = () => {
@@ -48,7 +49,7 @@ const TopNavbar: React.FC = () => {
 
   return (
     <nav className="w-full bg-white dark:bg-bg-dark/80 dark:backdrop-blur-sm shadow-sm sticky top-0 z-30">
-      <div className="app-container flex items-center gap-6 h-16">
+      <div className="app-container flex items-center gap-4 sm:gap-6 h-16">
         <div className="flex items-center gap-3">
           <span className="font-extrabold text-xl text-primary">Vimero</span>
         </div>
@@ -58,10 +59,15 @@ const TopNavbar: React.FC = () => {
             <input
               value={searchValue}
               onChange={handleSearchChange}
-              className="w-full py-2 px-4 rounded-full border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 text-sm shadow-sm outline-none"
+              aria-label="Search videos and creators"
+              className="w-full py-2 px-4 rounded-full border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 text-sm shadow-sm outline-none focus:ring-2 focus:ring-accent/30"
               placeholder="Search videos, creators..."
             />
-            <button type="submit" className="absolute right-1 top-1.5 bg-accent text-white px-3 py-1.5 rounded-full text-sm shadow">
+            <button
+              type="submit"
+              aria-label="Submit search"
+              className="absolute right-1 top-1.5 bg-accent text-white px-3 py-1.5 rounded-full text-sm shadow hover:opacity-95"
+            >
               <IoIosSearch size={16} />
             </button>
           </div>
@@ -70,18 +76,21 @@ const TopNavbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             aria-label="upload"
+            type="button"
             onClick={() => push("/account?modal=true")}
-            className="p-2 rounded-full bg-secondary hover:scale-105 transition-transform"
+            className="p-2 rounded-full bg-secondary hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-accent/30"
           >
             <RiVideoAddLine size={22} />
           </button>
 
           <button
             aria-label="toggle-theme"
+            type="button"
             onClick={toggleTheme}
-            className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm"
+            aria-pressed={theme === "dark"}
+            className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
           >
-            {theme === "light" ? "Dark" : "Light"}
+            {theme === "light" ? "Dark mode" : "Light mode"}
           </button>
 
           <div className="relative" onBlur={toggleMenu}>
