@@ -56,8 +56,9 @@ const Page = () => {
               <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Welcome Back</h2>
               <p className="text-sm text-gray-500 mb-6">Sign in to your account to continue watching and uploading videos.</p>
 
-              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
+              <label htmlFor="login-email" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
               <input
+                id="login-email"
                 type="text"
                 placeholder="you@example.com"
                 className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
@@ -66,8 +67,9 @@ const Page = () => {
                 name="email"
               />
 
-              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
+              <label htmlFor="login-password" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
               <input
+                id="login-password"
                 type="password"
                 placeholder="Your password"
                 className="w-full p-3 mb-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"

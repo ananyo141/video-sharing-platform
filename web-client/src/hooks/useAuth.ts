@@ -9,9 +9,21 @@ interface AuthResponse {
   message?: string;
 }
 
-// Fallback added so hook works even if env variable is missing
-const baseUrl =
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+const resolveServerUrl = () => {
+  const configuredUrl = process.env.NEXT_PUBLIC_SERVER_URL?.trim();
+
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return "http://localhost:5000";
+  }
+
+  throw new Error("NEXT_PUBLIC_SERVER_URL must be set in non-development environments.");
+};
+
+const baseUrl = resolveServerUrl();
 
 const useAuth = <T>() => {
   const [error, setError] = useState<string | null>(null);

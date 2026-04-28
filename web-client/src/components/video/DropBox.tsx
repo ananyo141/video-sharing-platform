@@ -219,7 +219,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
             <div className="w-full sm:w-auto">
               <button
                 onClick={handleUpload}
-                className="w-full px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-semibold shadow"
+                className="w-full px-6 py-2 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-semibold shadow transition-shadow hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary focus-visible:ring-offset-2"
               >
                 Upload
               </button>

@@ -52,8 +52,9 @@ const RegisterPage = () => {
               <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Create an account</h2>
               <p className="text-sm text-gray-500 mb-6">Join Vimero and start sharing your videos with the world.</p>
 
-              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Username</label>
+              <label htmlFor="register-username" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Username</label>
               <input
+                id="register-username"
                 type="text"
                 placeholder="username"
                 className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
@@ -62,8 +63,9 @@ const RegisterPage = () => {
                 name="username"
               />
 
-              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
+              <label htmlFor="register-email" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
               <input
+                id="register-email"
                 type="text"
                 placeholder="you@example.com"
                 className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
@@ -72,8 +74,9 @@ const RegisterPage = () => {
                 name="email"
               />
 
-              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
+              <label htmlFor="register-password" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
               <input
+                id="register-password"
                 type="password"
                 placeholder="Choose a secure password"
                 className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"

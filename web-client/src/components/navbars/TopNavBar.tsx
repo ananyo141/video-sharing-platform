@@ -8,13 +8,8 @@ import { useRouter } from "next/navigation";
 
 const TopNavbar: React.FC = () => {
   const { push } = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [theme, setTheme] = useState<"light" | "dark">("light");
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -93,9 +88,7 @@ const TopNavbar: React.FC = () => {
             {theme === "light" ? "Dark mode" : "Light mode"}
           </button>
 
-          <div className="relative" onBlur={toggleMenu}>
-            <IconFallback onClick={() => push("/account")} size="sm" word="A" />
-          </div>
+          <IconFallback onClick={() => push("/account")} size="sm" word="A" />
         </div>
       </div>
     </nav>
