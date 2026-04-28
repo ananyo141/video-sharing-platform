@@ -45,52 +45,53 @@ const Page = () => {
 
   return (
     <>
-      <Illustration src={illustration1} className="right-5 bottom-32" />
-      <Illustration
-        src={illustration2}
-        className="top-12 right-[40%]"
-        size={400}
-      />
-      <Illustration src={illustration3} className="bottom-2 left-2" />
-      <Illustration src={illustration4} className="top-32 left-5" />
-      <main className="bg-background flex items-center justify-center h-screen">
-        <div className="bg-secondary flex flex-col item-center text-center p-10 px-24 rounded-lg w-[36rem] z-10 shadow">
-          <h2 className="text-tertiary text-2xl font-semibold p-5 select-none">
-            Welcome Back to Vimero
-          </h2>
-          <input
-            type="text"
-            placeholder="Enter Your Email"
-            className="input w-full p-2 px-4 mb-6 rounded-full border-0 outline-1 text-sm outline-tertiary"
-            value={value.email}
-            onChange={handleChange}
-            name="email"
-          />
-          <input
-            type="password"
-            placeholder="Enter Your Passwod"
-            className="input w-full p-2 px-4 mb-6 rounded-full text-sm outline-tertiary"
-            value={value.password}
-            onChange={handleChange}
-            name="password"
-          />
-          <span className="font-semibold text-red-600 text-sm">
-            {errorMessage}
-          </span>
-          <button
-            className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
-            onClick={handleOnLogin}
-          >
-            Login
-          </button>
-          <div className="p-2">
-            {"Don't Have an Account? "}
-            <Link
-              href={"/register"}
-              className="font-semibold text-tertiary hover:underline"
-            >
-              Register
-            </Link>
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary">
+        <div className="app-container flex items-center justify-center">
+          <div className="max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="hidden md:block">
+              <Illustration src={illustration1} className="" />
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
+              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Welcome Back</h2>
+              <p className="text-sm text-gray-500 mb-6">Sign in to your account to continue watching and uploading videos.</p>
+
+              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
+              <input
+                type="text"
+                placeholder="you@example.com"
+                className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
+                value={value.email}
+                onChange={handleChange}
+                name="email"
+              />
+
+              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
+              <input
+                type="password"
+                placeholder="Your password"
+                className="w-full p-3 mb-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
+                value={value.password}
+                onChange={handleChange}
+                name="password"
+              />
+
+              <div className="text-sm text-red-600 mb-4">{errorMessage}</div>
+
+              <button
+                className="w-full py-3 mb-3 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-semibold shadow"
+                onClick={handleOnLogin}
+              >
+                Sign in
+              </button>
+
+              <div className="text-center text-sm">
+                Don't have an account?{' '}
+                <Link href={'/register'} className="text-accent font-semibold">
+                  Create account
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </main>

@@ -9,7 +9,9 @@ interface AuthResponse {
   message?: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL as string;
+// Fallback added so hook works even if env variable is missing
+const baseUrl =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
 const useAuth = <T>() => {
   const [error, setError] = useState<string | null>(null);
@@ -18,12 +20,14 @@ const useAuth = <T>() => {
 
   const handleLogin = async (credentials: any): Promise<AuthResponse> => {
     const loginUrl = urlJoin(authUrl, "/login");
+
     try {
       const data: LoginRequest = await publicRequest(
         loginUrl,
         "POST",
         credentials
       );
+
       if (!data.success) {
         setError(data.message || "Login failed");
       } else {
@@ -31,6 +35,7 @@ const useAuth = <T>() => {
         Cookies.set("jwt-token", data.data.access_token);
         Cookies.set("email", credentials.email);
       }
+
       return data;
     } catch (error) {
       setError(String(error));
@@ -40,14 +45,16 @@ const useAuth = <T>() => {
 
   const handleRegister = async (credentials: T): Promise<AuthResponse> => {
     const registerUrl = urlJoin(authUrl, "/register");
+
     try {
       const data = await publicRequest(registerUrl, "POST", credentials);
+
       if (!data.success) {
         setError(data.message || "Registration failed");
         return { success: false };
       }
+
       setError(null);
-      
       return { success: true };
     } catch (error) {
       setError("An error occurred during registration");

@@ -13,8 +13,9 @@ type Response = {
 const Page = () => {
   const { data, loading, error } = useQuery<Response>(gql`${getVideoGQLQuery}`);
   return (
-    <div className="flex flex-col justify-center">
-      <div className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-16">
+    <div className="app-container py-6">
+      <h1 className="text-2xl font-semibold mb-4">Recommended</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {data &&
           data.videos &&
           data.videos.map((item) => (

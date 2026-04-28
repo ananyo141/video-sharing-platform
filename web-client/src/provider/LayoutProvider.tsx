@@ -1,13 +1,15 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import urlJoin from "url-join";
 import { ToastContainer } from "react-toastify";
 import TopProgresBar from "@/components/loader/TopProgressBar";
 
-const baseURL = process.env.NEXT_PUBLIC_SERVER_URL as string;
+// Fallback added so app doesn't crash if env variable is missing
+const baseURL =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
 
 interface UserContextType {
   user: { email: string; token: string };
@@ -28,7 +30,7 @@ const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
     uri: urlJoin(baseURL, "/media/graphql"),
     cache: new InMemoryCache(),
     headers: {
-      authorization: `Bearer ${Cookies.get("jwt-token")}`,
+      authorization: `Bearer ${Cookies.get("jwt-token") || ""}`,
     },
   });
 
@@ -37,14 +39,10 @@ const LayoutProvider = ({ children }: { children: React.ReactNode }) => {
     token: "",
   });
 
-  // useEffect(() => {
-  //   setUser({ ...user, token: Cookies.get("jwt-token") as string });
-  // }, [user]);
-
   return (
     <ApolloProvider client={client}>
       <UserContext.Provider value={{ user, setUser }}>
-        <TopProgresBar/>
+        <TopProgresBar />
         {children}
         <ToastContainer />
       </UserContext.Provider>

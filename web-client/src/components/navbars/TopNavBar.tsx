@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import IconFallback from "../IconFallback";
 import { IoIosSearch } from "react-icons/io";
 import { RiVideoAddLine } from "react-icons/ri";
@@ -10,6 +10,7 @@ const TopNavbar: React.FC = () => {
   const { push } = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [theme, setTheme] = useState("light");
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -25,36 +26,66 @@ const TopNavbar: React.FC = () => {
     // Add your search logic here
   };
 
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      setTheme("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (theme === "light") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setTheme("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setTheme("light");
+    }
+  };
+
   return (
-    <nav className="bg-secondary h-14 flex justify-between px-10 items-center">
-      <span className="font-semibold text-xl">Vimero</span>
-      <div className="flex">
-        <input
-          className="p-2 px-6 text-sm border border-tertiary rounded-full rounded-r-none bg-white outline-none min-w-full"
-          placeholder="Type Your Search..."
-        />
-        <button className="p-2 pr-4 border rounded-full rounded-l-none bg-tertiary border-tertiary text-sm text-white flex items-center justify-between gap-2">
-          <IoIosSearch size={16} />
-          Search
-        </button>
-      </div>
-      <div className="flex gap-4 items-center">
-        <div className="hover:bg-slate-400 p-2 rounded-full cursor-pointer">
-          <RiVideoAddLine size={25} onClick={() => push("/account?modal=true")} />
+    <nav className="w-full bg-white dark:bg-bg-dark/80 dark:backdrop-blur-sm shadow-sm sticky top-0 z-30">
+      <div className="app-container flex items-center gap-6 h-16">
+        <div className="flex items-center gap-3">
+          <span className="font-extrabold text-xl text-primary">Vimero</span>
         </div>
-        <div className="" onBlur={toggleMenu}>
-          <IconFallback onClick={() => push("/account")} size="sm" word="A" />
-          <div
-            className={`mt-2 bg-white rounded p-2 absolute right-0 z-10 ${
-              isMenuOpen ? "block" : "hidden"
-            }`}
+
+        <form onSubmit={handleSearchSubmit} className="flex flex-1 max-w-xl items-center gap-2">
+          <div className="relative w-full">
+            <input
+              value={searchValue}
+              onChange={handleSearchChange}
+              className="w-full py-2 px-4 rounded-full border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 text-sm shadow-sm outline-none"
+              placeholder="Search videos, creators..."
+            />
+            <button type="submit" className="absolute right-1 top-1.5 bg-accent text-white px-3 py-1.5 rounded-full text-sm shadow">
+              <IoIosSearch size={16} />
+            </button>
+          </div>
+        </form>
+
+        <div className="flex items-center gap-3">
+          <button
+            aria-label="upload"
+            onClick={() => push("/account?modal=true")}
+            className="p-2 rounded-full bg-secondary hover:scale-105 transition-transform"
           >
-            <div className="m-2 p-2 px-4 hover:bg-slate-200 select-none cursor-pointer rounded-lg">
-              Sign Out
-            </div>
-            <div className="m-2 p-2 px-4 hover:bg-slate-200 select-none cursor-pointer rounded-lg">
-              Sign Out
-            </div>
+            <RiVideoAddLine size={22} />
+          </button>
+
+          <button
+            aria-label="toggle-theme"
+            onClick={toggleTheme}
+            className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm"
+          >
+            {theme === "light" ? "Dark" : "Light"}
+          </button>
+
+          <div className="relative" onBlur={toggleMenu}>
+            <IconFallback onClick={() => push("/account")} size="sm" word="A" />
           </div>
         </div>
       </div>

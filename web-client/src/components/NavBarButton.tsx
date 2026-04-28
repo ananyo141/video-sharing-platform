@@ -8,15 +8,19 @@ interface Props {
   active: boolean
 }
 
-const NavBarButton = ({label, href, icon, active = false}: Props) => {
+const NavBarButton = ({ label, href, icon, active = false }: Props) => {
   const Icon = () => icon;
   return (
     <Link
-      className={`rounded p-2 px-4 bg-background bg-opacity-50 hover:bg-opacity-100 m-2 transition flex items-center gap-2 ${active ? "font-semibold" : "font-medium"}`}
       href={href}
+      className={`flex items-center gap-3 p-2 px-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${
+        active
+          ? "bg-gray-100 dark:bg-gray-800 font-semibold border-l-4 border-accent"
+          : "text-muted"
+      }`}
     >
-      <Icon />
-      <span className="lg:block md:hidden">{label}</span>
+      <div className="text-xl">{<Icon />}</div>
+      <span className="hidden lg:inline-block">{label}</span>
     </Link>
   );
 };

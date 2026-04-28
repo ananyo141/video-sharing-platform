@@ -17,28 +17,27 @@ const VideoComponent: React.FC<VideoComponentProps> = ({
   return (
     <Link href={url} passHref>
       <motion.a
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        className="block shadow-md rounded-md overflow-hidden transition-transform duration-200 ease-in-out"
-        style={{ position: "relative", width: "100%", height: "200px" }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="block rounded-lg overflow-hidden transition-transform duration-200 ease-in-out shadow-md bg-surface"
       >
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-transparent">
-          <span className="absolute bottom-0 left-0 right-0 p-4 text-white text-shadow">
-            {title}
-          </span>
-             
+        <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+          {thumbnailURL ? (
+            <Image
+              alt={title}
+              src={`https://videosite.ddns.net/${thumbnailURL}`}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-t-lg"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gray-200" />
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+            <span className="text-sm font-semibold text-white line-clamp-2">{title}</span>
+          </div>
         </div>
-
-        {thumbnailURL ? (
-          <Image alt={title} src={`https://videosite.ddns.net/${thumbnailURL}`}
-          layout="fill"
-          objectFit="cover"
-
-
-      />
-        ) : (
-          <div className="bg-gray-200 h-full w-full" />
-        )}
       </motion.a>
     </Link>
   );

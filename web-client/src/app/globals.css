@@ -2,4 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-html {overflow-y: hidden;}
+:root {
+	--transition-duration: 200ms;
+}
+
+html, body {
+	height: 100%;
+}
+
+body {
+	@apply antialiased text-gray-800 bg-background;
+	-webkit-font-smoothing: antialiased;
+	transition: background-color var(--transition-duration), color var(--transition-duration);
+	min-height: 100vh;
+}
+
+.dark body {
+	@apply bg-gray-900 text-gray-100;
+}
+
+/* Container helper */
+.app-container {
+	@apply max-w-screen-xl mx-auto px-4;
+}
+
+/* Smooth scrollbar */
+*:where(:not(textarea)):not(pre) {
+	-webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+	width: 10px;
+}
+::-webkit-scrollbar-thumb {
+	background: rgba(0,0,0,0.12);
+	border-radius: 9999px;
+}

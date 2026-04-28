@@ -41,54 +41,61 @@ const RegisterPage = () => {
       />
       <Illustration src={illustration3} className="top-2 right-5" />
 
-      <main className="bg-background flex items-center justify-center h-screen">
-        <div className="bg-secondary flex flex-col item-center text-center p-10 px-24 rounded-lg w-[36rem] z-10 shadow">
-          <h2 className="text-tertiary text-2xl font-semibold p-5 select-none">
-            Create an Account
-          </h2>
+      <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary">
+        <div className="app-container flex items-center justify-center">
+          <div className="max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="hidden md:block">
+              <Illustration src={illustration2} />
+            </div>
 
-          <input
-            type="password"
-            placeholder="Enter Username"
-            className="input w-full p-2 px-4 mb-6 rounded-full text-sm outline-tertiary"
-            value={value.username}
-            onChange={handleChange}
-            name="username"
-          />
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
+              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Create an account</h2>
+              <p className="text-sm text-gray-500 mb-6">Join Vimero and start sharing your videos with the world.</p>
 
-          <input
-            type="text"
-            placeholder="Enter Your Email"
-            className="input w-full p-2 px-4 mb-6 rounded-full border-0 outline-1 text-sm outline-tertiary"
-            value={value.email}
-            onChange={handleChange}
-            name="email"
-          />
+              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Username</label>
+              <input
+                type="text"
+                placeholder="username"
+                className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
+                value={value.username}
+                onChange={handleChange}
+                name="username"
+              />
 
-          <input
-            type="password"
-            placeholder="Enter Your Password"
-            className="input w-full p-2 px-4 mb-6 rounded-full text-sm"
-            value={value.password}
-            onChange={handleChange}
-            name="password"
-          />
+              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
+              <input
+                type="text"
+                placeholder="you@example.com"
+                className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
+                value={value.email}
+                onChange={handleChange}
+                name="email"
+              />
 
-          <button
-            className="text-white bg-tertiary rounded-full p-2 w-40 self-center hover:bg-background hover:text-tertiary transition active:scale-95"
-            onClick={handleOnRegister}
-          >
-            Register
-          </button>
+              <label className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
+              <input
+                type="password"
+                placeholder="Choose a secure password"
+                className="w-full p-3 mb-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent text-sm outline-none"
+                value={value.password}
+                onChange={handleChange}
+                name="password"
+              />
 
-          <div className="p-2">
-            {"Already have an account? "}
-            <Link
-              href={"/login"}
-              className="font-semibold text-tertiary hover:underline"
-            >
-              Login
-            </Link>
+              <button
+                className="w-full py-3 mb-3 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-semibold shadow"
+                onClick={handleOnRegister}
+              >
+                Create account
+              </button>
+
+              <div className="text-center text-sm">
+                Already have an account?{' '}
+                <Link href={'/login'} className="text-accent font-semibold">
+                  Sign in
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </main>
