@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
+    distDir: '.next-local',
     images: {
-        domains: ['videosite.ddns.net'], 
+        domains: ['videosite.ddns.net', 'localhost', '127.0.0.1'], 
     },
     webpack: (
         config,

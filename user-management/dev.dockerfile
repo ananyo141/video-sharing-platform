@@ -1,5 +1,5 @@
 # Use the official Rust image as a base image
-FROM rust:1.75
+FROM rust:1.86
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -10,7 +10,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 # Install rust dependencies
-RUN cargo install cargo-watch & \
+RUN cargo install cargo-watch --locked & \
   cargo install diesel_cli --no-default-features --features postgres & \
   wait
 

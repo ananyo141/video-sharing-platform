@@ -3,8 +3,10 @@ version: "3"
 services:
   # API Gateway #
   traefik:
-    image: traefik:v2.10
+    image: traefik:latest
     command: --api.insecure=true --providers.docker
+    environment:
+      - DOCKER_API_VERSION=1.40
     ports:
       - "8001:80"
       - "8002:8080"
@@ -78,7 +80,7 @@ services:
       - video-sharing-platform
 
   media-db:
-    image: mongo:latest
+    image: mongo:7.0
     networks:
       - video-sharing-platform
   # --- END --- #
