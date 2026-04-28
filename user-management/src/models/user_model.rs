@@ -136,9 +136,16 @@ impl User {
     }
 
     pub async fn update(conn: Db, user_id: i32, user: UpdateUser) -> QueryResult<User> {
+        let mut user_to_update = user;
+        // Hash password if provided (matches create() logic)
+        if let Some(password) = user_to_update.password.take() {
+            let hashed_password = hash_password(&password).unwrap();
+            user_to_update.password = Some(hashed_password);
+        }
+
         conn.run(move |c| {
             diesel::update(users::table.find(user_id))
-                .set(&user)
+                .set(&user_to_update)
                 .get_result(c)
         })
         .await
