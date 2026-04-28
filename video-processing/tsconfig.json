@@ -62,13 +62,13 @@
       ],
       "@entity/*": [
         "entities/*"
-      ],
+      ]
     }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.json",
-    ".env",
+    ".env"
   ],
   "exclude": [
     "node_modules",

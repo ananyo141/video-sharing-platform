@@ -12,9 +12,7 @@ const IconFallback = ({ word, size = "lg", onClick }: Props) => {
       } ${onClick ? "cursor-pointer" : ""}`}
     >
       <span
-        className={`text-secondary font-semibold ${
-          size == "lg" ? "text-5xl" : "text-lg"
-        }`}
+        className={`text-secondary font-semibold ${size == "lg" ? "text-5xl" : "text-lg"}`}
         onClick={onClick}
       >
         {word.at(0)?.toUpperCase()}

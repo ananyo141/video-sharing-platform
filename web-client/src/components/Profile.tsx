@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { StaticImageData } from "next/image";
 import React from "react";

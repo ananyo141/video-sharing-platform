@@ -101,7 +101,7 @@ services:
     build:
       context: ./video-processing
       dockerfile: bucket.dockerfile
-    command: server /data/ 
+    command: server /data/
       # --console-address :9001
     restart: unless-stopped
     environment:

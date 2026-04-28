@@ -13,7 +13,5 @@ export const errorHandler = (
   _next: NextFunction
 ) => {
   logger.error(`Error ${err.statusCode}: ${err.message}`);
-  return _res
-    .status(err.statusCode)
-    .json(httpResponse(false, err.message, err.errors));
+  return _res.status(err.statusCode).json(httpResponse(false, err.message, err.errors));
 };

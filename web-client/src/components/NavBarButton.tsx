@@ -5,7 +5,7 @@ interface Props {
   label: string;
   href: string;
   icon: ReactNode;
-  active: boolean
+  active: boolean;
 }
 
 const NavBarButton = ({ label, href, icon, active = false }: Props) => {

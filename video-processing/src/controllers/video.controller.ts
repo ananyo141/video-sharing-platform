@@ -6,26 +6,20 @@ import { MinioClient } from "@/lib/uploadBucket";
 import env from "@/environment";
 import { httpResponse } from "@/utils/httpResponse";
 
-export const getPresignedUrl = async (
-  _req: Request,
-  _res: Response,
-  _next: NextFunction,
-) => {
+export const getPresignedUrl = async (_req: Request, _res: Response, _next: NextFunction) => {
   try {
     const bucketName = env.MINIO_BUCKET; // Replace with your MinIO bucket name
     const filename = _req.query.filename;
     if (!filename || typeof filename !== "string") {
-      return _next(
-        new CustomError.BadRequestError("Filename string is required"),
-      );
+      return _next(new CustomError.BadRequestError("Filename string is required"));
     }
 
     const ext = path.extname(filename);
     if (![".mp4", ".mov", ".avi", ".mkv"].includes(ext)) {
       return _next(
         new CustomError.BadRequestError(
-          "Only video files with extensions .mp4, .mov, .avi, .mkv are allowed",
-        ),
+          "Only video files with extensions .mp4, .mov, .avi, .mkv are allowed"
+        )
       );
     }
     // add timestamp to filename before extension
@@ -42,15 +36,11 @@ export const getPresignedUrl = async (
     const presignedUrl = await MinioClient.presignedPutObject(
       bucketName,
       objectName,
-      expiryInSeconds,
+      expiryInSeconds
     );
 
     _res.json(httpResponse(true, "Presigned URL generated", { presignedUrl }));
   } catch (error: any) {
-    _next(
-      new CustomError.InternalServerError(
-        `Something went wrong ${error.message}`,
-      ),
-    );
+    _next(new CustomError.InternalServerError(`Something went wrong ${error.message}`));
   }
 };

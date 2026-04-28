@@ -17,7 +17,7 @@ const VideoWorker = new Worker(
       // transcode video
       const folderPath = await convertToHLS(fileUrl);
       // upload to minio
-      await uploadFolderBucket(folderPath, 'hls_encoded/' + path.basename(filename));
+      await uploadFolderBucket(folderPath, "hls_encoded/" + path.basename(filename));
       // delete muxed file
       fs.rm(folderPath, { recursive: true }, (err) => {
         if (err) console.error(err);
@@ -32,7 +32,7 @@ const VideoWorker = new Worker(
       port: parseInt(env.REDIS_PORT),
     },
     concurrency: 5,
-  },
+  }
 );
 
 export default VideoWorker;

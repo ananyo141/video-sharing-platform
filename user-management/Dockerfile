@@ -10,7 +10,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 # Install rust dependencies
-RUN cargo install diesel_cli --no-default-features --features postgres 
+RUN cargo install diesel_cli --no-default-features --features postgres
 
 COPY Cargo.toml Cargo.lock ./
 

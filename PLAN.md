@@ -71,7 +71,7 @@ Instead of using subdomains (media.localhost, user.localhost), traefik would mat
 
 /user/profile (CRUD)
 
-/user/token_verify → verify the identity of a user 
+/user/token_verify → verify the identity of a user
 
 /user/list → get basic details of a list of users send in request body (to be cached in media redis, required in getting list of users commented, liked, etc)
 

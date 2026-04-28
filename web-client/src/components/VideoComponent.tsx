@@ -4,16 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface VideoComponentProps {
-  thumbnailURL: string
+  thumbnailURL: string;
   title: string;
   url: string;
 }
 
-const VideoComponent: React.FC<VideoComponentProps> = ({
-  thumbnailURL,
-  title,
-  url,
-}) => {
+const VideoComponent: React.FC<VideoComponentProps> = ({ thumbnailURL, title, url }) => {
   return (
     <Link href={url} passHref>
       <motion.a

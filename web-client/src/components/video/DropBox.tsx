@@ -97,10 +97,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
     };
 
     const resImageUpload = handleUploadImage();
-    console.log(
-      "resImageUpload Response from upload image is -",
-      resImageUpload
-    );
+    console.log("resImageUpload Response from upload image is -", resImageUpload);
     setLoader(true);
     createVideo(videoInput)
       .then((data) => {
@@ -113,8 +110,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
       .catch((error) => {
         setLoader(false);
         const errorMessage =
-          error.response?.errors[0]?.message ||
-          "File must be in avi, mov, mp4, mkv format";
+          error.response?.errors[0]?.message || "File must be in avi, mov, mp4, mkv format";
         setError(errorMessage);
         console.log(errorMessage);
       });
@@ -148,7 +144,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
       >
         {isDragging && !fileName && (
           <div
-            className="flex justify-center items-center p-10 h-96 border-4 
+            className="flex justify-center items-center p-10 h-96 border-4
          border-purple-400 border-dotted backdrop-blur-md bg-purple-50"
           >
             <h2 className="text-3xl font-semibold">Drop video here</h2>
@@ -158,10 +154,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
           {!loader && !isDragging && !fileName && (
             <div className="space-y-2">
               <div>
-                <label
-                  htmlFor="video_title"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label htmlFor="video_title" className="block text-sm font-medium text-gray-700">
                   Video Title
                 </label>
                 <input
@@ -172,9 +165,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
                   placeholder="Enter video title"
                   onChange={(e) => {
                     setVideoTitle(e.target.value);
-                    setThumbnailName(
-                      normalizeFilename(e.target.value + " " + Date.now())
-                    );
+                    setThumbnailName(normalizeFilename(e.target.value + " " + Date.now()));
                   }}
                   required
                 />
@@ -206,9 +197,7 @@ const DropBox = ({ closeModal }: DropBoxProps) => {
                 alt="thumbnail"
                 className="w-[400px] h-[600px] rounded-lg object-center"
               />
-              <h3 className="text-2xl mt-4 font-medium text-center">
-                Video Thumbnail
-              </h3>
+              <h3 className="text-2xl mt-4 font-medium text-center">Video Thumbnail</h3>
             </div>
           )}
           <div

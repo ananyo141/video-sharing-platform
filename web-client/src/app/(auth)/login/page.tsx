@@ -53,10 +53,19 @@ const Page = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
-              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Welcome Back</h2>
-              <p className="text-sm text-gray-500 mb-6">Sign in to your account to continue watching and uploading videos.</p>
+              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+                Welcome Back
+              </h2>
+              <p className="text-sm text-gray-500 mb-6">
+                Sign in to your account to continue watching and uploading videos.
+              </p>
 
-              <label htmlFor="login-email" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
+              <label
+                htmlFor="login-email"
+                className="block text-sm mb-1 text-gray-600 dark:text-gray-300"
+              >
+                Email
+              </label>
               <input
                 id="login-email"
                 type="text"
@@ -67,7 +76,12 @@ const Page = () => {
                 name="email"
               />
 
-              <label htmlFor="login-password" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
+              <label
+                htmlFor="login-password"
+                className="block text-sm mb-1 text-gray-600 dark:text-gray-300"
+              >
+                Password
+              </label>
               <input
                 id="login-password"
                 type="password"
@@ -88,8 +102,8 @@ const Page = () => {
               </button>
 
               <div className="text-center text-sm">
-                Don&apos;t have an account?{' '}
-                <Link href={'/register'} className="text-accent font-semibold">
+                Don&apos;t have an account?{" "}
+                <Link href={"/register"} className="text-accent font-semibold">
                   Create account
                 </Link>
               </div>

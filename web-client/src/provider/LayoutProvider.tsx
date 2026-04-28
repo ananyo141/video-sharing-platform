@@ -26,9 +26,7 @@ const baseURL = resolveServerUrl();
 
 interface UserContextType {
   user: { email: string; token: string };
-  setUser: React.Dispatch<
-    React.SetStateAction<{ email: string; token: string }>
-  >;
+  setUser: React.Dispatch<React.SetStateAction<{ email: string; token: string }>>;
 }
 
 const UserContext = createContext<UserContextType>({

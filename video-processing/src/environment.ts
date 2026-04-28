@@ -3,9 +3,7 @@ import fs from "fs";
 
 import logger from "@utils/logger";
 
-const envPath = process.env.NODE_ENV
-  ? `.env.${process.env.NODE_ENV.toLowerCase()}`
-  : ".env";
+const envPath = process.env.NODE_ENV ? `.env.${process.env.NODE_ENV.toLowerCase()}` : ".env";
 
 if (!fs.existsSync(envPath)) {
   logger.warn(process.env.NODE_ENV);
@@ -48,7 +46,7 @@ const env: EnvType = {
 
 if (Object.values(env).includes(undefined)) {
   logger.error(
-    `Some environment variables are missing, given env: ${JSON.stringify(env, null, 2)}`,
+    `Some environment variables are missing, given env: ${JSON.stringify(env, null, 2)}`
   );
   process.exit(1);
 }

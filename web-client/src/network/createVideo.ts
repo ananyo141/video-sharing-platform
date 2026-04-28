@@ -31,12 +31,17 @@ async function createVideo(videoInput: VideoInput): Promise<any> {
 
     const client = new GraphQLClient("https://videosite.ddns.net/media/graphql", {
       headers: {
-        Authorization: `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
       },
     });
 
     const mutation = gql`
-      mutation CreateVideo($title: String!,$thumbnailUrl: String!, $description: String!, $fileExtension: String!) {
+      mutation CreateVideo(
+        $title: String!
+        $thumbnailUrl: String!
+        $description: String!
+        $fileExtension: String!
+      ) {
         createVideo(
           input: {
             title: $title

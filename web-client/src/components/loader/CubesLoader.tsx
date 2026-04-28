@@ -10,9 +10,7 @@ const CubesLoader = () => {
       <div className="item cubes"></div>
       <div className="item cubes"></div>
       <div className="item cubes"></div>
-      <span className="text-2xl font-semibold shadow-md text-purple-800">
-        Loading
-      </span>
+      <span className="text-2xl font-semibold shadow-md text-purple-800">Loading</span>
     </div>
   );
 };

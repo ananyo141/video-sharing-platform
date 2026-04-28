@@ -7,7 +7,7 @@ const publicRequest = async (
   url: string,
   method: string = "GET",
   body?: any,
-  headers: Headers = {} 
+  headers: Headers = {}
 ) => {
   const config: AxiosRequestConfig = {
     method,

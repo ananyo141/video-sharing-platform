@@ -7,5 +7,5 @@ export default interface LoginRequest extends Response {
 }
 
 interface Data {
-    access_token: string
+  access_token: string;
 }

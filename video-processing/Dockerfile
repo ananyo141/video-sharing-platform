@@ -25,4 +25,3 @@ RUN yarn build
 
 # Define the command to run the application
 CMD [ "yarn", "start" ]
-

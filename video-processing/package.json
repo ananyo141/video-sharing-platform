@@ -38,6 +38,7 @@
     "cross-env": "^7.0.3",
     "esbuild": "^0.20.0",
     "nodemon": "^3.0.3",
+    "prettier": "^3.8.3",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",

@@ -34,11 +34,7 @@ const useAuth = <T>() => {
     const loginUrl = urlJoin(authUrl, "/login");
 
     try {
-      const data: LoginRequest = await publicRequest(
-        loginUrl,
-        "POST",
-        credentials
-      );
+      const data: LoginRequest = await publicRequest(loginUrl, "POST", credentials);
 
       if (!data.success) {
         setError(data.message || "Login failed");

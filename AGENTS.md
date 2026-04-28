@@ -532,6 +532,76 @@ docker cp ./local-file <container>:/path/to/file
 docker exec -it video-sharing-platform-user-management-1 ping media-db
 ```
 
+## Pre-Commit Hooks
+
+The repository uses [`pre-commit`](https://pre-commit.com/) to run linters, formatters, and security scanners on every commit. Hooks are configured centrally in `.pre-commit-config.yaml` but target each microservice with its own toolchain.
+
+### Why One Config for All Services
+
+This is a **polyglot monorepo**. Each microservice uses a different language and toolchain:
+
+| Service | Formatter | Linter | Security |
+|---------|-----------|--------|----------|
+| user-management (Rust) | `rustfmt` | `cargo clippy` (CI) | — |
+| media-handler (Go) | `gofmt` | `go vet` (CI) | — |
+| video-processing (TS) | `prettier` | `eslint` | `gitleaks` |
+| web-client (TS/Next) | `prettier` | `eslint` | `gitleaks` |
+| s3-service (Java) | `spotless` | `spotless:check` | — |
+| All | — | — | `semgrep` (manual) |
+
+A single `.pre-commit-config.yaml` at the root orchestrates everything. Hooks use `files:` filters so only the relevant service's tools run when you change files in that service.
+
+### Setup
+
+```bash
+# Install pre-commit framework
+pipx install pre-commit
+
+# Install git hooks
+pre-commit install
+
+# Run against all files (one-time baseline check)
+pre-commit run --all-files
+```
+
+### Running Hooks
+
+```bash
+# Run automatically on git commit
+git commit -m "your message"
+
+# Run manually on all files
+pre-commit run --all-files
+
+# Run manually on staged files only
+pre-commit run
+
+# Run a specific hook
+pre-commit run rustfmt --all-files
+pre-commit run eslint --all-files
+
+# Run security scan manually (semgrep is configured as manual-only)
+pre-commit run semgrep --all-files --hook-stage manual
+```
+
+### Per-Service Tooling Prerequisites
+
+- **Rust**: `cargo` (installed with Rust toolchain)
+- **Go**: `go` (installed with Go toolchain)
+- **Node.js**: `npm` — run `npm install` in `web-client/` and `video-processing/`
+- **Java**: `mvn` or `./mvnw` + JDK 17+ — required for `spotless:check`
+- **Docker**: Docker daemon — required for `hadolint-docker`
+
+### Skipping Hooks (Emergency Only)
+
+```bash
+# Skip all pre-commit hooks for one commit
+git commit -m "hotfix" --no-verify
+
+# Skip a specific hook
+SKIP=rustfmt git commit -m "wip"
+```
+
 ## Agent Safety Rules
 
 1. **Always verify before destructive operations**: Use `docker compose down -v` only when explicitly instructed — it destroys all persistent data

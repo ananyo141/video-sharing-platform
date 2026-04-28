@@ -1,8 +1,8 @@
 use std::error::Error;
 
-use rocket::Response;
 use rocket::request::Request;
 use rocket::response::{self, Responder};
+use rocket::Response;
 
 use rocket::{
     http::Status,
@@ -97,8 +97,7 @@ pub async fn verify_token_handler(
             id: user.id.to_string(),
             email: user.email.to_string(),
             role: user.role.name.to_string(),
-            body: ResFmt::new(true, "User profile fetched")
-                .with_data(json!(user)),
+            body: ResFmt::new(true, "User profile fetched").with_data(json!(user)),
         }),
         Err(err) => Err(CustomError::bad_request(
             String::from("Unable to find user"),

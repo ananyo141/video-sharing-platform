@@ -26,19 +26,15 @@ const RegisterPage = () => {
   };
 
   const handleOnRegister = async () => {
-    console.log(value)
-    const data = await handleRegister(value)
-    console.log(data)
+    console.log(value);
+    const data = await handleRegister(value);
+    console.log(data);
   };
 
   return (
     <>
       <Illustration src={illustration1} className="top-5 left-32" />
-      <Illustration
-        src={illustration2}
-        className="bottom-12 left-[20%]"
-        size={500}
-      />
+      <Illustration src={illustration2} className="bottom-12 left-[20%]" size={500} />
       <Illustration src={illustration3} className="top-2 right-5" />
 
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary">
@@ -49,10 +45,19 @@ const RegisterPage = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl">
-              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">Create an account</h2>
-              <p className="text-sm text-gray-500 mb-6">Join Vimero and start sharing your videos with the world.</p>
+              <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+                Create an account
+              </h2>
+              <p className="text-sm text-gray-500 mb-6">
+                Join Vimero and start sharing your videos with the world.
+              </p>
 
-              <label htmlFor="register-username" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Username</label>
+              <label
+                htmlFor="register-username"
+                className="block text-sm mb-1 text-gray-600 dark:text-gray-300"
+              >
+                Username
+              </label>
               <input
                 id="register-username"
                 type="text"
@@ -63,7 +68,12 @@ const RegisterPage = () => {
                 name="username"
               />
 
-              <label htmlFor="register-email" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Email</label>
+              <label
+                htmlFor="register-email"
+                className="block text-sm mb-1 text-gray-600 dark:text-gray-300"
+              >
+                Email
+              </label>
               <input
                 id="register-email"
                 type="text"
@@ -74,7 +84,12 @@ const RegisterPage = () => {
                 name="email"
               />
 
-              <label htmlFor="register-password" className="block text-sm mb-1 text-gray-600 dark:text-gray-300">Password</label>
+              <label
+                htmlFor="register-password"
+                className="block text-sm mb-1 text-gray-600 dark:text-gray-300"
+              >
+                Password
+              </label>
               <input
                 id="register-password"
                 type="password"
@@ -93,8 +108,8 @@ const RegisterPage = () => {
               </button>
 
               <div className="text-center text-sm">
-                Already have an account?{' '}
-                <Link href={'/login'} className="text-accent font-semibold">
+                Already have an account?{" "}
+                <Link href={"/login"} className="text-accent font-semibold">
                   Sign in
                 </Link>
               </div>

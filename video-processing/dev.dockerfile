@@ -23,4 +23,3 @@ EXPOSE 8003
 
 # Define the command to run the application
 CMD [ "yarn", "start:dev" ]
-

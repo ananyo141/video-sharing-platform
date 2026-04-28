@@ -4,14 +4,16 @@ import VideoComponent from "@/components/VideoComponent";
 import img_example from "/public/assets/thumbnail.jpg";
 import Video from "@/interface/video.interface";
 import { useQuery, gql } from "@apollo/client";
-import getVideoGQLQuery from "@/queries/getVideByUser.graphql"
+import getVideoGQLQuery from "@/queries/getVideByUser.graphql";
 
 type Response = {
   videos: Video[];
 };
 
 const Page = () => {
-  const { data, loading, error } = useQuery<Response>(gql`${getVideoGQLQuery}`);
+  const { data, loading, error } = useQuery<Response>(gql`
+    ${getVideoGQLQuery}
+  `);
   return (
     <div className="app-container py-6">
       <h1 className="text-2xl font-semibold mb-4">Recommended</h1>

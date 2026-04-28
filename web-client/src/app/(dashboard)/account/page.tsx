@@ -22,12 +22,9 @@ const Page = () => {
   const { user } = useUser();
   const [modal, setModal] = useState(false);
 
-  const { data, loading, error } = useQuery<Response>(
-    gql`
-      ${getVideoByUser}
-    `
-  );
-
+  const { data, loading, error } = useQuery<Response>(gql`
+    ${getVideoByUser}
+  `);
 
   useEffect(() => {
     console.log(data);
@@ -48,7 +45,9 @@ const Page = () => {
           <div className="ml-auto">
             <motion.div whileTap={{ scale: 0.95 }}>
               <Button onClick={() => setModal(true)}>
-                <span className="mr-2"><GoUpload /></span>
+                <span className="mr-2">
+                  <GoUpload />
+                </span>
                 Upload
               </Button>
             </motion.div>
@@ -68,8 +67,6 @@ const Page = () => {
                 key={item._id}
               />
             ))}
-
-
         </div>
       </div>
     </>

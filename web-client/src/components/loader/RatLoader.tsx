@@ -1,9 +1,13 @@
-import React from 'react';
-import './RatLoader.css'; 
+import React from "react";
+import "./RatLoader.css";
 
 const RatLoader: React.FC = () => {
   return (
-    <div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
+    <div
+      aria-label="Orange and tan hamster running in a metal wheel"
+      role="img"
+      className="wheel-and-hamster"
+    >
       <div className="wheel"></div>
       <div className="hamster">
         <div className="hamster__body">
@@ -22,6 +26,6 @@ const RatLoader: React.FC = () => {
       <div className="spoke"></div>
     </div>
   );
-}
+};
 
 export default RatLoader;

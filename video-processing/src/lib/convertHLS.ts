@@ -20,7 +20,7 @@ export default async function convertToHLS(inputPath: string): Promise<string> {
       channel.publish(
         exchangeName,
         filebasename, // routing key
-        Buffer.from(JSON.stringify(message)),
+        Buffer.from(JSON.stringify(message))
       );
       logger.info(`Progress update sent: ${progress}%`);
     } catch (err) {

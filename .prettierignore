@@ -1,0 +1,27 @@
+# Build outputs
+.next/
+.next-local/
+build/
+dist/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.generated.ts
+*.generated.js
+graph/generated.go
+
+# Lockfiles (keep these formatted by their own tools)
+Cargo.lock
+yarn.lock
+package-lock.json
+bun.lockb
+
+# MinIO / runtime data
+uploads/
+
+# IDE
+.vscode/
+.idea/

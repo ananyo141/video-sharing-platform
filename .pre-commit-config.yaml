@@ -1,0 +1,105 @@
+default_install_hook_types: [pre-commit]
+
+repos:
+  # General file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        exclude: tsconfig.*\.json$
+      - id: check-toml
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+  # Secret scanning
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.23.1
+    hooks:
+      - id: gitleaks
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.1-beta
+    hooks:
+      - id: hadolint-docker
+        files: (Dockerfile|\.dockerfile)$
+        args: ['--failure-threshold=error']
+
+  # Rust — user-management
+  - repo: local
+    hooks:
+      - id: rustfmt
+        name: rustfmt (user-management)
+        entry: bash -c 'cd user-management && cargo fmt -- --check'
+        language: system
+        types: [rust]
+        files: ^user-management/
+        pass_filenames: false
+
+  # Go — media-handler
+  - repo: local
+    hooks:
+      - id: gofmt
+        name: gofmt (media-handler)
+        entry: bash -c 'cd media-handler && test -z "$(gofmt -l .)"'
+        language: system
+        types: [go]
+        files: ^media-handler/
+        pass_filenames: false
+      # Note: go vet is run in CI due to dependency compatibility issues with golang.org/x/tools
+
+  # Node.js — web-client
+  - repo: local
+    hooks:
+      - id: web-client-lint
+        name: eslint (web-client)
+        entry: bash -c 'cd web-client && npm run lint'
+        language: system
+        files: ^web-client/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+      - id: web-client-prettier
+        name: prettier (web-client)
+        entry: bash -c 'cd web-client && npx prettier --check --ignore-unknown .'
+        language: system
+        files: ^web-client/
+        pass_filenames: false
+
+  # Node.js — video-processing
+  - repo: local
+    hooks:
+      - id: video-processing-lint
+        name: eslint (video-processing)
+        entry: bash -c 'cd video-processing && npm run lint'
+        language: system
+        files: ^video-processing/.*\.(ts|js)$
+        pass_filenames: false
+      - id: video-processing-prettier
+        name: prettier (video-processing)
+        entry: bash -c 'cd video-processing && npx prettier --check --ignore-unknown src/'
+        language: system
+        files: ^video-processing/
+        pass_filenames: false
+
+  # Java — s3-service
+  - repo: local
+    hooks:
+      - id: java-spotless
+        name: spotless check (s3-service)
+        entry: bash -c 'cd s3-service && mvn spotless:check'
+        language: system
+        files: ^s3-service/.*\.java$
+        pass_filenames: false
+
+  # Semgrep — security scanning (manual stage only; too slow for every commit)
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.104.0
+    hooks:
+      - id: semgrep
+        args: ['--config=auto', '--error', '--skip-unknown-extensions']
+        stages: [manual]

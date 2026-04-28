@@ -47,8 +47,8 @@ const createBucket = (bucketName: string) => {
       ],
     };
 
-    MinioClient.setBucketPolicy(bucketName, JSON.stringify(policy)).catch(
-      (err) => logger.error(err.message || err),
+    MinioClient.setBucketPolicy(bucketName, JSON.stringify(policy)).catch((err) =>
+      logger.error(err.message || err)
     );
   });
 };
@@ -62,7 +62,7 @@ export const initBucket = () => {
 export async function uploadFolderBucket(
   localFolderPath: string,
   remoteFolderPath: string,
-  bucketName: string = env.MINIO_PROCESSED_BUCKET,
+  bucketName: string = env.MINIO_PROCESSED_BUCKET
 ): Promise<void> {
   // Get a list of files in the local folder
   const files = await readdirAsync(localFolderPath);
@@ -89,7 +89,7 @@ export async function uploadFolderBucket(
 export async function uploadToBucket(
   objectName: string,
   filePath: string,
-  bucketName: string = env.MINIO_PROCESSED_BUCKET,
+  bucketName: string = env.MINIO_PROCESSED_BUCKET
 ): Promise<{
   objectName: string;
   filePath: string;
@@ -106,7 +106,7 @@ export async function uploadToBucket(
         details: {
           etag: string;
           versionId: string;
-        },
+        }
       ) => {
         if (err) {
           logger.error(`Error uploading file: ${err}`);
@@ -119,10 +119,10 @@ export async function uploadToBucket(
               objectName,
               filePath,
               etag: details.etag,
-            }),
+            })
           );
         }
-      },
+      }
     );
   });
 }

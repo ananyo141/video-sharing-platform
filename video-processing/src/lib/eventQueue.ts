@@ -4,9 +4,7 @@ import jobQueue from "./jobQueue";
 
 export async function connectToRabbitMQ() {
   try {
-    const connection = await amqp.connect(
-      "amqp://guest:guest@events-queue:5672",
-    );
+    const connection = await amqp.connect("amqp://guest:guest@events-queue:5672");
     const channel = await connection.createChannel();
 
     process.once("SIGINT", async () => {
@@ -24,7 +22,7 @@ export async function connectToRabbitMQ() {
 export async function listenQueue(
   queueName: string,
   exchangeName: string,
-  routingKey: string,
+  routingKey: string
 ): Promise<void> {
   try {
     const { connection, channel } = await connectToRabbitMQ();
@@ -40,13 +38,9 @@ export async function listenQueue(
       durable: true,
     });
 
-    await channel.bindQueue(
-      assertQueueResponse.queue,
-      exchangeName,
-      routingKey,
-    );
+    await channel.bindQueue(assertQueueResponse.queue, exchangeName, routingKey);
     console.log(
-      `Waiting for messages from exchange: ${exchangeName} with routing key: ${routingKey}`,
+      `Waiting for messages from exchange: ${exchangeName} with routing key: ${routingKey}`
     );
 
     channel.consume(
@@ -58,7 +52,7 @@ export async function listenQueue(
           console.log(`Received message: ${message}`);
         }
       },
-      { noAck: true },
+      { noAck: true }
     ); // Set noAck to false if you want to manually acknowledge messages
 
     console.log(" [*] Waiting for messages. To exit press CTRL+C");
