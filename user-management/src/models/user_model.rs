@@ -60,6 +60,16 @@ impl UserView {
             updated_at: user.updated_at,
         }
     }
+
+    pub fn from_user_with_role(user_with_role: UserWithRole) -> UserView {
+        UserView {
+            id: user_with_role.id,
+            email: user_with_role.email,
+            role_id: user_with_role.role.id,
+            created_at: user_with_role.created_at,
+            updated_at: user_with_role.updated_at,
+        }
+    }
 }
 
 impl User {
@@ -136,9 +146,16 @@ impl User {
     }
 
     pub async fn update(conn: Db, user_id: i32, user: UpdateUser) -> QueryResult<User> {
+        let mut user_to_update = user;
+        // Hash password if provided (matches create() logic)
+        if let Some(password) = user_to_update.password.take() {
+            let hashed_password = hash_password(&password).unwrap();
+            user_to_update.password = Some(hashed_password);
+        }
+
         conn.run(move |c| {
             diesel::update(users::table.find(user_id))
-                .set(&user)
+                .set(&user_to_update)
                 .get_result(c)
         })
         .await
